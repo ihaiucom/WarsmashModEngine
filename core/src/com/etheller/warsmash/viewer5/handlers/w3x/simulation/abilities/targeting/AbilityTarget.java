@@ -5,5 +5,6 @@ public interface AbilityTarget {
 
 	float getY();
 
+	// 访问获得有效目标
 	<T> T visit(AbilityTargetVisitor<T> visitor);
 }

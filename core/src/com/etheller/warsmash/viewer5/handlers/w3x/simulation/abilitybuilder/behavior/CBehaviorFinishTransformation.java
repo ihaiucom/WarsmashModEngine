@@ -13,7 +13,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilitybuilder.hand
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilitybuilder.handler.TransformationHandler.OnTransformationActions;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.CBehavior;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.CBehaviorVisitor;
-
+// CBehaviorFinishTransformation类实现了CBehavior接口，处理单位的变形行为
 public class CBehaviorFinishTransformation implements CBehavior {
 	private Map<String, Object> localStore;
 	private OnTransformationActions actions;
@@ -43,6 +43,7 @@ public class CBehaviorFinishTransformation implements CBehavior {
 
 	private int castStartTick = 0;
 
+	// 构造函数用于初始化变形行为的各项属性
 	public CBehaviorFinishTransformation(Map<String, Object> localStore, final CUnit unit,
 			AbilityBuilderActiveAbility ability, CUnitType newType, OnTransformationActions actions,
 			boolean addAlternateTagAfter, final int visibleOrderId, boolean permanent, float duration,
@@ -82,6 +83,7 @@ public class CBehaviorFinishTransformation implements CBehavior {
 		}
 	}
 
+	// 更新方法用于在每个游戏循环中处理变形的状态
 	@Override
 	public CBehavior update(CSimulation game) {
 		if (this.castStartTick == 0) {
@@ -113,27 +115,33 @@ public class CBehaviorFinishTransformation implements CBehavior {
 		return this;
 	}
 
+	// 开始变形行为的方法
 	@Override
 	public void begin(CSimulation game) {
 	}
 
+	// 结束变形行为的方法，处理被中断的情况
 	@Override
 	public void end(CSimulation game, boolean interrupted) {
 	}
 
+	// 获取高亮显示的订单ID
 	@Override
 	public int getHighlightOrderId() {
 		return visibleOrderId;
 	}
 
+	// 判断该行为是否可以被打断
 	@Override
 	public boolean interruptable() {
 		return false;
 	}
 
+	// 访问者模式，用于访问该行为的相关操作
 	@Override
 	public <T> T visit(final CBehaviorVisitor<T> visitor) {
 		return visitor.accept(this);
 	}
 
 }
+

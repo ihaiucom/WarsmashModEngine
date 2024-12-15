@@ -1,9 +1,10 @@
 package com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.attacks.listeners;
 
+// 伤害修改器结果
 public class CUnitAttackDamageTakenModificationListenerDamageModResult {
-	private float baseDamage;
-	private float bonusDamage;
-	private float damageMultiplier;
+	private float baseDamage; // 基本伤害
+	private float bonusDamage; // 额外伤害
+	private float damageMultiplier; // 伤害倍率
 	
 	public CUnitAttackDamageTakenModificationListenerDamageModResult(float baseDamage, float bonusDamage) {
 		this.baseDamage = baseDamage;
@@ -44,6 +45,7 @@ public class CUnitAttackDamageTakenModificationListenerDamageModResult {
 		this.damageMultiplier *= damageMultiplier;
 	}
 
+	// 计算最终伤害
 	public float computeFinalDamage() {
 		return (baseDamage * damageMultiplier) + bonusDamage;
 	}

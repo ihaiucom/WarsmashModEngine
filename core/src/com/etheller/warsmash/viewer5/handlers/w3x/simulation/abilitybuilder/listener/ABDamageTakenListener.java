@@ -10,6 +10,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilitybuilder.core
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.attacks.listeners.CUnitAttackDamageTakenListener;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CDamageType;
 
+// jass onDamage 的动作监听 伤害处理 回调
 public class ABDamageTakenListener implements CUnitAttackDamageTakenListener {
 
 	private Map<String, Object> localStore;

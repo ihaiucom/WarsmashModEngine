@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+// 指令 ID 和 指令 字段名称 字典映射
 public class OrderIdUtils {
 	private static Map<Integer, String> orderIdToString = new HashMap<>();
 	private static Map<String, Integer> stringToOrderId = new HashMap<>();

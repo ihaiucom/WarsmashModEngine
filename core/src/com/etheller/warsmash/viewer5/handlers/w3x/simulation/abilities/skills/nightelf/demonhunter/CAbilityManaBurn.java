@@ -78,16 +78,23 @@ public class CAbilityManaBurn extends CAbilityTargetSpellBase {
 		}
 		return false;
 	}
-
+	// CEffectManaBurnBolt类实现了CEffect接口，用于处理魔法燃烧效果的逻辑
 	private static final class CEffectManaBurnBolt implements CEffect {
 
+		// 闪电效果的结束时间
 		private final int boltLifetimeEndTick;
+		// 最大可消耗的法力值
 		private final float maxManaDrained;
+		// 施法者单位
 		private final CUnit caster;
+		// 目标单位
 		private final CUnit targetUnit;
+		// 闪电效果的渲染组件
 		private final SimulationRenderComponentLightning boltFx;
+		// 闪电效果的延迟结束时间
 		private int boltDelayEndTick;
 
+		// 构造函数，初始化闪电效果的相关参数
 		public CEffectManaBurnBolt(final int boltLifetimeEndTick, final int boltDelayEndTick,
 				final float maxManaDrained, final CUnit caster, final CUnit targetUnit,
 				final SimulationRenderComponentLightning boltFx) {
@@ -99,15 +106,23 @@ public class CAbilityManaBurn extends CAbilityTargetSpellBase {
 			this.boltFx = boltFx;
 		}
 
+		// 更新方法，处理闪电效果的逻辑
 		@Override
 		public boolean update(final CSimulation game) {
+			// 获取当前游戏帧
 			final int gameTurnTick = game.getGameTurnTick();
+			// 游戏帧过了延时帧
 			if (gameTurnTick >= boltDelayEndTick) {
+				// 目标魔法值
 				final float targetMana = targetUnit.getMana();
+				// 可吸收最大魔法值
 				final float manaDamage = StrictMath.min(targetMana, this.maxManaDrained);
+				// 减少目标的魔法值
 				targetUnit.setMana(targetMana - manaDamage);
+				// 目标伤害处理，伤害值为魔法值，伤害类型为 火焰灼烧
 				targetUnit.damage(game, caster, false, true, CAttackType.SPELLS, CDamageType.FIRE,
 						CWeaponSoundTypeJass.WHOKNOWS.name(), manaDamage);
+				// 显示飘字
 				game.spawnTextTag(targetUnit, caster.getPlayerIndex(), TextTagConfigType.MANA_BURN, (int) manaDamage);
 				this.boltDelayEndTick = Integer.MAX_VALUE;
 			}
@@ -118,4 +133,5 @@ public class CAbilityManaBurn extends CAbilityTargetSpellBase {
 			return done;
 		}
 	}
+
 }

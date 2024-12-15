@@ -26,12 +26,13 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.players.CPlayer;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.timers.CTimer;
 
 public class TransformationHandler {
-
+	// 设置单位ID的方法
 	public static void setUnitID(CSimulation game, Map<String, Object> localStore, CUnit unit, CUnitType newType,
 			boolean addAlternateTagAfter, OnTransformationActions actions, CAbility ability) {
 		setUnitID(game, localStore, unit, newType, addAlternateTagAfter, actions, ability, false);
 	}
 
+	// 设置单位ID的重载方法
 	public static void setUnitID(CSimulation game, Map<String, Object> localStore, CUnit unit, CUnitType newType,
 			boolean addAlternateTagAfter, OnTransformationActions actions, CAbility ability, boolean updateArt) {
 		CPlayer pl = game.getPlayer(unit.getPlayerIndex());
@@ -67,6 +68,7 @@ public class TransformationHandler {
 		}
 	}
 
+	// 播放形态变化动画的方法
 	public static void playMorphAnimation(CUnit unit, boolean addAlternateTagAfter) {
 		if (addAlternateTagAfter) {
 			unit.getUnitAnimationListener().removeSecondaryTagForFutureAnimations(SecondaryTag.ALTERNATE);
@@ -84,6 +86,7 @@ public class TransformationHandler {
 		}
 	}
 
+	// 设置标签的方法
 	public static void setTags(CUnit unit, boolean addAlternateTagAfter) {
 		if (addAlternateTagAfter) {
 			unit.getUnitAnimationListener().addSecondaryTagForFutureAnimations(SecondaryTag.ALTERNATE);
@@ -94,6 +97,7 @@ public class TransformationHandler {
 				addAlternateTagAfter ? EnumSet.of(SecondaryTag.ALTERNATE) : SequenceUtils.EMPTY, 1.0f, true);
 	}
 
+	// 开始起飞的方法
 	public static void beginTakingOff(CSimulation game, Map<String, Object> localStore, CUnit unit, CUnitType newType,
 			OnTransformationActions actions, CAbility ability, boolean addAlternateTagAfter, boolean immediateTakeoff,
 			float altitudeAdjustmentDelay, float altitudeAdjustmentDuration) {
@@ -116,6 +120,7 @@ public class TransformationHandler {
 		}
 	}
 
+	// 开始着陆的方法
 	public static void beginLanding(CSimulation game, Map<String, Object> localStore, CUnit unit, CUnitType newType, boolean addAlternateTagAfter,
 			boolean immediateLanding, float landingDelay, float altitudeAdjustmentDuration) {
 		unit.setFacing(225);
@@ -135,6 +140,7 @@ public class TransformationHandler {
 		localStore.put(ABLocalStoreKeys.ACTIVE_ALTITUDE_ADJUSTMENT, timer);
 	}
 
+	// 开始慢速变形的函数
 	public static void startSlowTransformation(CSimulation game, Map<String, Object> localStore, CUnit unit,
 			CUnitType newType, OnTransformationActions actions, CAbility ability, boolean addAlternateTagAfter,
 			boolean takingOff, boolean landing, boolean immediateTakeoff, boolean immediateLanding,
@@ -161,6 +167,7 @@ public class TransformationHandler {
 		}
 	}
 
+	// 完成慢速变形的函数
 	public static void finishSlowTransformation(CSimulation game, Map<String, Object> localStore, CUnit unit,
 			CUnitType newType, OnTransformationActions actions, AbilityBuilderAbility ability,
 			boolean addAlternateTagAfter, boolean permanent, boolean takingOff) {
@@ -172,6 +179,7 @@ public class TransformationHandler {
 		}
 	}
 
+	// 进行瞬时变形的函数
 	public static void instantTransformation(CSimulation game, Map<String, Object> localStore, CUnit unit,
 			CUnitType newType, OnTransformationActions actions, AbilityBuilderAbility ability,
 			boolean addAlternateTagAfter, boolean permanent, boolean playMorph) {
@@ -184,6 +192,7 @@ public class TransformationHandler {
 		}
 	}
 
+	// 创建慢速变形恢复buff的函数
 	public static void createSlowTransformBackBuff(CSimulation game, Map<String, Object> localStore, CUnit unit,
 			CUnitType newType, OnTransformationActions actions, AbilityBuilderActiveAbility ability, War3ID buffId,
 			boolean addAlternateTagAfter, float transformationTime, float duration, boolean permanent,
@@ -198,6 +207,7 @@ public class TransformationHandler {
 		}
 	}
 
+	// 创建瞬时变形恢复buff的函数
 	public static void createInstantTransformBackBuff(CSimulation game, Map<String, Object> localStore, CUnit unit,
 			CUnitType newType, OnTransformationActions actions, AbilityBuilderAbility ability, War3ID buffId,
 			boolean addAlternateTagAfter, float transformationTime, float duration, boolean permanent) {
@@ -210,17 +220,20 @@ public class TransformationHandler {
 		}
 	}
 
+	// 处理变换动作的类
 	public static class OnTransformationActions {
-		private int goldCost;
-		private int lumberCost;
-		private Integer foodCost;
-		private List<ABAction> onTransformActions;
-		private List<ABAction> onUntransformActions;
+		private int goldCost; // 黄金成本
+		private int lumberCost; // 木材成本
+		private Integer foodCost; // 食物成本
+		private List<ABAction> onTransformActions; // 变换时的动作列表
+		private List<ABAction> onUntransformActions; // 反变换时的动作列表
 
+		// 构造函数：初始化反变换动作列表
 		public OnTransformationActions(List<ABAction> onUntransformActions) {
 			this.onUntransformActions = onUntransformActions;
 		}
 
+		// 构造函数：初始化所有成本和两个动作列表
 		public OnTransformationActions(int goldCost, int lumberCost, Integer foodCost,
 				List<ABAction> onTransformActions, List<ABAction> onUntransformActions) {
 			this.goldCost = goldCost;
@@ -230,13 +243,16 @@ public class TransformationHandler {
 			this.onUntransformActions = onUntransformActions;
 		}
 
+		// 创建反变换动作列表的方法
 		public OnTransformationActions createUntransformActions() {
 			return new OnTransformationActions(-goldCost, -lumberCost, foodCost != null ? -foodCost : null, null, onUntransformActions);
 		}
 
+		// 设置反变换动作列表的方法
 		public void setOnUntransformActions(List<ABAction> onUntransformActions) {
 			this.onUntransformActions = onUntransformActions;
 		}
 	}
+
 
 }

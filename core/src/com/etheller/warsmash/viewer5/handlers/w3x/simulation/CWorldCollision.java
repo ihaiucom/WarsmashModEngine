@@ -137,6 +137,7 @@ public class CWorldCollision {
 		unit.setCollisionRectangle(null);
 	}
 
+	// 查找在指定范围内的所有单位
 	public void enumUnitsInRect(final Rectangle rect, final CUnitEnumFunction callback) {
 		// NOTE: allocation here seems quite wasteful, but when it was a recycled
 		// value there were times this function looped units in rect, killed a few,
@@ -172,6 +173,7 @@ public class CWorldCollision {
 		});
 	}
 
+	// 查找在指定范围内的所有单位
 	public void enumUnitsInRange(final float x, final float y, final float radius, final CUnitEnumFunction callback) {
 		enumUnitsInRect(new Rectangle(x - radius, y - radius, radius * 2, radius * 2), (enumUnit) -> {
 			if (enumUnit.canReach(x, y, radius)) {

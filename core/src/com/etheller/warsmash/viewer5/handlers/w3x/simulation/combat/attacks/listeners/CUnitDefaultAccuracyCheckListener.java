@@ -9,6 +9,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.CAttackType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.CWeaponType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CDamageType;
 
+// 丢失检查
 public class CUnitDefaultAccuracyCheckListener implements CUnitAttackPreDamageListener{
 	
 	public CUnitDefaultAccuracyCheckListener() {
@@ -20,6 +21,7 @@ public class CUnitDefaultAccuracyCheckListener implements CUnitAttackPreDamageLi
 			CUnitAttackPreDamageListenerDamageModResult damageResult) {
 		boolean miss = false;
 		if (target instanceof CUnit) {
+			// 攻击者在攻击目标的下方
 			if (simulation.getTerrainHeight(attacker.getX(), attacker.getY()) < simulation.getTerrainHeight(target.getX(), target.getY())) {
 				Random random = simulation.getSeededRandom();
 				if (random.nextFloat(1f) < simulation.getGameplayConstants().getChanceToMiss()) {

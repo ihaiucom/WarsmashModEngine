@@ -125,30 +125,35 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.SimulationRend
 public class CUnit extends CWidget {
 	private static RegionCheckerImpl regionCheckerImpl = new RegionCheckerImpl();
 
-	private War3ID typeId;
-	private float facing; // degrees
-	private float mana;
-	private int baseMaximumLife;
-	private int maximumLife;
-	private float lifeRegen;
-	private float lifeRegenStrengthBonus;
-	private float lifeRegenBonus;
-	private float manaRegen;
-	private float manaRegenIntelligenceBonus;
-	private float manaRegenBonus;
-	private int baseMaximumMana;
-	private int maximumMana;
-	private int speed;
-	private int agilityDefensePermanentBonus;
-	private float agilityDefenseTemporaryBonus;
-	private int permanentDefenseBonus;
-	private float temporaryDefenseBonus;
-	private float totalTemporaryDefenseBonus;
+	private War3ID typeId; // 单位的类型标识符（ID
+	private float facing; // degrees 单位的朝向，单位的朝向以角度表示（0° 到 360°）
+	private float mana; // 当前的魔法值
+	private int baseMaximumLife; // 单位的基础生命值上限
+	private int maximumLife; // 单位的当前生命值上限
+	private float lifeRegen; // 单位的生命恢复速率
+	private float lifeRegenStrengthBonus; // 单位的力量属性等因素造成的生命恢复加成。
+	private float lifeRegenBonus; // 单位的生命恢复加成。
+	private float manaRegen; // 单位的魔法恢复速率
+	private float manaRegenIntelligenceBonus; // 单位的智力属性等因素造成的魔法恢复加成。
+	private float manaRegenBonus; // 单位的魔法恢复加成。
+	private int baseMaximumMana; // 单位的基础魔法值上限
+	private int maximumMana; // 单位的当前魔法值上限
+	private int speed; // 单位的速度
+	private int agilityDefensePermanentBonus; // 单位的永久敏捷属性加成
+	private float agilityDefenseTemporaryBonus; // 单位的临时敏捷属性加成
+	private int permanentDefenseBonus; // 单位的永久防御属性加成
+	private float temporaryDefenseBonus; // 单位的临时防御属性加成
 
-	private int speedBonus;
 
+	private float totalTemporaryDefenseBonus; // 单位的总临时防御属性加成
+
+	private int speedBonus; // 单位的速度加成
+
+	// 反伤
 	private CUnitDefaultThornsListener flatThornsListener = null;
+	// 反伤 %
 	private CUnitDefaultThornsListener percentThornsListener = null;
+	// 生命偷取
 	private CUnitDefaultLifestealListener lifestealListener = null;
 
 	private final List<StateModBuff> stateModBuffs = new ArrayList<>();
@@ -163,6 +168,7 @@ public class CUnit extends CWidget {
 	private float currentManaRegenPerTick;
 	private CDefenseType defenseType;
 
+	// 普攻冷却时间
 	private int cooldownEndTime = 0;
 	private float flyHeight;
 	private int playerIndex;
@@ -170,7 +176,9 @@ public class CUnit extends CWidget {
 	private final List<CAbility> abilities = new ArrayList<>();
 	private final List<CAbility> disabledAbilities = new ArrayList<>();
 
+	// 当前正在执行的行为
 	private CBehavior currentBehavior;
+	// 等待执行的指令队列
 	private final Queue<COrder> orderQueue = new LinkedList<>();
 	private CUnitType unitType;
 
@@ -180,11 +188,11 @@ public class CUnit extends CWidget {
 	private final EnumSet<CUnitClassification> classifications = EnumSet.noneOf(CUnitClassification.class);
 
 	private int deathTurnTick;
-	private boolean raisable;
-	private boolean decays;
-	private boolean corpse;
-	private boolean boneCorpse;
-	private boolean falseDeath;
+	private boolean raisable; // 可穿戴
+	private boolean decays; // 衰减 腐烂
+	private boolean corpse; // 尸体
+	private boolean boneCorpse; // 骨骸
+	private boolean falseDeath; // 虚假死亡
 
 	private transient CUnitAnimationListener unitAnimationListener;
 
@@ -193,19 +201,20 @@ public class CUnit extends CWidget {
 	// which fields shouldn't be persisted if we do game state save later
 	private transient CUnitStateNotifier stateNotifier = new CUnitStateNotifier();
 	private transient List<StateListenerUpdate> stateListenersUpdates = new ArrayList<>();
+	// 采集范围
 	private float acquisitionRange;
 	private transient static AutoAttackTargetFinderEnum autoAttackTargetFinderEnum = new AutoAttackTargetFinderEnum();
 	private transient static AutocastTargetFinderEnum autocastTargetFinderEnum = new AutocastTargetFinderEnum();
 	private transient CAutocastAbility autocastAbility = null;
 
-	private transient CBehaviorMove moveBehavior;
-	private transient CBehaviorAttack attackBehavior;
-	private transient CBehaviorAttackMove attackMoveBehavior;
-	private transient CBehaviorFollow followBehavior;
-	private transient CBehaviorPatrol patrolBehavior;
-	private transient CBehaviorStop stopBehavior;
-	private transient CBehaviorHoldPosition holdPositionBehavior;
-	private transient CBehaviorBoardTransport boardTransportBehavior;
+	private transient CBehaviorMove moveBehavior; // 移动行为
+	private transient CBehaviorAttack attackBehavior; // 攻击行为
+	private transient CBehaviorAttackMove attackMoveBehavior; // 攻击并移动行为
+	private transient CBehaviorFollow followBehavior; // 跟随行为
+	private transient CBehaviorPatrol patrolBehavior; // 巡逻行为
+	private transient CBehaviorStop stopBehavior; // 停止行为
+	private transient CBehaviorHoldPosition holdPositionBehavior; // 停留位置行为
+	private transient CBehaviorBoardTransport boardTransportBehavior; // 乘坐行为
 	private boolean constructing = false;
 	private boolean constructingPaused = false;
 	private boolean structure;
@@ -219,10 +228,10 @@ public class CUnit extends CWidget {
 	private boolean resistant = false;
 	private boolean autoAttack = true;
 	private boolean moveDisabled = false;
-	private CBehavior defaultBehavior;
-	private CBehavior interruptedDefaultBehavior;
-	private CBehavior interruptedBehavior;
-	private COrder lastStartedOrder = null;
+	private CBehavior defaultBehavior; // 当前行为
+	private CBehavior interruptedDefaultBehavior; // 被打断的行为
+	private CBehavior interruptedBehavior; // 被打断的行为
+	private COrder lastStartedOrder = null; // 最后执行的命令
 	private CUnit workerInside;
 	private final War3ID[] buildQueue = new War3ID[WarsmashConstants.BUILD_QUEUE_SIZE];
 	private final QueueItemType[] buildQueueTypes = new QueueItemType[WarsmashConstants.BUILD_QUEUE_SIZE];
@@ -234,18 +243,18 @@ public class CUnit extends CWidget {
 
 	private int triggerEditorCustomValue;
 
-	private List<CUnitAttack> unitSpecificAttacks;
-	private List<CUnitAttack> unitSpecificCurrentAttacks;
-	private boolean disableAttacks;
+	private List<CUnitAttack> unitSpecificAttacks; // 普攻列表
+	private List<CUnitAttack> unitSpecificCurrentAttacks; // 当前普攻列表
+	private boolean disableAttacks; // 禁用普攻
 	private final CUnitAttackVisionFogModifier attackFogMod;
 
-	private final Map<CUnitAttackPreDamageListenerPriority, List<CUnitAttackPreDamageListener>> preDamageListeners = new HashMap<>();
-	private final List<CUnitAttackPostDamageListener> postDamageListeners = new ArrayList<>();
-	private final List<CUnitAttackDamageTakenModificationListener> damageTakenModificationListeners = new ArrayList<>();
-	private final List<CUnitAttackFinalDamageTakenModificationListener> finalDamageTakenModificationListeners = new ArrayList<>();
-	private final List<CUnitAttackDamageTakenListener> damageTakenListeners = new ArrayList<>();
-	private final Map<CUnitDeathReplacementEffectPriority, List<CUnitDeathReplacementEffect>> deathReplacementEffects = new HashMap<>();
-	private final List<CUnitAttackEvasionListener> evasionListeners = new ArrayList<>();
+	private final Map<CUnitAttackPreDamageListenerPriority, List<CUnitAttackPreDamageListener>> preDamageListeners = new HashMap<>(); // onAttack 攻击受伤前处理器列表
+	private final List<CUnitAttackPostDamageListener> postDamageListeners = new ArrayList<>(); // onHit 受击 处理器列表
+	private final List<CUnitAttackDamageTakenModificationListener> damageTakenModificationListeners = new ArrayList<>(); // onDamage 伤害修改器列表
+	private final List<CUnitAttackFinalDamageTakenModificationListener> finalDamageTakenModificationListeners = new ArrayList<>(); // onDamage 最终伤害修改器列表
+	private final List<CUnitAttackDamageTakenListener> damageTakenListeners = new ArrayList<>(); // onDamage 伤害处理器列表
+	private final Map<CUnitDeathReplacementEffectPriority, List<CUnitDeathReplacementEffect>> deathReplacementEffects = new HashMap<>(); // onDeath 死亡替换效果列表
+	private final List<CUnitAttackEvasionListener> evasionListeners = new ArrayList<>(); // 闪避 监听
 
 	private transient Set<CRegion> containingRegions = new LinkedHashSet<>();
 	private transient Set<CRegion> priorContainingRegions = new LinkedHashSet<>();
@@ -288,6 +297,7 @@ public class CUnit extends CWidget {
 		computeAllDerivedFields();
 	}
 
+	// 执行默认行为
 	public void performDefaultBehavior(final CSimulation game) {
 		if (this.currentBehavior != null) {
 			this.currentBehavior.end(game, true);
@@ -476,12 +486,19 @@ public class CUnit extends CWidget {
 		case DISABLE_SPECIAL_ATTACK:
 		case DISABLE_SPELLS:
 		case ETHEREAL:
+			// 定义攻击状态标志变量
 			boolean isDisableAttack = false;
+			// 近战攻击禁用标志
 			boolean isDisableMeleeAttack = false;
+			// 远程攻击禁用标志
 			boolean isDisableRangedAttack = false;
+			// 特殊攻击禁用标志
 			boolean isDisableSpecialAttack = false;
+			// 法术禁用标志
 			boolean isDisableSpells = false;
+			// 以虚无态标志
 			boolean isEthereal = false;
+
 			for (final StateModBuff buff : this.stateModBuffs) {
 				if (buff.getBuffType() == StateModBuffType.DISABLE_ATTACK) {
 					if (buff.getValue() != 0) {
@@ -547,10 +564,13 @@ public class CUnit extends CWidget {
 			notifyAttacksChanged();
 			checkDisabledAbilities(game, isDisableAttack);
 
+			// 虚无状态
 			if (isEthereal) {
+				// 添加伤害修改器
 				if (!this.damageTakenModificationListeners.contains(CUnitDefaultEtherealDamageModListener.INSTANCE)) {
 					addDamageTakenModificationListener(CUnitDefaultEtherealDamageModListener.INSTANCE);
 				}
+				// 修改角色顶点颜色 虚无 半透明
 				game.changeUnitVertexColor(this, RenderUnit.ETHEREAL);
 				// Disable physical skills
 //				for (CAbility ability : this.abilities) {
@@ -560,8 +580,10 @@ public class CUnit extends CWidget {
 //				}
 			}
 			else {
+				// 移除伤害修改器
 				if (this.damageTakenModificationListeners.contains(CUnitDefaultEtherealDamageModListener.INSTANCE)) {
 					removeDamageTakenModificationListener(CUnitDefaultEtherealDamageModListener.INSTANCE);
+					// 恢复默认颜色
 					game.changeUnitVertexColor(this, RenderUnit.DEFAULT);
 				}
 				// Enable physical skills
@@ -583,7 +605,7 @@ public class CUnit extends CWidget {
 			}
 			this.autoAttack = !isDisableAutoAttack;
 			break;
-		case MAGIC_IMMUNE:
+		case MAGIC_IMMUNE: // 魔法攻击免疫
 			boolean isMagicImmune = false;
 			for (final StateModBuff buff : this.stateModBuffs) {
 				if (buff.getBuffType() == StateModBuffType.MAGIC_IMMUNE) {
@@ -617,8 +639,8 @@ public class CUnit extends CWidget {
 			}
 			this.resistant = isResistant;
 			break;
-		case SLEEPING:
-		case STUN:
+		case SLEEPING: // 睡眠状态
+		case STUN: // 眩晕状态
 			boolean isSleeping = false;
 			boolean isStun = false;
 			for (final StateModBuff buff : this.stateModBuffs) {
@@ -2187,7 +2209,9 @@ public class CUnit extends CWidget {
 		return false;
 	}
 
+	// 自动获取攻击目标的方法
 	public boolean autoAcquireAttackTargets(final CSimulation game, final boolean disableMove) {
+		// 普攻列表不为空，且当前单位不是工人
 		if (!getCurrentAttacks().isEmpty() && !this.unitType.getClassifications().contains(CUnitClassification.PEON)) {
 			if (this.collisionRectangle != null) {
 				tempRect.set(this.collisionRectangle);
@@ -2207,6 +2231,7 @@ public class CUnit extends CWidget {
 		return false;
 	}
 
+
 	public float getEndingDecayTime(final CSimulation game) {
 		if (isBuilding()) {
 			return game.getGameplayConstants().getStructureDecayTime();
@@ -2217,6 +2242,7 @@ public class CUnit extends CWidget {
 		return game.getGameplayConstants().getBoneDecayTime();
 	}
 
+	// 检查指令是否是队列，是立即执行，还是添加到队列
 	public void order(final CSimulation game, final COrder order, final boolean queue) {
 		if (isDead()) {
 			return;
@@ -2228,13 +2254,19 @@ public class CUnit extends CWidget {
 			if (ability != null) {
 				if (!getAbilities().contains(ability)) {
 					// not allowed to use ability of other unit...
+					//不允许使用其他单位的能力。。。
 					return;
 				}
 				// Allow the ability to response to the order without actually placing itself in
 				// the queue, nor modifying (interrupting) the queue.
+				//允许在不实际放置自己的情况下对订单进行响应的能力
+				//也不修改（中断）队列。
 				if (!ability.checkBeforeQueue(game, this, order.getOrderId(), order.getTarget(game))) {
+					// 该段代码可能涉及一个待处理的TODO任务，
+					// 需要检查网络请求是否在调用checkBeforeQueue之前进行了checkCanUse的验证。
 					// TODO is this a possible bug vector that the network request doesn't
 					// checkCanUse like the UI before checkBeforeQueue is called??
+
 					order.fireEvents(game, this);
 					this.stateNotifier.ordersChanged();
 					return;
@@ -2242,14 +2274,23 @@ public class CUnit extends CWidget {
 			}
 		}
 
+		// TODO #如果是右键指令，并且上一个也是右键指令，就跳过
 		if ((this.lastStartedOrder != null) && this.lastStartedOrder.equals(order)
-				&& (this.lastStartedOrder.getOrderId() == OrderIds.smart)) {
+				&& (this.lastStartedOrder.getOrderId() == OrderIds.smart)) { // 右键点击
 			// I skip your spammed move orders, TODO this will probably break some repeat
 			// attack order or something later
+			//我跳过你的垃圾邮件移动订单，TODO这可能会打破一些重复
+			//攻击命令或稍后发生的事情
 			return;
 		}
+
+		// TODO #不加入队列的指令，清空之前排队的指令
+		// !queue：这表示当前的指令不是要入队，而是要立即执行。
+		// !this.acceptingOrders：这检查单位是否接受新指令。如果单位不接受指令，条件成立。
+		// 如果当前存在行为（currentBehavior），并且该行为是不可中断的（interruptable()返回false），则条件也成立。
 		if (!queue && (!this.acceptingOrders
 				|| ((this.currentBehavior != null) && !this.currentBehavior.interruptable()))) {
+			// 处理现有指令：取消队列中的指令：
 			for (final COrder queuedOrder : this.orderQueue) {
 				if (queuedOrder != null) {
 					final int abilityHandleId = queuedOrder.getAbilityHandleId();
@@ -2257,35 +2298,53 @@ public class CUnit extends CWidget {
 					ability.onCancelFromQueue(game, this, queuedOrder.getOrderId());
 				}
 			}
+			// 清空现有的指令队列，以确保不会再执行旧的指令。
 			this.orderQueue.clear();
+			// 将新的指令添加到指令队列中。
 			this.orderQueue.add(order);
+			// 调用状态通知者，发出指令发生变化的通知，以便更新相关的状态或UI（用户界面）。
 			this.stateNotifier.ordersChanged();
 			this.stateNotifier.waypointsChanged();
 		}
+		// TODO #将指令加入到队列
+		// 这一行检查当前指令是否需要入队(queue为真)。
+		// 另外，确认当前行为既不是停止行为(stopBehavior)，也不是保持位置行为(holdPositionBehavior)。这一条件的核心在于确保单位正在执行一些可进行队列操作的行为。
 		else if (queue && (this.currentBehavior != this.stopBehavior)
 				&& (this.currentBehavior != this.holdPositionBehavior)) {
+			// 检查当前指令是否是巡逻指令。
 			if (order.getOrderId() == OrderIds.patrol) {
+				// 进一步检查默认行为是否为巡逻行为。
 				if (this.defaultBehavior == this.patrolBehavior) {
+					// 如果默认行为是巡逻，则将新的巡逻点添加到巡逻行为中，调用addPatrolPoint方法。
 					this.patrolBehavior.addPatrolPoint(order.getTarget(game));
 				}
 				else {
+					// 如果默认行为不是巡逻，将当前的巡逻指令添加到指令队列中(this.orderQueue.add(order))，以等待执行。
 					this.orderQueue.add(order);
 				}
 			}
 			else {
+				// 无论当前指令是什么，如果它不是巡逻指令，直接将该指令添加到指令队列中。
 				this.orderQueue.add(order);
 			}
+			// 这一行调用状态通知者，通知系统方向点发生了变化。这通常会引发进一步的状态更新或者更新UI等操作。
 			this.stateNotifier.waypointsChanged();
 		}
+		// TODO #停止当前行为，执行新命令，并情况指令队列
 		else {
+			// 这行代码将单位的默认行为设置为停止行为（stopBehavior）。这意味着在处理新指令之前，单位将不再执行任何其他活动。
 			setDefaultBehavior(this.stopBehavior);
+			// 结束当前行为:如果当前有行为正在进行，则调用 end 方法结束该行为，传入的参数 true 可能表示以某种强制方式结束（具体含义可能根据上下文而有所不同）。
 			if (this.currentBehavior != null) {
 				this.currentBehavior.end(game, true);
 			}
+			// 开始新指令的行为: 这里调用 beginOrder 方法开始新的指令行为，将当前行为更新为新的行为。此时，order 是指当前要执行的指令。
 			this.currentBehavior = beginOrder(game, order);
 			if (this.currentBehavior != null) {
+				// 如果成功获取到新的行为，调用 begin 方法来开始这个行为。
 				this.currentBehavior.begin(game);
 			}
+			// 处理已排队的指令:这段代码遍历当前的指令队列（orderQueue），并取消队列中每一个指令的执行。对于每个非空的指令调用其对应的能力的 onCancelFromQueue 方法，表示这些指令不再执行。
 			for (final COrder queuedOrder : this.orderQueue) {
 				if (queuedOrder != null) {
 					final int abilityHandleId = queuedOrder.getAbilityHandleId();
@@ -2293,32 +2352,43 @@ public class CUnit extends CWidget {
 					ability.onCancelFromQueue(game, this, queuedOrder.getOrderId());
 				}
 			}
+			// 清空指令队列，确保没有残留的指令。
 			this.orderQueue.clear();
+			// 最后，调用状态通知者 (stateNotifier) 以通知系统指令和路径点（waypoints）已经发生变化。这通常用于更新用户界面或其它与状态相关的逻辑。
 			this.stateNotifier.ordersChanged();
 			this.stateNotifier.waypointsChanged();
 		}
 	}
 
+	// 检查指令 是否有对应的能力 能处理
 	public boolean order(final CSimulation simulation, final int orderId, final AbilityTarget target) {
+		// 如果是停止指令：直接创建指令处理
 		if (orderId == OrderIds.stop) {
 			order(simulation, new COrderNoTarget(0, orderId, false), false);
 			return true;
 		}
+		// 遍历所有能力，找到能处理该指令的能力
 		for (final CAbility ability : this.abilities) {
 			final BooleanAbilityActivationReceiver activationReceiver = BooleanAbilityActivationReceiver.INSTANCE;
+			// 检查能力是否可以使用
 			ability.checkCanUse(simulation, this, orderId, activationReceiver);
 			if (activationReceiver.isOk()) {
+				// 无目标的指令， 能力检测是否可以处理无目标指令，如果可以，则创建指令处理
 				if (target == null) {
 					final BooleanAbilityTargetCheckReceiver<Void> booleanTargetReceiver = BooleanAbilityTargetCheckReceiver
 							.<Void>getInstance().reset();
+					// 检查无目标是否可以使用
 					ability.checkCanTargetNoTarget(simulation, this, orderId, booleanTargetReceiver);
 					if (booleanTargetReceiver.isTargetable()) {
 						order(simulation, new COrderNoTarget(ability.getHandleId(), orderId, false), false);
 						return true;
 					}
 				}
+				// 有目标的指令， 能力检测是否可以处理该目标，如果可以，则创建指令处理
 				else {
+					// 处理不同的目标类型进行处理
 					final boolean targetable = target.visit(new AbilityTargetVisitor<Boolean>() {
+						// 处理点目标
 						@Override
 						public Boolean accept(final AbilityPointTarget target) {
 							final BooleanAbilityTargetCheckReceiver<AbilityPointTarget> booleanTargetReceiver = BooleanAbilityTargetCheckReceiver
@@ -2332,6 +2402,7 @@ public class CUnit extends CWidget {
 							return pointTargetable;
 						}
 
+						// 处理单位、可破坏物、物品等目标
 						public Boolean acceptWidget(final CWidget target) {
 							final BooleanAbilityTargetCheckReceiver<CWidget> booleanTargetReceiver = BooleanAbilityTargetCheckReceiver
 									.<CWidget>getInstance().reset();
@@ -2368,6 +2439,7 @@ public class CUnit extends CWidget {
 		return false;
 	}
 
+	// 执行指令begin方法，获取指令的行为，并设置最后执行的指令
 	private CBehavior beginOrder(final CSimulation game, final COrder order) {
 		this.lastStartedOrder = order;
 		CBehavior nextBehavior;
@@ -2411,6 +2483,7 @@ public class CUnit extends CWidget {
 		this.cooldownEndTime = cooldownEndTime;
 	}
 
+	// 普攻冷却时间
 	public int getCooldownEndTime() {
 		return this.cooldownEndTime;
 	}
@@ -2625,14 +2698,18 @@ public class CUnit extends CWidget {
 			return 0;
 		}
 		float trueDamage = 0;
+		// 非 无敌状态
 		if (!this.invulnerable) {
 
+			// 创建伤害修改结构体
 			final CUnitAttackDamageTakenModificationListenerDamageModResult result = new CUnitAttackDamageTakenModificationListenerDamageModResult(
 					damage, bonusDamage);
+			// onDamage 伤害修改
 			for (final CUnitAttackDamageTakenModificationListener listener : this.damageTakenModificationListeners) {
 				listener.onDamage(simulation, source, this, isAttack, isRanged, attackType, damageType, result);
 			}
 
+			// 查询 攻击和防御 的伤害比例
 			final float damageRatioFromArmorClass = simulation.getGameplayConstants().getDamageRatioAgainst(attackType,
 					getDefenseType());
 			final float damageRatioFromDefense;
@@ -2648,8 +2725,10 @@ public class CUnit extends CWidget {
 				damageRatioFromDefense = 2f
 						- (float) StrictMath.pow(1f - simulation.getGameplayConstants().getDefenseArmor(), -defense);
 			}
+			// 真实伤害
 			trueDamage = damageRatioFromArmorClass * damageRatioFromDefense * result.computeFinalDamage();
 
+			// onDamage 最终伤害修改
 			for (final CUnitAttackFinalDamageTakenModificationListener listener : new ArrayList<>(
 					this.finalDamageTakenModificationListeners)) {
 				trueDamage = listener.onDamage(simulation, source, this, isAttack, isRanged, attackType, damageType,
@@ -2666,13 +2745,17 @@ public class CUnit extends CWidget {
 			}
 			this.stateNotifier.lifeChanged();
 		}
+		// onDamage 伤害监听
 		for (final CUnitAttackDamageTakenListener listener : new ArrayList<>(this.damageTakenListeners)) {
 			listener.onDamage(simulation, source, this, isAttack, isRanged, damageType, damage, bonusDamage,
 					trueDamage);
 		}
+		// 伤害音响事件
 		simulation.unitDamageEvent(this, weaponSoundType, this.unitType.getArmorType());
+		// 检查是否 死亡
 		if (!this.invulnerable && isDead()) {
 			if (!wasDead) {
+				// 击杀
 				kill(simulation, source);
 			}
 		}
@@ -2706,6 +2789,7 @@ public class CUnit extends CWidget {
 		return trueDamage;
 	}
 
+	// 击杀
 	private void kill(final CSimulation simulation, final CUnit source) {
 		if (this.currentBehavior != null) {
 			this.currentBehavior.end(simulation, true);
@@ -2714,8 +2798,9 @@ public class CUnit extends CWidget {
 
 		final CUnitDeathReplacementResult result = new CUnitDeathReplacementResult();
 		CUnitDeathReplacementStacking allowContinue = new CUnitDeathReplacementStacking();
+		// 死亡替换效果处理器
 		for (final CUnitDeathReplacementEffectPriority priority : CUnitDeathReplacementEffectPriority.values()) {
-			if (allowContinue.isAllowStacking()) {
+			if (allowContinue.isAllowStacking()) { // 是否允许堆叠
 				for (final CUnitDeathReplacementEffect effect : this.deathReplacementEffects.get(priority)) {
 					if (allowContinue.isAllowSamePriorityStacking()) {
 						allowContinue = effect.onDeath(simulation, this, source, result);
@@ -2723,6 +2808,7 @@ public class CUnit extends CWidget {
 				}
 			}
 		}
+		// 复活状态
 		if (result.isReviving()) {
 			return;
 		}
@@ -2877,15 +2963,18 @@ public class CUnit extends CWidget {
 		}
 	}
 
+	// 能否到达指定目标范围内
 	public boolean canReach(final AbilityTarget target, final float range) {
 		final double distance = distance(target);
 		if (target instanceof CUnit) {
 			final CUnit targetUnit = (CUnit) target;
 			final CUnitType targetUnitType = targetUnit.getUnitType();
+			// 如果是建筑，并且建筑修改寻路图存在
 			if (targetUnit.isBuilding() && (targetUnitType.getBuildingPathingPixelMap() != null)) {
 				final BufferedImage buildingPathingPixelMap = targetUnitType.getBuildingPathingPixelMap();
 				final float targetX = target.getX();
 				final float targetY = target.getY();
+				//
 				if (canReachToPathing(range, targetUnit.getFacing(), buildingPathingPixelMap, targetX, targetY)) {
 					return true;
 				}
@@ -2908,7 +2997,7 @@ public class CUnit extends CWidget {
 	public boolean canReach(final float x, final float y, final float range) {
 		return distance(x, y) <= range; // TODO use dist squared for performance
 	}
-
+	// 检查是否可以到达指定路径的函数
 	public boolean canReachToPathing(final float range, final float rotationForPathing,
 			final BufferedImage buildingPathingPixelMap, final float targetX, final float targetY) {
 		if (buildingPathingPixelMap == null) {
@@ -2960,6 +3049,7 @@ public class CUnit extends CWidget {
 		return false;
 	}
 
+
 	private int getRGBFromPixelData(final BufferedImage buildingPathingPixelMap, final int checkX, final int checkY,
 			final int rotation) {
 
@@ -3003,6 +3093,7 @@ public class CUnit extends CWidget {
 		return this.boneCorpse;
 	}
 
+	// 检查目标类型集合能否作为目标
 	@Override
 	public boolean canBeTargetedBy(final CSimulation simulation, final CUnit source,
 			final EnumSet<CTargetType> targetsAllowed, final AbilityTargetCheckReceiver<CWidget> receiver) {
@@ -3150,6 +3241,7 @@ public class CUnit extends CWidget {
 		return false;
 	}
 
+	// 是否禁止移动
 	public boolean isMovementDisabled() {
 		return (this.moveBehavior == null) || this.moveDisabled;
 		// TODO this used to directly return the state of whether our unit was a
@@ -3382,13 +3474,14 @@ public class CUnit extends CWidget {
 			return false;
 		}
 	}
-
+	// 类 AutoAttackTargetFinderEnum 实现了 CUnitEnumFunction 接口，负责自动攻击目标的查找逻辑
 	private static final class AutoAttackTargetFinderEnum implements CUnitEnumFunction {
 		private CSimulation game;
 		private CUnit source;
 		private boolean disableMove;
 		private boolean foundAnyTarget;
 
+		// 重置函数，初始化游戏、源单位和其他参数
 		private AutoAttackTargetFinderEnum reset(final CSimulation game, final CUnit source,
 				final boolean disableMove) {
 			this.game = game;
@@ -3399,6 +3492,7 @@ public class CUnit extends CWidget {
 		}
 
 		@Override
+		// 调用函数，判断单位是否可作为攻击目标并执行攻击行为
 		public boolean call(final CUnit unit) {
 			if ((this.source.getAttackBehavior() != null)
 					&& !this.source.getFirstAbilityOfType(CAbilityAttack.class).isDisabled()) {
@@ -3435,6 +3529,7 @@ public class CUnit extends CWidget {
 		}
 	}
 
+	// 移动行为
 	public CBehaviorMove getMoveBehavior() {
 		return this.moveBehavior;
 	}
@@ -3495,20 +3590,26 @@ public class CUnit extends CWidget {
 		return this.boardTransportBehavior;
 	}
 
+	// 处理下一个指令行为
 	public CBehavior pollNextOrderBehavior(final CSimulation game) {
+		// 如果默认行为与停止行为不相同，则返回当前的默认行为。
 		if (this.defaultBehavior != this.stopBehavior) {
 			// kind of a stupid hack, meant to align in feel with some behaviors that were
 			// observed on War3
+			// 这行代码检查当前单位的默认行为（defaultBehavior）与停止行为（stopBehavior）是否相同。这主要用于判断单位当前是否是在执行特定的行为而不是处于停止状态。
 			return this.defaultBehavior;
 		}
+		// 这行代码检查当前是否有一个中断行为（interruptedBehavior），如果有，则意味着单位在执行一个特定的动作被中断了。
 		if (this.interruptedBehavior != null) {
 			return this.interruptedBehavior;
 		}
+		// 从指令队列中获取下一个指令：
 		final COrder order = this.orderQueue.poll();
 		final CBehavior nextOrderBehavior = beginOrder(game, order);
 		this.stateNotifier.waypointsChanged();
 		return nextOrderBehavior;
 	}
+
 
 	public boolean isMoving() {
 		return getCurrentBehavior() instanceof CBehaviorMove;
@@ -3824,7 +3925,10 @@ public class CUnit extends CWidget {
 	}
 
 	public static enum QueueItemType {
-		UNIT, RESEARCH, HERO_REVIVE, SACRIFICE;
+		UNIT, // 单位
+		RESEARCH, // 研究一个技术或能力。
+		HERO_REVIVE, // 复活一个英雄单位
+		SACRIFICE; // 牺牲某个单位以取得某种效果。
 	}
 
 	public void setRallyPoint(final AbilityTarget target) {
@@ -3859,7 +3963,7 @@ public class CUnit extends CWidget {
 	private static final class UseAbilityOnTargetByIdVisitor implements AbilityTargetVisitor<Void> {
 		private static final UseAbilityOnTargetByIdVisitor INSTANCE = new UseAbilityOnTargetByIdVisitor();
 		private CSimulation game;
-		private CUnit trainedUnit;
+		private CUnit trainedUnit; // 受训单位
 		private int rallyOrderId;
 
 		private UseAbilityOnTargetByIdVisitor reset(final CSimulation game, final CUnit trainedUnit,
@@ -4438,17 +4542,22 @@ public class CUnit extends CWidget {
 		game.getPlayer(this.playerIndex).firePickUpItemEvents(this, item, game);
 	}
 
+	// 无目标 指令 事件
 	public void fireOrderEvents(final CSimulation game, final COrderNoTarget order) {
+		// 获取无目标事件列表
 		final List<CWidgetEvent> eventList = getEventList(JassGameEventsWar3.EVENT_UNIT_ISSUED_ORDER);
 		if (eventList != null) {
+			// 遍历事件列表，执行事件
 			for (final CWidgetEvent event : eventList) {
 				event.fire(this, CommonTriggerExecutionScope.unitOrderScope(JassGameEventsWar3.EVENT_UNIT_ISSUED_ORDER,
 						event.getTrigger(), this, order.getOrderId()));
 			}
 		}
+		// 获取Player执行事件列表
 		game.getPlayer(this.playerIndex).fireOrderEvents(this, game, order);
 	}
 
+	// 坐标点 指令 事件
 	public void fireOrderEvents(final CSimulation game, final COrderTargetPoint order) {
 		final List<CWidgetEvent> eventList = getEventList(JassGameEventsWar3.EVENT_UNIT_ISSUED_POINT_ORDER);
 		if (eventList != null) {
@@ -4463,6 +4572,7 @@ public class CUnit extends CWidget {
 		game.getPlayer(this.playerIndex).fireOrderEvents(this, game, order);
 	}
 
+	// 单位/可破坏物/物品 指令 事件
 	public void fireOrderEvents(final CSimulation game, final COrderTargetWidget order) {
 		final List<CWidgetEvent> eventList = getEventList(JassGameEventsWar3.EVENT_UNIT_ISSUED_TARGET_ORDER);
 		if (eventList != null) {
@@ -4817,11 +4927,13 @@ public class CUnit extends CWidget {
 		this.damageTakenListeners.remove(listener);
 	}
 
+	// 获取 死亡替换 效果处理器 列表
 	public List<CUnitDeathReplacementEffect> getDeathReplacementEffectsForPriority(
 			final CUnitDeathReplacementEffectPriority priority) {
 		return this.deathReplacementEffects.get(priority);
 	}
 
+	// 添加 死亡替换 效果处理器
 	public void addDeathReplacementEffect(final CUnitDeathReplacementEffectPriority priority,
 			final CUnitDeathReplacementEffect listener) {
 		List<CUnitDeathReplacementEffect> list = this.deathReplacementEffects.get(priority);
@@ -4831,6 +4943,7 @@ public class CUnit extends CWidget {
 		list.add(0, listener);
 	}
 
+	// 移除 死亡替换 效果处理器
 	public void removeDeathReplacementEffect(final CUnitDeathReplacementEffectPriority priority,
 			final CUnitDeathReplacementEffect listener) {
 		final List<CUnitDeathReplacementEffect> list = this.deathReplacementEffects.get(priority);
@@ -4839,10 +4952,12 @@ public class CUnit extends CWidget {
 		}
 	}
 
+	// 添加 闪避 处理器
 	public void addEvasionListener(final CUnitAttackEvasionListener listener) {
 		this.evasionListeners.add(0, listener);
 	}
 
+	// 移除 闪避 处理器
 	public void removeEvasionListener(final CUnitAttackEvasionListener listener) {
 		this.evasionListeners.remove(listener);
 	}

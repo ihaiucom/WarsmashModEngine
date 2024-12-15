@@ -3,16 +3,22 @@ package com.etheller.warsmash.viewer5.handlers.w3x.simulation;
 import com.etheller.warsmash.util.SubscriberSetNotifier;
 
 public interface CPlayerStateListener {
+	// 金币改变
 	void goldChanged();
 
+	// 木头改变
 	void lumberChanged();
 
+	// 粮食改变
 	void foodChanged();
 
+	// 维修经费改变
 	void upkeepChanged();
 
+	// 英雄死亡
 	void heroDeath();
 
+	// 英雄技能点改变
 	void heroTokensChanged();
 
 	public static final class CPlayerStateNotifier extends SubscriberSetNotifier<CPlayerStateListener>

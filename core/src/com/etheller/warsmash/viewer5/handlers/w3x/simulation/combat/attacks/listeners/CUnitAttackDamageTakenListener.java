@@ -7,6 +7,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.CUnit;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.CTargetType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CDamageType;
 
+// 伤害处理器
 public interface CUnitAttackDamageTakenListener {
 	public static final EnumSet<CTargetType> ENEMY_TARGET = EnumSet.of(CTargetType.ENEMIES);
 	

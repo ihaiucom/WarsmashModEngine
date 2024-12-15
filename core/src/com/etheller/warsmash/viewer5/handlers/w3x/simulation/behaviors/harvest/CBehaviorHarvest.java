@@ -23,18 +23,20 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.CBehavior
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.CBehaviorAttackListener;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.orders.OrderIds;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.ResourceType;
-
+// 收割行为
 public class CBehaviorHarvest extends CAbstractRangedBehavior
 		implements AbilityTargetVisitor<CBehavior>, CBehaviorAttackListener {
 	private final CAbilityHarvest abilityHarvest;
 	private CSimulation simulation;
 	private int popoutFromMineTurnTick = 0;
 
+	// 构造函数，初始化单位和收割能力
 	public CBehaviorHarvest(final CUnit unit, final CAbilityHarvest abilityHarvest) {
 		super(unit);
 		this.abilityHarvest = abilityHarvest;
 	}
 
+	// 重置行为并设定目标
 	public CBehaviorHarvest reset(final CWidget target) {
 		innerReset(target, target instanceof CUnit);
 		this.abilityHarvest.setLastHarvestTarget(target);
@@ -47,27 +49,32 @@ public class CBehaviorHarvest extends CAbstractRangedBehavior
 	}
 
 	@Override
+	// 判断单位是否在攻击范围内
 	public boolean isWithinRange(final CSimulation simulation) {
 		return this.unit.canReach(this.target, this.abilityHarvest.getTreeAttack().getRange());
 	}
 
 	@Override
+	// 获取高亮顺序ID
 	public int getHighlightOrderId() {
 		return OrderIds.harvest;
 	}
 
 	@Override
+	// 更新行为并访问目标
 	protected CBehavior update(final CSimulation simulation, final boolean withinFacingWindow) {
 		this.simulation = simulation;
 		return this.target.visit(this);
 	}
 
 	@Override
+	// 接受点目标
 	public CBehavior accept(final AbilityPointTarget target) {
 		return CBehaviorHarvest.this.unit.pollNextOrderBehavior(this.simulation);
 	}
 
 	@Override
+	// 接受单位目标
 	public CBehavior accept(final CUnit target) {
 		if ((this.abilityHarvest.getCarriedResourceAmount() == 0)
 				|| (this.abilityHarvest.getCarriedResourceType() != ResourceType.GOLD)) {
@@ -107,6 +114,7 @@ public class CBehaviorHarvest extends CAbstractRangedBehavior
 		}
 	}
 
+	// 从矿中弹出，并处理金矿
 	public void popoutFromMine(final int goldMined) {
 		this.popoutFromMineTurnTick = 0;
 		this.unit.setHidden(false);
@@ -120,6 +128,7 @@ public class CBehaviorHarvest extends CAbstractRangedBehavior
 	}
 
 	@Override
+	// 接受可破坏目标
 	public CBehavior accept(final CDestructable target) {
 		if ((this.abilityHarvest.getCarriedResourceType() != ResourceType.LUMBER)
 				|| (this.abilityHarvest.getCarriedResourceAmount() < this.abilityHarvest.getLumberCapacity())) {
@@ -133,6 +142,7 @@ public class CBehaviorHarvest extends CAbstractRangedBehavior
 	}
 
 	@Override
+	// 处理命中事件
 	public void onHit(final AbilityTarget target, final float damage) {
 		if (this.abilityHarvest.getCarriedResourceType() != ResourceType.LUMBER) {
 			dropResources();
@@ -149,11 +159,13 @@ public class CBehaviorHarvest extends CAbstractRangedBehavior
 	}
 
 	@Override
+	// 行为启动时调用
 	public void onLaunch() {
 
 	}
 
 	@Override
+	// 在首次更新后执行的行为
 	public CBehavior onFirstUpdateAfterBackswing(final CBehaviorAttack currentAttackBehavior) {
 		if (this.abilityHarvest.getCarriedResourceAmount() >= this.abilityHarvest.getLumberCapacity()) {
 			return this.abilityHarvest.getBehaviorReturnResources().reset(this.simulation);
@@ -162,6 +174,7 @@ public class CBehaviorHarvest extends CAbstractRangedBehavior
 	}
 
 	@Override
+	// 行为完成时处理
 	public CBehavior onFinish(final CSimulation game, final CUnit finishingUnit) {
 		if (this.abilityHarvest.getCarriedResourceAmount() >= this.abilityHarvest.getLumberCapacity()) {
 			return this.abilityHarvest.getBehaviorReturnResources().reset(this.simulation);
@@ -170,16 +183,19 @@ public class CBehaviorHarvest extends CAbstractRangedBehavior
 	}
 
 	@Override
+	// 接受物品目标
 	public CBehavior accept(final CItem target) {
 		return this.unit.pollNextOrderBehavior(this.simulation);
 	}
 
 	@Override
+	// 检查目标是否仍然有效
 	protected boolean checkTargetStillValid(final CSimulation simulation) {
 		return this.target.visit(AbilityTargetStillAliveVisitor.INSTANCE);
 	}
 
 	@Override
+	// 更新当目标无效时的行为
 	protected CBehavior updateOnInvalidTarget(final CSimulation simulation) {
 		if (this.target instanceof CDestructable) {
 			// wood
@@ -193,28 +209,34 @@ public class CBehaviorHarvest extends CAbstractRangedBehavior
 	}
 
 	@Override
+	// 移动前重置行为
 	protected void resetBeforeMoving(final CSimulation simulation) {
 
 	}
 
 	@Override
+	// 开始行为
 	public void begin(final CSimulation game) {
 
 	}
 
 	@Override
+	// 结束行为
 	public void end(final CSimulation game, final boolean interrupted) {
 
 	}
 
+	// 获取弹出矿井的回合时间
 	public int getPopoutFromMineTurnTick() {
 		return this.popoutFromMineTurnTick;
 	}
 
+	// 获取金矿容量
 	public int getGoldCapacity() {
 		return this.abilityHarvest.getGoldCapacity();
 	}
 
+	// 处理资源投放
 	private void dropResources() {
 		if (this.abilityHarvest.getCarriedResourceType() != null && this.abilityHarvest.getCarriedResourceAmount() > 0) {
 			switch (this.abilityHarvest.getCarriedResourceType()) {
@@ -232,11 +254,13 @@ public class CBehaviorHarvest extends CAbstractRangedBehavior
 	}
 
 	@Override
+	// 结束移动
 	public void endMove(final CSimulation game, final boolean interrupted) {
 
 	}
 
 	@Override
+	// 判断是否可被打断
 	public boolean interruptable() {
 		return true;
 	}

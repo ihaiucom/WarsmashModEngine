@@ -54,7 +54,9 @@ public class CUnitType {
 	// game data? can we store it in a cleaner way?
 	private final BufferedImage buildingPathingPixelMap;
 	private final EnumSet<CTargetType> targetedAs;
+	// 默认采集范围
 	private final float defaultAcquisitionRange;
+	// 最小攻击范围
 	private final float minimumAttackRange;
 	private final List<War3ID> structuresBuilt;
 	private final List<War3ID> unitsTrained;
@@ -333,6 +335,7 @@ public class CUnitType {
 		return this.targetedAs;
 	}
 
+	// 默认采集范围
 	public float getDefaultAcquisitionRange() {
 		return this.defaultAcquisitionRange;
 	}

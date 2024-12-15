@@ -15,6 +15,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.attacks.list
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.attacks.listeners.CUnitAttackPreDamageListenerDamageModResult;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CDamageType;
 
+// jass onAttack 的动作监听 攻击前 回调
 public class ABAttackPreDamageListener implements CUnitAttackPreDamageListener {
 
 	private Map<String, Object> localStore;

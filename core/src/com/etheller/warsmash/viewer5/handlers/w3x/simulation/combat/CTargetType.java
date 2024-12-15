@@ -4,11 +4,41 @@ import java.util.EnumSet;
 import java.util.List;
 
 public enum CTargetType {
-	AIR, ALIVE, ALLIES, DEAD, DEBRIS, ENEMIES, GROUND, HERO, INVULNERABLE, ITEM, MECHANICAL, NEUTRAL, NONE, NONHERO,
-	NONSAPPER, NOTSELF, ORGANIC, PLAYERUNITS, SAPPER, SELF, STRUCTURE, TERRAIN, TREE, VULNERABLE, WALL, WARD, ANCIENT,
-	NONANCIENT, FRIEND, BRIDGE, DECORATION,
-	// BELOW: internal values:
-	NON_MAGIC_IMMUNE, NON_ETHEREAL
+	AIR,//空气
+	ALIVE,//活着
+	ALLIES,//盟友
+	DEAD,//死了
+	DEBRIS,//碎片
+	ENEMIES,//敌人
+	GROUND,//地面
+	HERO,//英雄
+	INVULNERABLE,//无懈可击
+	ITEM,//项目
+	MECHANICAL,//机械的
+	NEUTRAL,//中性
+	NONE,//没有
+	NONHERO,//非英雄
+	NONSAPPER,//无症状
+	NOTSELF,//不是自己
+	ORGANIC,//有机
+	PLAYERUNITS,//玩家
+	SAPPER,//工兵
+	SELF,//自我
+	STRUCTURE,//结构
+	TERRAIN,//地形
+	TREE,//树
+	VULNERABLE,//脆弱的
+	WALL,//墙
+	WARD,//病房
+	ANCIENT,//古代
+	NONANCIENT,//非古代
+	FRIEND,//朋友
+	BRIDGE,//桥
+	DECORATION,//装饰
+	// BELOW: internal values:,////下面：内部值：
+	NON_MAGIC_IMMUNE,//非免疫性
+	NON_ETHEREAL,//不存在
+
 
 	;
 

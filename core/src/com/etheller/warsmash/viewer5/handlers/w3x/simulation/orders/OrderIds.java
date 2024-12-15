@@ -20,167 +20,162 @@ import com.etheller.warsmash.util.WarsmashConstants;
  */
 public class OrderIds {
 	;/**
-		 * This is an order with no target that opens up the build menu of a unit that
-		 * can build structures.
+		 * 这是一个没有目标的命令，用于打开可以建造建筑物的单位的建造菜单。
 		 */
 	;
 	public static final int buildmenu = 851994;
 	/**
-	 * 851976 (cancel): This is an order with no target that is like a click on a
-	 * cancel button. We used to be able to catch cancel clicks with this id back
-	 * then but this id doesn't seem to work any more.
+	 * 851976 (cancel): 这是一个没有目标的命令，类似于点击取消按钮。我们过去能够通过这个ID捕捉取消点击，但这个ID似乎不再有效。
 	 */
 	public static final int cancel = 851976;
 	/**
-	 * An item targeted order that move the target item to a certain inventory slot
-	 * of the ordered hero.
+	 * 指向物品的命令，将目标物品移动到所订购英雄的某个库存槽中。
 	 */
 	public static final int itemdrag00 = WarsmashConstants.USE_NINE_ITEM_INVENTORY ? 85200200 : 852002;
 	/**
-	 * An item targeted order that move the target item to a certain inventory slot
-	 * of the ordered hero.
+	 * 指向物品的命令，将目标物品移动到所订购英雄的某个库存槽中。
 	 */
 	public static final int itemdrag01 = 852003;
 	/**
-	 * An item targeted order that move the target item to a certain inventory slot
-	 * of the ordered hero.
+	 * 指向物品的命令，将目标物品移动到所订购英雄的某个库存槽中。
 	 */
 	public static final int itemdrag02 = 852004;
 	/**
-	 * An item targeted order that move the target item to a certain inventory slot
-	 * of the ordered hero.
+	 * 指向物品的命令，将目标物品移动到所订购英雄的某个库存槽中。
 	 */
 	public static final int itemdrag03 = 852005;
 	/**
-	 * An item targeted order that move the target item to a certain inventory slot
-	 * of the ordered hero.
+	 * 指向物品的命令，将目标物品移动到所订购英雄的某个库存槽中。
 	 */
 	public static final int itemdrag04 = 852006;
 	/**
-	 * An item targeted order that move the target item to a certain inventory slot
-	 * of the ordered hero.
+	 * 指向物品的命令，将目标物品移动到所订购英雄的某个库存槽中。
 	 */
 	public static final int itemdrag05 = WarsmashConstants.USE_NINE_ITEM_INVENTORY ? 85200700 : 852007;
 	/**
-	 * An order that will make the ordered hero use the item in a certain inventory
-	 * slot. If it's an order with no target or object or point targeted depends on
-	 * the type of item.
+	 * 一个命令，让所订购的英雄使用某个库存槽中的物品。如果是没有目标的命令，则取决于物品的类型。
 	 */
 	public static final int itemuse00 = WarsmashConstants.USE_NINE_ITEM_INVENTORY ? 85200800 : 852008;
 	/**
-	 * An order that will make the ordered hero use the item in a certain inventory
-	 * slot. If it's an order with no target or object or point targeted depends on
-	 * the type of item.
+	 * 一个命令，让所订购的英雄使用某个库存槽中的物品。如果是没有目标的命令，则取决于物品的类型。
 	 */
 	public static final int itemuse01 = 852009;
 	/**
-	 * An order that will make the ordered hero use the item in a certain inventory
-	 * slot. If it's an order with no target or object or point targeted depends on
-	 * the type of item.
+	 * 一个命令，让所订购的英雄使用某个库存槽中的物品。如果是没有目标的命令，则取决于物品的类型。
 	 */
 	public static final int itemuse02 = 852010;
 	/**
-	 * An order that will make the ordered hero use the item in a certain inventory
-	 * slot. If it's an order with no target or object or point targeted depends on
-	 * the type of item.
+	 * 一个命令，让所订购的英雄使用某个库存槽中的物品。如果是没有目标的命令，则取决于物品的类型。
 	 */
 	public static final int itemuse03 = 852011;
 	/**
-	 * An order that will make the ordered hero use the item in a certain inventory
-	 * slot. If it's an order with no target or object or point targeted depends on
-	 * the type of item.
+	 * 一个命令，让所订购的英雄使用某个库存槽中的物品。如果是没有目标的命令，则取决于物品的类型。
 	 */
 	public static final int itemuse04 = 852012;
 	/**
-	 * An order that will make the ordered hero use the item in a certain inventory
-	 * slot. If it's an order with no target or object or point targeted depends on
-	 * the type of item.
+	 * 一个命令，让所订购的英雄使用某个库存槽中的物品。如果是没有目标的命令，则取决于物品的类型。
 	 */
 	public static final int itemuse05 = WarsmashConstants.USE_NINE_ITEM_INVENTORY ? 85201300 : 852013;
 	/**
-	 * Order for AIaa ability, which blizzard made for tome of attack, but never
-	 * used it. But it can actually change caster's base attack!
+	 * AIaa能力的命令，暴雪为攻击卷轴制作了这个命令，但从未使用过。但它实际上可以改变施法者的基础攻击！
 	 */
 	public static final int tomeOfAttack = 852259;
-	/** This is a point or object targeted order that is like a right click. */
+	/** 这是一个点或物体目标命令，类似于右键点击。 */
 	public static final int smart = 851971;
 	/**
-	 * This is an order with no target that opens the skill menu of heroes. If it is
-	 * issued for a normal unit with triggers it will black out the command card for
-	 * this unit, the command card will revert to normal after reselecting the unit.
+	 * 这是一个没有目标的命令，用于打开英雄的技能菜单。如果对普通单位发出该命令，并且有触发器，则会使该单位的命令卡变黑，命令卡会在重新选择该单位后恢复正常。
 	 */
 	public static final int skillmenu = 852000;
 	/**
-	 * This order is issued to units that get stunned by a spell, for example War
-	 * Stomp (AOws). This is probably a hold position + hold fire order. The ordered
-	 * unit will be unable to move and attack.
+	 * 此命令是对被法术眩晕的单位发出的，例如战争践踏（AOws）。这可能是一个保持位置 + 保持开火的命令。被命令的单位将无法移动和攻击。
 	 */
 	public static final int stunned = 851973;
-	public static final int wandOfIllusion = 852274;
-	public static final int absorb = 852529;
-	public static final int acidbomb = 852662;
-	public static final int acolyteharvest = 852185;
-	public static final int ambush = 852131;
-	public static final int ancestralspirit = 852490;
-	public static final int ancestralspirittarget = 852491;
-	public static final int animatedead = 852217;
-	public static final int antimagicshell = 852186;
-	public static final int attack = 851983;
-	public static final int attackground = 851984;
-	public static final int attackonce = 851985;
-	public static final int attributemodskill = 852576;
-	public static final int auraunholy = 852215;
-	public static final int auravampiric = 852216;
-	public static final int autodispel = 852132;
-	public static final int autodispeloff = 852134;
-	public static final int autodispelon = 852133;
-	public static final int autoentangle = 852505;
-	public static final int autoentangleinstant = 852506;
-	public static final int autoharvestgold = 852021;
-	public static final int autoharvestlumber = 852022;
-	public static final int avatar = 852086;
-	public static final int avengerform = 852531;
-	public static final int awaken = 852466;
-	public static final int banish = 852486;
-	public static final int barkskin = 852135;
-	public static final int barkskinoff = 852137;
-	public static final int barkskinon = 852136;
-	public static final int battleroar = 852599;
-	public static final int battlestations = 852099;
-	public static final int bearform = 852138;
-	public static final int berserk = 852100;
-	public static final int blackarrow = 852577;
-	public static final int blackarrowoff = 852579;
-	public static final int blackarrowon = 852578;
-	public static final int blight = 852187;
-	public static final int blink = 852525;
-	public static final int blizzard = 852089;
-	public static final int bloodlust = 852101;
-	public static final int bloodlustoff = 852103;
-	public static final int bloodluston = 852102;
-	public static final int board = 852043;
-	public static final int breathoffire = 852580;
+	public static final int wandOfIllusion = 852274; // 幻象魔杖
+	public static final int absorb = 852529; // 吸收
+	public static final int acidbomb = 852662; // 酸性炸弹
+	public static final int acolyteharvest = 852185; // 侍僧收获
+	public static final int ambush = 852131; // 伏击
+	public static final int ancestralspirit = 852490; // 祖先之灵
+	public static final int ancestralspirittarget = 852491; // 祖先之灵目标
+	public static final int animatedead = 852217; // 动化死尸
+	public static final int antimagicshell = 852186; // 反魔法护罩
+	public static final int attack = 851983; // 攻击
+	public static final int attackground = 851984; // 地面攻击
+	public static final int attackonce = 851985; // 单次攻击
+	public static final int attributemodskill = 852576; // 属性修改技能
+	public static final int auraunholy = 852215; // 不洁光环
+	public static final int auravampiric = 852216; // 吸血光环
+	public static final int autodispel = 852132; // 自动驱散
+	public static final int autodispeloff = 852134; // 关闭自动驱散
+	public static final int autodispelon = 852133; // 开启自动驱散
+	public static final int autoentangle = 852505; // 自动缠绕
+	public static final int autoentangleinstant = 852506; // 立即自动缠绕
+	public static final int autoharvestgold = 852021; // 自动收集金币
+	public static final int autoharvestlumber = 852022; // 自动收集木材
+	public static final int avatar = 852086; // 化身
+	public static final int avengerform = 852531; // 复仇者形态
+	public static final int awaken = 852466; // 觉醒
+	public static final int banish = 852486; // 驱逐
+	public static final int barkskin = 852135; // 树皮护甲
+	public static final int barkskinoff = 852137; // 离开犬吠状态
+	public static final int barkskinon = 852136; // 进入犬吠状态
+	public static final int battleroar = 852599; // 战斗咆哮
+	public static final int battlestations = 852099; // 战斗状态
+	public static final int bearform = 852138; // 熊形态
+	public static final int berserk = 852100; // 狂暴状态
+	public static final int blackarrow = 852577; // 黑箭
+	public static final int blackarrowoff = 852579; // 黑箭结束
+	public static final int blackarrowon = 852578; // 黑箭开始
+	public static final int blight = 852187; // 贫瘠
+	public static final int blink = 852525; // 瞬间移动
+	public static final int blizzard = 852089; // 暴风雪
+	public static final int bloodlust = 852101; // 血之狂热
+	public static final int bloodlustoff = 852103; // 血之狂热结束
+	public static final int bloodluston = 852102; // 血之狂热开始
+	public static final int board = 852043; // 登船
+	public static final int breathoffire = 852580; // 火焰喷吐
 	public static final int breathoffrost = 852560;
+	// 定义构建技能的常量
 	public static final int build = 851994;
+	// 定义挖掘技能的常量
 	public static final int burrow = 852533;
+	// 定义食人魔技能的常量
 	public static final int cannibalize = 852188;
+	// 定义尸虫技能的常量
 	public static final int carrionscarabs = 852551;
+	// 定义尸虫瞬发技能的常量
 	public static final int carrionscarabsinstant = 852554;
+	// 定义尸虫关闭状态的常量
 	public static final int carrionscarabsoff = 852553;
+	// 定义尸虫开启状态的常量
 	public static final int carrionscarabson = 852552;
+	// 定义尸虫群的常量
 	public static final int carrionswarm = 852218;
+	// 定义连锁闪电技能的常量
 	public static final int chainlightning = 852119;
+	// 定义引导技能的常量
 	public static final int channel = 852600;
+	// 定义魅惑技能的常量
 	public static final int charm = 852581;
+	// 定义化学狂怒技能的常量
 	public static final int chemicalrage = 852663;
+	// 定义雾云技能的常量
 	public static final int cloudoffog = 852473;
+	// 定义集群火箭技能的常量
 	public static final int clusterrockets = 852652;
+	// 定义寒冷箭技能的常量
 	public static final int coldarrows = 852244;
+	// 定义寒冷箭目标的常量
 	public static final int coldarrowstarg = 852243;
+	// 定义控制魔法技能的常量
 	public static final int controlmagic = 852474;
+	// 定义实体形态技能的常量
 	public static final int corporealform = 852493;
+	// 定义腐蚀性呼吸技能的常量
 	public static final int corrosivebreath = 852140;
+	// 定义瞬发双目标技能的常量
 	public static final int coupleinstant = 852508;
+	// 定义双目标技能的常量
 	public static final int coupletarget = 852507;
 	public static final int creepanimatedead = 852246;
 	public static final int creepdevour = 852247;

@@ -31,6 +31,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.generic.A
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.generic.CBuff;
 
 public class RenderUnit implements RenderWidget {
+	// 单位 虚无 半透明 顶点颜色
 	public static final Color ETHEREAL = new Color(0.75f, 1, 0.5f, 0.5f);
 	public static final Color DEFAULT = new Color(1, 1, 1, 1);
 	public static final Quaternion tempQuat = new Quaternion();

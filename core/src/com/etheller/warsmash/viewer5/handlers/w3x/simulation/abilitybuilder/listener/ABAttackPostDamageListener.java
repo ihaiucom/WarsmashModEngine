@@ -10,6 +10,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilitybuilder.core
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilitybuilder.core.ABLocalStoreKeys;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.attacks.listeners.CUnitAttackPostDamageListener;
 
+// jass onHit 的动作监听 受击 回调
 public class ABAttackPostDamageListener implements CUnitAttackPostDamageListener {
 
 	private Map<String, Object> localStore;

@@ -5,6 +5,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.CUnit;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.CAttackType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CDamageType;
 
+// 魔法攻击免疫
 public class CUnitDefaultMagicImmuneDamageModListener implements CUnitAttackFinalDamageTakenModificationListener {
 	public static CUnitDefaultMagicImmuneDamageModListener INSTANCE = new CUnitDefaultMagicImmuneDamageModListener();
 

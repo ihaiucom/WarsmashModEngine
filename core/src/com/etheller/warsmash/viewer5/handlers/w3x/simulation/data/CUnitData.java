@@ -900,41 +900,41 @@ public class CUnitData {
 			final String weaponSound, final CWeaponType weaponType) {
 		final CUnitAttack attack;
 		switch (weaponType) {
-		case MISSILE:
+		case MISSILE: // 箭矢
 			attack = new CUnitAttackMissile(animationBackswingPoint, animationDamagePoint, attackType, cooldownTime,
 					damageBase, damageDice, damageSidesPerDie, damageUpgradeAmount, range, rangeMotionBuffer, showUI,
 					targetsAllowed, weaponSound, weaponType, projectileArc, projectileArt, projectileHomingEnabled,
 					projectileSpeed);
 			break;
-		case MBOUNCE:
+		case MBOUNCE: // 箭矢(弹射)
 			attack = new CUnitAttackMissileBounce(animationBackswingPoint, animationDamagePoint, attackType,
 					cooldownTime, damageBase, damageDice, damageSidesPerDie, damageUpgradeAmount, range,
 					rangeMotionBuffer, showUI, targetsAllowed, weaponSound, weaponType, projectileArc, projectileArt,
 					projectileHomingEnabled, projectileSpeed, damageLossFactor, maximumNumberOfTargets,
 					areaOfEffectFullDamage, areaOfEffectTargets);
 			break;
-		case MSPLASH:
-		case ARTILLERY:
+		case MSPLASH: // 箭矢(溅射)
+		case ARTILLERY: // 炮火
 			attack = new CUnitAttackMissileSplash(animationBackswingPoint, animationDamagePoint, attackType,
 					cooldownTime, damageBase, damageDice, damageSidesPerDie, damageUpgradeAmount, range,
 					rangeMotionBuffer, showUI, targetsAllowed, weaponSound, weaponType, projectileArc, projectileArt,
 					projectileHomingEnabled, projectileSpeed, areaOfEffectFullDamage, areaOfEffectMediumDamage,
 					areaOfEffectSmallDamage, areaOfEffectTargets, damageFactorMedium, damageFactorSmall);
 			break;
-		case MLINE:
-		case ALINE:
+		case MLINE: // 箭矢(穿透)
+		case ALINE: // 炮灰(穿透)
 			attack = new CUnitAttackMissileLine(animationBackswingPoint, animationDamagePoint, attackType, cooldownTime,
 					damageBase, damageDice, damageSidesPerDie, damageUpgradeAmount, range, rangeMotionBuffer, showUI,
 					targetsAllowed, weaponSound, weaponType, projectileArc, projectileArt, projectileHomingEnabled,
 					projectileSpeed, damageSpillDistance, damageSpillRadius);
 			break;
-		case INSTANT:
+		case INSTANT: // 立即
 			attack = new CUnitAttackInstant(animationBackswingPoint, animationDamagePoint, attackType, cooldownTime,
 					damageBase, damageDice, damageSidesPerDie, damageUpgradeAmount, range, rangeMotionBuffer, showUI,
 					targetsAllowed, weaponSound, weaponType, projectileArt);
 			break;
 		default:
-		case NORMAL:
+		case NORMAL: // 近战
 			attack = new CUnitAttackNormal(animationBackswingPoint, animationDamagePoint, attackType, cooldownTime,
 					damageBase, damageDice, damageSidesPerDie, damageUpgradeAmount, range, rangeMotionBuffer, showUI,
 					targetsAllowed, weaponSound, weaponType);

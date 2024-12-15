@@ -11,6 +11,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.attacks.list
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.attacks.listeners.CUnitDeathReplacementResult;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.attacks.listeners.CUnitDeathReplacementStacking;
 
+// jass onDeath 的动作监听死亡替换效果处理器
 public class ABDeathReplacementEffect implements CUnitDeathReplacementEffect {
 
 	private Map<String, Object> localStore;

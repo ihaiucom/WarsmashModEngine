@@ -28,23 +28,26 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.AbilityTargetC
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.CommandStringErrorKeys;
 
 @Deprecated
+// CAbilityAbilityBuilderActiveFlexTargetSimple类：实现一种灵活目标的法术能力构建器
 public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellBase {
 	private CBehavior behavior;
 
+	// 法术等级数据列表
 	List<CAbilityTypeAbilityBuilderLevelData> levelData;
-	private AbilityBuilderConfiguration config;
-	private Map<String, Object> localStore;
-	private int orderId;
-	private int autoCastOnId = 0;
-	private int autoCastOffId = 0;
-	private boolean autocasting = false;
-	private boolean initialized;
+	private AbilityBuilderConfiguration config; // 配置
+	private Map<String, Object> localStore; // 本地存储
+	private int orderId; // 命令ID
+	private int autoCastOnId = 0; // 自动施法开启ID
+	private int autoCastOffId = 0; // 自动施法关闭ID
+	private boolean autocasting = false; // 是否自动施法标志
+	private boolean initialized; // 是否初始化标志
 
-	private int castId = 0;
-	
-	private boolean targetedSpell = false;
-	private boolean pointTarget = false;
+	private int castId = 0; // 施法ID
 
+	private boolean targetedSpell = false; // 是否为目标法术
+	private boolean pointTarget = false; // 是否为点目标
+
+	// 构造函数：初始化法术能力构建器
 	public CAbilityAbilityBuilderActiveFlexTargetSimple(int handleId, War3ID alias,
 			List<CAbilityTypeAbilityBuilderLevelData> levelData, AbilityBuilderConfiguration config,
 			Map<String, Object> localStore) {
@@ -60,7 +63,8 @@ public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellB
 			autoCastOffId = OrderIdUtils.getOrderId(config.getAutoCastOffId());
 		}
 	}
-	
+
+	// 设置目标法术属性
 	private void setTargeted(CSimulation game, CUnit unit) {
 		if (config.getSpecialFields() != null && config.getSpecialFields().getTargetedSpell() != null) {
 			boolean result = true;
@@ -70,6 +74,8 @@ public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellB
 			this.targetedSpell = result;
 		}
 	}
+
+	// 设置点目标属性
 	private void setPointTarget(CSimulation game, CUnit unit) {
 		if (config.getSpecialFields() != null && config.getSpecialFields().getPointTargeted() != null) {
 			boolean result = true;
@@ -79,6 +85,8 @@ public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellB
 			this.pointTarget = result;
 		}
 	}
+
+	// 设置法术的行为
 	private void setBehavior(final CUnit unit) {
 		if (this.targetedSpell) {
 			if (this.behavior == null || !(this.behavior instanceof CBehaviorTargetSpellBase)) {
@@ -91,21 +99,25 @@ public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellB
 		}
 	}
 
+	// 检查是否为目标法术
 	public boolean isTargetedSpell() {
 		return this.targetedSpell;
 	}
 
+	// 检查是否为点目标
 	public boolean isPointTarget() {
 		return this.pointTarget;
 	}
 
 	@Override
+	// 设置法术等级
 	public void setLevel(CSimulation game, CUnit unit, int level) {
 		super.setLevel(game, unit, level);
 		localStore.put(ABLocalStoreKeys.CURRENTLEVEL, level);
 	}
 
 	@Override
+	// 填充数据（更新法术状态）
 	public void populateData(GameObject worldEditorAbility, int level) {
 		if (this.initialized) {
 			CSimulation game = (CSimulation) this.localStore.get(ABLocalStoreKeys.GAME);
@@ -123,23 +135,28 @@ public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellB
 	}
 
 	@Override
+	// 获取基础命令ID
 	public int getBaseOrderId() {
 		return this.orderId;
 	}
 
+	// 获取法术等级数据列表
 	public List<CAbilityTypeAbilityBuilderLevelData> getLevelData() {
 		return this.levelData;
 	}
 
+	// 获取法术配置
 	public AbilityBuilderConfiguration getConfig() {
 		return this.config;
 	}
 
+	// 获取本地存储
 	public Map<String, Object> getLocalStore() {
 		return this.localStore;
 	}
 
 	@Override
+	// 添加法术时调用
 	public void onAdd(CSimulation game, CUnit unit) {
 		localStore.put(ABLocalStoreKeys.FLEXABILITY, this);
 		this.setTargeted(game, unit);
@@ -155,6 +172,7 @@ public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellB
 	}
 
 	@Override
+	// 执行法术效果
 	public boolean doEffect(CSimulation simulation, CUnit unit, AbilityTarget target) {
 		this.castId++;
 		if (this.config.getOnBeginCasting() != null) {
@@ -189,6 +207,7 @@ public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellB
 	}
 
 	@Override
+	// 检查是否可以使用法术
 	protected void innerCheckCanUseSpell(CSimulation game, CUnit unit, int orderId,
 			AbilityActivationReceiver receiver) {
 		if (config.getExtraCastConditions() != null) {
@@ -211,6 +230,7 @@ public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellB
 		}
 	}
 
+	// 检查是否可以对目标施法
 	protected void innerCheckCanTargetSpell(CSimulation game, CUnit unit, int orderId, CWidget target,
 			AbilityTargetCheckReceiver<CWidget> receiver) {
 		if (this.config.getExtraTargetConditions() != null) {
@@ -239,6 +259,7 @@ public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellB
 		}
 	}
 
+	// 检查是否可以对点目标施法
 	protected void innerCheckCanTargetSpell(CSimulation game, CUnit unit, int orderId, AbilityPointTarget target,
 			AbilityTargetCheckReceiver<AbilityPointTarget> receiver) {
 		if (this.config.getExtraTargetConditions() != null) {
@@ -264,26 +285,31 @@ public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellB
 	}
 
 	@Override
+	// 获取自动施法开启命令ID
 	public int getAutoCastOnOrderId() {
 		return this.autoCastOnId;
 	}
 
 	@Override
+	// 获取自动施法关闭命令ID
 	public int getAutoCastOffOrderId() {
 		return this.autoCastOffId;
 	}
 
 	@Override
+	// 检查是否自动施法开启
 	public boolean isAutoCastOn() {
 		return this.autocasting;
 	}
 
 	@Override
+	// 设置自动施法
 	public void setAutoCastOn(final CUnit caster, final boolean autoCastOn) {
 		this.autocasting = autoCastOn;
 	}
 
 	@Override
+	// 开始施法（针对目标）
 	public CBehavior begin(CSimulation game, CUnit caster, int orderId, CWidget target) {
 		if (this.isTargetedSpell() && !this.isPointTarget()) {
 			if (this.behavior instanceof CBehaviorTargetSpellBase) {
@@ -297,6 +323,7 @@ public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellB
 	}
 
 	@Override
+	// 开始施法（针对点目标）
 	public CBehavior begin(CSimulation game, CUnit caster, int orderId, AbilityPointTarget point) {
 		if (this.isTargetedSpell() && this.isPointTarget()) {
 			if (this.behavior instanceof CBehaviorTargetSpellBase) {
@@ -310,6 +337,7 @@ public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellB
 	}
 
 	@Override
+	// 开始无目标施法
 	public CBehavior beginNoTarget(CSimulation game, CUnit caster, int orderId) {
 		if (!this.isTargetedSpell()) {
 			if (this.behavior instanceof CBehaviorNoTargetSpellBase) {
@@ -323,6 +351,7 @@ public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellB
 	}
 
 	@Override
+	// 检查是否可以对目标施法
 	protected void innerCheckCanTarget(CSimulation game, CUnit unit, int orderId, CWidget target,
 			AbilityTargetCheckReceiver<CWidget> receiver) {
 		if (this.isTargetedSpell() && !this.isPointTarget()) {
@@ -339,6 +368,7 @@ public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellB
 	}
 
 	@Override
+	// 检查是否可以对点目标施法
 	protected void innerCheckCanTarget(CSimulation game, CUnit unit, int orderId, AbilityPointTarget target,
 			AbilityTargetCheckReceiver<AbilityPointTarget> receiver) {
 		if (this.isTargetedSpell() && this.isPointTarget()) {
@@ -353,6 +383,7 @@ public class CAbilityAbilityBuilderActiveFlexTargetSimple extends CAbilitySpellB
 	}
 
 	@Override
+	// 检查是否可以进行无目标施法
 	protected void innerCheckCanTargetNoTarget(CSimulation game, CUnit unit, int orderId,
 			AbilityTargetCheckReceiver<Void> receiver) {
 		if (!this.isTargetedSpell()) {

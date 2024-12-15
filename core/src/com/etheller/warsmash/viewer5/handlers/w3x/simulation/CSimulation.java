@@ -90,7 +90,7 @@ public class CSimulation implements CPlayerAPI {
 	private final List<CEffect> newProjectiles;
 	private final HandleIdAllocator handleIdAllocator;
 	private transient final SimulationRenderController simulationRenderController;
-	private int gameTurnTick = 0;
+	private int gameTurnTick = 0; // 游戏当前第几帧
 	private final PathingGrid pathingGrid;
 	private final CWorldCollision worldCollision;
 	private final CPathfindingProcessor[] pathfindingProcessors;
@@ -402,6 +402,7 @@ public class CSimulation implements CPlayerAPI {
 		this.newProjectiles.add(effect);
 	}
 
+	// 创建闪电渲染效果
 	public SimulationRenderComponentLightning createLightning(final CUnit source, final War3ID lightningId,
 			final CUnit target) {
 		return this.simulationRenderController.createLightning(this, lightningId, source, target);
@@ -718,6 +719,7 @@ public class CSimulation implements CPlayerAPI {
 		this.simulationRenderController.spawnEffectOnUnit(unit, effectPath);
 	}
 
+	// 创建施法效果
 	public void createTemporarySpellEffectOnUnit(final CUnit unit, final War3ID alias, final CEffectType effectType) {
 		this.simulationRenderController.spawnTemporarySpellEffectOnUnit(unit, alias, effectType);
 	}

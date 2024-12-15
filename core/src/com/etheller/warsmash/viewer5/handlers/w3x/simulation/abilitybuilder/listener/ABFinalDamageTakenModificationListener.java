@@ -11,6 +11,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.CAttackType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.attacks.listeners.CUnitAttackFinalDamageTakenModificationListener;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CDamageType;
 
+// jass onDamage 的动作监听 最终伤害修改器
 public class ABFinalDamageTakenModificationListener implements CUnitAttackFinalDamageTakenModificationListener {
 
 	private Map<String, Object> localStore;

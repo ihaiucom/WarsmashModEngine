@@ -7,6 +7,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.CAttackType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.CWeaponType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CDamageType;
 
+// 攻击前监听器
 public interface CUnitAttackPreDamageListener {
 	public CUnitAttackEffectListenerStacking onAttack(final CSimulation simulation, CUnit attacker, AbilityTarget target, CWeaponType weaponType, CAttackType attackType, CDamageType damageType, CUnitAttackPreDamageListenerDamageModResult damageResult);
 }

@@ -41,6 +41,7 @@ public class CBehaviorMove implements CBehavior {
 	private CUnit followUnit;
 	private CRangedBehavior rangedBehavior;
 	private boolean firstUpdate = true;
+	// 禁用碰撞
 	private boolean disableCollision = false;
 	private boolean pathfindingActive = false;
 	private boolean firstPathfindJob = false;

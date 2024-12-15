@@ -3562,7 +3562,8 @@ public class War3MapViewer extends AbstractMdxModelViewer {
 								final RenderCorner corner = War3MapViewer.this.terrain.getCorner(x, y);
 								return corner == null ? false : corner.getWater() != 0;
 							}
-						}, War3MapViewer.this.terrain.pathingGrid, War3MapViewer.this.terrain.getEntireMap(),
+						},
+						War3MapViewer.this.terrain.pathingGrid, War3MapViewer.this.terrain.getEntireMap(),
 						War3MapViewer.this.seededRandom, War3MapViewer.this.commandErrorListener);
 			});
 
