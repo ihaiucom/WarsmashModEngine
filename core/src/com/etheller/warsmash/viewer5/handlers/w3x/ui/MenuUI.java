@@ -886,7 +886,7 @@ public class MenuUI {
 			});
 		}
 
-		this.localAreaNetworkButton.setEnabled(false);
+		this.localAreaNetworkButton.setEnabled(true);
 		this.optionsButton.setEnabled(false);
 		this.creditsButton.setEnabled(false);
 
@@ -1660,8 +1660,6 @@ public class MenuUI {
 			final DataTable worldEditData = viewer.loadWorldEditData(map);
 			final WTS wts = viewer.preloadWTS(map);
 
-			final int loadingScreen = mapInfo.getLoadingScreen();
-			System.out.println("LOADING SCREEN INT: " + loadingScreen);
 			final int campaignBackground = mapInfo.getCampaignBackground();
 			int animationSequenceIndex;
 			final String campaignScreenModel;
@@ -1733,7 +1731,9 @@ public class MenuUI {
 		MenuUI.this.campaignSelectFrame.setVisible(false);
 		MenuUI.this.campaignWarcraftIIILogo.setVisible(false);
 		MenuUI.this.campaignRootMenuUI.setVisible(false);
-		MenuUI.this.currentMissionSelectMenuUI.setVisible(false);
+		if (this.currentMissionSelectMenuUI != null) {
+			MenuUI.this.currentMissionSelectMenuUI.setVisible(false);
+		}
 		MenuUI.this.skirmish.setVisible(false);
 		MenuUI.this.glueSpriteLayerTopLeft.setSequence("Death");
 		MenuUI.this.glueSpriteLayerTopRight.setSequence("Death");
@@ -1752,7 +1752,7 @@ public class MenuUI {
 			}
 		}
 		MenuUI.this.beginGameInformation.localPlayerIndex = localPlayerIndex;
-		this.beginGameInformation.loadingStarted = true;
+//		this.beginGameInformation.loadingStarted = true;
 		MenuUI.this.menuState = MenuState.GOING_TO_MAP;
 	}
 
@@ -1781,7 +1781,9 @@ public class MenuUI {
 		this.campaignButton.setEnabled(b);
 		this.loadSavedButton.setEnabled(b && ENABLE_NOT_YET_IMPLEMENTED_BUTTONS);
 		this.viewReplayButton.setEnabled(b && ENABLE_NOT_YET_IMPLEMENTED_BUTTONS);
-		this.customCampaignButton.setEnabled(b && ENABLE_NOT_YET_IMPLEMENTED_BUTTONS);
+		if (this.customCampaignButton != null) {
+			this.customCampaignButton.setEnabled(b && ENABLE_NOT_YET_IMPLEMENTED_BUTTONS);
+		}
 		this.skirmishButton.setEnabled(b);
 		this.singlePlayerCancelButton.setEnabled(b);
 	}
@@ -1805,7 +1807,7 @@ public class MenuUI {
 	}
 
 	public void resize() {
-
+		this.rootFrame.positionBounds(this.rootFrame, this.uiViewport);
 	}
 
 	public void render(final SpriteBatch batch, final GlyphLayout glyphLayout) {
@@ -1813,10 +1815,12 @@ public class MenuUI {
 			final BitmapFont font = this.rootFrame.getFont();
 			final BitmapFont font20 = this.rootFrame.getFont20();
 			font.setColor(Color.YELLOW);
-			final String fpsString = "FPS: " + Gdx.graphics.getFramesPerSecond();
-			glyphLayout.setText(font, fpsString);
-			font.draw(batch, fpsString, (getMinWorldWidth() - glyphLayout.width) / 2,
-					1100 * this.heightRatioCorrection);
+			if (WarsmashConstants.SHOW_FPS) {
+				final String fpsString = "FPS: " + Gdx.graphics.getFramesPerSecond();
+				glyphLayout.setText(font, fpsString);
+				font.draw(batch, fpsString, (getMinWorldWidth() - glyphLayout.width) / 2,
+						1100 * this.heightRatioCorrection);
+			}
 			this.rootFrame.render(batch, font20, glyphLayout);
 		}
 	}
@@ -2393,15 +2397,42 @@ public class MenuUI {
 	}
 
 	private static enum MenuState {
-		GOING_TO_MAIN_MENU, MAIN_MENU, GOING_TO_BATTLE_NET_LOGIN, GOING_TO_BATTLE_NET_LOGIN_PART2, BATTLE_NET_LOGIN,
-		LEAVING_BATTLE_NET, LEAVING_BATTLE_NET_FROM_LOGGED_IN, GOING_TO_BATTLE_NET_CUSTOM_GAME_MENU,
-		BATTLE_NET_CUSTOM_GAME_MENU, GOING_TO_BATTLE_NET_CREATE_CUSTOM_GAME_MENU, BATTLE_NET_CREATE_CUSTOM_GAME_MENU,
-		GOING_TO_BATTLE_NET_CHANNEL_MENU, BATTLE_NET_CHANNEL_MENU, GOING_TO_BATTLE_NET_WELCOME, BATTLE_NET_WELCOME,
-		GOING_TO_SINGLE_PLAYER, LEAVING_CAMPAIGN, SINGLE_PLAYER, GOING_TO_SINGLE_PLAYER_SKIRMISH,
-		SINGLE_PLAYER_SKIRMISH, GOING_TO_MAP, GOING_TO_CAMPAIGN, GOING_TO_CAMPAIGN_PART2, GOING_TO_MISSION_SELECT,
-		MISSION_SELECT, CAMPAIGN, GOING_TO_SINGLE_PLAYER_PROFILE, SINGLE_PLAYER_PROFILE, GOING_TO_LOADING_SCREEN,
-		QUITTING, RESTARTING, GOING_TO_BATTLE_NET_CHAT_CHANNEL, GOING_TO_BATTLE_NET_CHAT_CHANNEL_FROM_OUTSIDE,
-		BATTLE_NET_CHAT_CHANNEL, GOING_TO_BATTLE_NET_CUSTOM_GAME_LOBBY, BATTLE_NET_CUSTOM_GAME_LOBBY;
+		GOING_TO_MAIN_MENU,
+		MAIN_MENU,
+		GOING_TO_BATTLE_NET_LOGIN,
+		GOING_TO_BATTLE_NET_LOGIN_PART2,
+		BATTLE_NET_LOGIN,
+		LEAVING_BATTLE_NET,
+		LEAVING_BATTLE_NET_FROM_LOGGED_IN,
+		GOING_TO_BATTLE_NET_CUSTOM_GAME_MENU,
+		BATTLE_NET_CUSTOM_GAME_MENU,
+		GOING_TO_BATTLE_NET_CREATE_CUSTOM_GAME_MENU,
+		BATTLE_NET_CREATE_CUSTOM_GAME_MENU,
+		GOING_TO_BATTLE_NET_CHANNEL_MENU,
+		BATTLE_NET_CHANNEL_MENU,
+		GOING_TO_BATTLE_NET_WELCOME,
+		BATTLE_NET_WELCOME,
+		GOING_TO_SINGLE_PLAYER,
+		LEAVING_CAMPAIGN,
+		SINGLE_PLAYER,
+		GOING_TO_SINGLE_PLAYER_SKIRMISH,
+		SINGLE_PLAYER_SKIRMISH,
+		GOING_TO_MAP,
+		GOING_TO_CAMPAIGN,
+		GOING_TO_CAMPAIGN_PART2,
+		GOING_TO_MISSION_SELECT,
+		MISSION_SELECT,
+		CAMPAIGN,
+		GOING_TO_SINGLE_PLAYER_PROFILE,
+		SINGLE_PLAYER_PROFILE,
+		GOING_TO_LOADING_SCREEN,
+		QUITTING,
+		RESTARTING,
+		GOING_TO_BATTLE_NET_CHAT_CHANNEL,
+		GOING_TO_BATTLE_NET_CHAT_CHANNEL_FROM_OUTSIDE,
+		BATTLE_NET_CHAT_CHANNEL,
+		GOING_TO_BATTLE_NET_CUSTOM_GAME_LOBBY,
+		BATTLE_NET_CUSTOM_GAME_LOBBY;
 	}
 
 	public void hide() {

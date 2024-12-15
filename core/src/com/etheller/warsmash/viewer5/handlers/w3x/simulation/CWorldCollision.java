@@ -18,10 +18,13 @@ public class CWorldCollision {
 	private final Quadtree<CUnit> buildingUnitCollision;
 	private final Quadtree<CUnit> anyUnitEnumerableCollision;
 	private final Quadtree<CDestructable> destructablesForEnum;
+	private final Quadtree<CItem> itemsForEnum;
 	private final float maxCollisionRadius;
 	private final AnyUnitExceptTwoIntersector anyUnitExceptTwoIntersector;
 	private final EachUnitOnlyOnceIntersector eachUnitOnlyOnceIntersector;
 	private final DestructableEnumIntersector destructableEnumIntersector;
+	private final ItemEnumIntersector itemEnumIntersector;
+	private final ItemEnumIntersectorBoolean itemEnumIntersectorBoolean;
 
 	public CWorldCollision(final Rectangle entireMapBounds, final float maxCollisionRadius) {
 		this.deadUnitCollision = new Quadtree<>(entireMapBounds);
@@ -31,10 +34,13 @@ public class CWorldCollision {
 		this.buildingUnitCollision = new Quadtree<>(entireMapBounds);
 		this.anyUnitEnumerableCollision = new Quadtree<>(entireMapBounds);
 		this.destructablesForEnum = new Quadtree<>(entireMapBounds);
+		this.itemsForEnum = new Quadtree<>(entireMapBounds);
 		this.maxCollisionRadius = maxCollisionRadius;
 		this.anyUnitExceptTwoIntersector = new AnyUnitExceptTwoIntersector();
 		this.eachUnitOnlyOnceIntersector = new EachUnitOnlyOnceIntersector();
 		this.destructableEnumIntersector = new DestructableEnumIntersector();
+		this.itemEnumIntersector = new ItemEnumIntersector();
+		this.itemEnumIntersectorBoolean = new ItemEnumIntersectorBoolean();
 	}
 
 	public void addUnit(final CUnit unit) {
@@ -93,6 +99,16 @@ public class CWorldCollision {
 	public void removeDestructable(final CDestructable dest) {
 		final Rectangle bounds = dest.getOrCreateRegisteredEnumRectangle();
 		this.destructablesForEnum.remove(dest, bounds);
+	}
+
+	public void addItem(final CItem item) {
+		final Rectangle bounds = item.getOrCreateRegisteredEnumRectangle();
+		this.itemsForEnum.add(item, bounds);
+	}
+
+	public void removeItem(final CItem item) {
+		final Rectangle bounds = item.getOrCreateRegisteredEnumRectangle();
+		this.itemsForEnum.remove(item, bounds);
 	}
 
 	public void removeUnit(final CUnit unit) {
@@ -163,6 +179,21 @@ public class CWorldCollision {
 			return callback.call(unit);
 		});
 	}
+	
+	public void enumUnitsOrCorpsesInRect(final Rectangle rect, final CUnitEnumFunction callback) {
+		// NOTE: allocation here seems quite wasteful, see note on enumUnitsInRect
+		final Set<CUnit> intersectedUnits = new HashSet<>();
+		final QuadtreeIntersector<CUnit> intersectorFxn = (unit) -> {
+			if (unit.isHidden() || !intersectedUnits.add(unit)) {
+				return false;
+			}
+			return callback.call(unit);
+		};
+		if (!this.anyUnitEnumerableCollision.intersect(rect, intersectorFxn)) {
+			this.deadUnitCollision.intersect(rect, intersectorFxn);
+		}
+
+	}
 
 	public void enumCorpsesInRange(final float x, final float y, final float radius, final CUnitEnumFunction callback) {
 		enumCorpsesInRect(new Rectangle(x - radius, y - radius, radius * 2, radius * 2), (enumUnit) -> {
@@ -183,12 +214,25 @@ public class CWorldCollision {
 		});
 	}
 
+	public void enumUnitsOrCorpsesInRange(final float x, final float y, final float radius, final CUnitEnumFunction callback) {
+		enumUnitsOrCorpsesInRect(new Rectangle(x - radius, y - radius, radius * 2, radius * 2), (enumUnit) -> {
+			if (enumUnit.canReach(x, y, radius)) {
+				return callback.call(enumUnit);
+			}
+			return false;
+		});
+	}
+
 	public void enumBuildingsInRect(final Rectangle rect, final QuadtreeIntersector<CUnit> callback) {
 		this.buildingUnitCollision.intersect(rect, callback);
 	}
 
 	public void enumBuildingsAtPoint(final float x, final float y, final QuadtreeIntersector<CUnit> callback) {
 		this.buildingUnitCollision.intersect(x, y, callback);
+	}
+
+	public void enumItemsInRect(final Rectangle rect, final CItemEnumFunction callback) {
+		this.itemsForEnum.intersect(rect, this.itemEnumIntersector.reset(callback));
 	}
 
 	public void enumDestructablesInRect(final Rectangle rect, final CDestructableEnumFunction callback) {
@@ -206,39 +250,41 @@ public class CWorldCollision {
 	}
 
 	public boolean intersectsAnythingOtherThan(final Rectangle newPossibleRectangle, final CUnit sourceUnitToIgnore,
-			final MovementType movementType) {
-		return this.intersectsAnythingOtherThan(newPossibleRectangle, sourceUnitToIgnore, null, movementType);
+			final MovementType movementType, final boolean forConstruction) {
+		return this.intersectsAnythingOtherThan(newPossibleRectangle, sourceUnitToIgnore, null, movementType,
+				forConstruction);
 	}
 
 	public boolean intersectsAnythingOtherThan(final Rectangle newPossibleRectangle, final CUnit sourceUnitToIgnore,
-			final CUnit sourceSecondUnitToIgnore, final MovementType movementType) {
+			final CUnit sourceSecondUnitToIgnore, final MovementType movementType, final boolean forConstruction) {
 		if (movementType != null) {
 			switch (movementType) {
 			case AMPHIBIOUS:
-				if (this.seaUnitCollision.intersect(newPossibleRectangle,
-						this.anyUnitExceptTwoIntersector.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore))) {
+				if (this.seaUnitCollision.intersect(newPossibleRectangle, this.anyUnitExceptTwoIntersector
+						.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore, forConstruction))) {
 					return true;
 				}
-				if (this.groundUnitCollision.intersect(newPossibleRectangle,
-						this.anyUnitExceptTwoIntersector.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore))) {
+				if (this.groundUnitCollision.intersect(newPossibleRectangle, this.anyUnitExceptTwoIntersector
+						.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore, forConstruction))) {
 					return true;
 				}
 				return false;
 			case FLOAT:
-				return this.seaUnitCollision.intersect(newPossibleRectangle,
-						this.anyUnitExceptTwoIntersector.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore));
+				return this.seaUnitCollision.intersect(newPossibleRectangle, this.anyUnitExceptTwoIntersector
+						.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore, forConstruction));
 			case FLY:
-				return this.airUnitCollision.intersect(newPossibleRectangle,
-						this.anyUnitExceptTwoIntersector.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore));
-			case DISABLED:
+				return this.airUnitCollision.intersect(newPossibleRectangle, this.anyUnitExceptTwoIntersector
+						.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore, forConstruction));
 			case FOOT_NO_COLLISION:
+				return this.itemsForEnum.intersect(newPossibleRectangle, this.itemEnumIntersectorBoolean);
+			case DISABLED:
 				return false;
 			default:
 			case FOOT:
 			case HORSE:
 			case HOVER:
-				return this.groundUnitCollision.intersect(newPossibleRectangle,
-						this.anyUnitExceptTwoIntersector.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore));
+				return this.groundUnitCollision.intersect(newPossibleRectangle, this.anyUnitExceptTwoIntersector
+						.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore, forConstruction));
 			}
 		}
 		return false;
@@ -297,19 +343,32 @@ public class CWorldCollision {
 		} // else probably moving a dead unit that isn't corpse yet
 	}
 
+	public void translate(final CItem item, final float xShift, final float yShift) {
+		final Rectangle bounds = item.getOrCreateRegisteredEnumRectangle();
+		if (!item.isDead()) {
+			this.itemsForEnum.translate(item, bounds, xShift, yShift);
+		}
+	}
+
 	private static final class AnyUnitExceptTwoIntersector implements QuadtreeIntersector<CUnit> {
 		private CUnit firstUnit;
 		private CUnit secondUnit;
+		private boolean forConstruction;
 
-		public AnyUnitExceptTwoIntersector reset(final CUnit firstUnit, final CUnit secondUnit) {
+		public AnyUnitExceptTwoIntersector reset(final CUnit firstUnit, final CUnit secondUnit,
+				final boolean forConstruction) {
 			this.firstUnit = firstUnit;
 			this.secondUnit = secondUnit;
+			this.forConstruction = forConstruction;
 			return this;
 		}
 
 		@Override
 		public boolean onIntersect(final CUnit intersectingObject) {
-			if (intersectingObject.isHidden()) {
+			if (intersectingObject.isHidden()
+					|| MovementType.FOOT_NO_COLLISION.equals(intersectingObject.getMovementType())
+					|| (this.forConstruction && intersectingObject.isNoBuildingCollision())
+					|| (!this.forConstruction && intersectingObject.isNoUnitCollision())) {
 				return false;
 			}
 			return (intersectingObject != this.firstUnit) && (intersectingObject != this.secondUnit);
@@ -361,6 +420,34 @@ public class CWorldCollision {
 //				return false;
 //			}
 			return this.consumerDelegate.call(intersectingObject);
+		}
+	}
+
+	private static final class ItemEnumIntersector implements QuadtreeIntersector<CItem> {
+		private CItemEnumFunction consumerDelegate;
+
+		public ItemEnumIntersector reset(final CItemEnumFunction consumerDelegate) {
+			this.consumerDelegate = consumerDelegate;
+			return this;
+		}
+
+		@Override
+		public boolean onIntersect(final CItem intersectingObject) {
+			if (intersectingObject.isHidden()) {
+				return false;
+			}
+			return this.consumerDelegate.call(intersectingObject);
+		}
+	}
+
+	private static final class ItemEnumIntersectorBoolean implements QuadtreeIntersector<CItem> {
+
+		@Override
+		public boolean onIntersect(final CItem intersectingObject) {
+			if (intersectingObject.isHidden()) {
+				return false;
+			}
+			return true;
 		}
 	}
 }

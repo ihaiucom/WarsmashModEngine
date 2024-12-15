@@ -342,4 +342,16 @@ public class CAbilityAbilityBuilderActiveSmart extends AbstractGenericSingleIcon
 		return null;
 	}
 
+	@Override
+	public float getCooldownRemainingTicks(CSimulation game, CUnit unit) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getAbilityIntField(String field) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

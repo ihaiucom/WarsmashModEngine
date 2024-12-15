@@ -119,6 +119,12 @@ public abstract class CAbilityAbilityBuilderGenericActive extends AbstractGeneri
 			this.castingSecondaryTags = SequenceUtils.SPELL;
 		}
 	}
+	
+	@Override
+	public int getAbilityIntField(String field) {
+		GameObject editorData = (GameObject) localStore.get(ABLocalStoreKeys.ABILITYEDITORDATA);
+		return editorData.getFieldValue(field);
+	}
 
 	@Override
 	public void setLevel(CSimulation game, CUnit unit, int level) {
@@ -154,6 +160,10 @@ public abstract class CAbilityAbilityBuilderGenericActive extends AbstractGeneri
 			for (ABAction action : config.getOnAddDisabledAbility()) {
 				action.runAction(game, unit, localStore, castId);
 			}
+		}
+		
+		if (this.autocastType == AutocastType.ATTACKREPLACEMENT) {
+			//game.createProjectile(unit, offTooltipOverride, bufferMana, autoCastOnId, autoCastOffId, area, active, unit, null)
 		}
 	}
 
@@ -289,6 +299,15 @@ public abstract class CAbilityAbilityBuilderGenericActive extends AbstractGeneri
 	}
 
 	@Override
+	public float getCooldownRemainingTicks(CSimulation game, CUnit unit) {
+		War3ID cdID = getCooldownId();
+		if (cdID != War3ID.NONE) {
+			return unit.getCooldownRemainingTicks(game, cdID);
+		}
+		return unit.getCooldownRemainingTicks(game, this.getCode());
+	}
+
+	@Override
 	public void resetCooldown(CSimulation game, CUnit unit) {
 		War3ID cdID = getCooldownId();
 		if (cdID != War3ID.NONE) {
@@ -314,6 +333,11 @@ public abstract class CAbilityAbilityBuilderGenericActive extends AbstractGeneri
 		this.item = item;
 		this.localStore.put(ABLocalStoreKeys.ITEM, item);
 		this.localStore.put(ABLocalStoreKeys.ITEMSLOT, slot);
+	}
+	
+	@Override
+	public CItem getItem() {
+		return this.item;
 	}
 
 	@Override
@@ -415,6 +439,9 @@ public abstract class CAbilityAbilityBuilderGenericActive extends AbstractGeneri
 	@Override
 	public void setAutoCastOn(final CUnit caster, final boolean autoCastOn) {
 		this.autocasting = autoCastOn;
+		if (this.autocastType == AutocastType.ATTACKREPLACEMENT) {
+			//caster.addAttackReplacement(null, CUnitAttackReplacementPriority.AUTOCAST);
+		}
 		caster.setAutocastAbility(autoCastOn ? this : null);
 	}
 
@@ -435,6 +462,9 @@ public abstract class CAbilityAbilityBuilderGenericActive extends AbstractGeneri
 						&& this.config.getDisplayFields().getInstantCast().callback(null, unit, localStore, castId))) {
 			beh.setInstant(true);
 		}
+		if (this.config.getSpecialFields() != null && this.config.getSpecialFields().getBehaviorCategory() != null) {
+			beh.setBehaviorCategory(this.config.getSpecialFields().getBehaviorCategory());
+		}
 		return beh;
 	}
 
@@ -444,6 +474,9 @@ public abstract class CAbilityAbilityBuilderGenericActive extends AbstractGeneri
 				|| (this.config.getDisplayFields() != null && this.config.getDisplayFields().getInstantCast() != null
 						&& this.config.getDisplayFields().getInstantCast().callback(null, unit, localStore, castId))) {
 			beh.setInstant(true);
+		}
+		if (this.config.getSpecialFields() != null && this.config.getSpecialFields().getBehaviorCategory() != null) {
+			beh.setBehaviorCategory(this.config.getSpecialFields().getBehaviorCategory());
 		}
 		return beh;
 	}

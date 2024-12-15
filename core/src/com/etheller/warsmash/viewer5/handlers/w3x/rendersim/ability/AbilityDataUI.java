@@ -17,6 +17,7 @@ import com.etheller.warsmash.units.ObjectData;
 import com.etheller.warsmash.util.War3ID;
 import com.etheller.warsmash.util.WarsmashConstants;
 import com.etheller.warsmash.viewer5.handlers.w3x.War3MapViewer;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.COrderButton;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.impl.AbilityFields;
 
 public class AbilityDataUI {
@@ -122,6 +123,7 @@ public class AbilityDataUI {
 	private final IconUI selectSkillUI;
 	private final IconUI neutralInteractUI;
 	private final String disabledPrefix;
+	private final Map<COrderButton, OrderButtonUI> buttonToRenderPeer = new HashMap<>();
 
 	public AbilityDataUI(final Warcraft3MapRuntimeObjectData allObjectData, final GameUI gameUI,
 			final War3MapViewer viewer) {
@@ -178,7 +180,8 @@ public class AbilityDataUI {
 			final int casterAttachmentIndexMax = Math.min(casterAttachmentCount - 1, casterArtPaths.size() - 1);
 			final int casterIteratorCount = Math.max(casterAttachmentCount, casterArtPaths.size());
 			for (int i = 0; i < casterIteratorCount; i++) {
-				final String modelPath = casterArtPaths.get(Math.max(0, Math.min(i, casterAttachmentIndexMax)));
+				final String modelPath = casterArtPaths.isEmpty() ? ""
+						: casterArtPaths.get(Math.max(0, Math.min(i, casterAttachmentIndexMax)));
 				final String attachmentPointKey = tryGet(CASTER_ART_ATTACHMENT_POINT, i);
 				final List<String> attachmentPoints = abilityTypeData.getFieldAsList(attachmentPointKey);
 				casterArt.add(new EffectAttachmentUI(modelPath, attachmentPoints));
@@ -624,5 +627,17 @@ public class AbilityDataUI {
 			return ids[index];
 		}
 		return ids[ids.length - 1];
+	}
+
+	public OrderButtonUI getRenderPeer(final COrderButton orderButton) {
+		return this.buttonToRenderPeer.get(orderButton);
+	}
+
+	public void createRenderPeer(final COrderButton orderButton) {
+		this.buttonToRenderPeer.put(orderButton, new OrderButtonUI());
+	}
+
+	public void removeRenderPeer(final COrderButton orderButton) {
+		this.buttonToRenderPeer.remove(orderButton);
 	}
 }

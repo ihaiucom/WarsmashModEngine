@@ -15,6 +15,9 @@ import java.util.Set;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.IntIntMap;
+import com.etheller.interpreter.ast.scope.GlobalScope;
+import com.etheller.interpreter.ast.scope.TriggerExecutionScope;
+import com.etheller.interpreter.ast.scope.trigger.Trigger;
 import com.etheller.warsmash.parsers.jass.scope.CommonTriggerExecutionScope;
 import com.etheller.warsmash.util.War3ID;
 import com.etheller.warsmash.util.WarsmashConstants;
@@ -43,6 +46,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.harvest.C
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.hero.CAbilityHero;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.inventory.CAbilityInventory;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.item.shop.CAbilityNeutralBuilding;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.listeners.CUnitAbilityEffectReactionListener;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.mine.CAbilityGoldMinable;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.mine.CAbilityOverlayedMine;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.nightelf.root.CAbilityRoot;
@@ -51,6 +55,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.targeting
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.targeting.AbilityTargetVisitor;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilitybuilder.buff.ABGenericTimedBuff;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilitybuilder.buff.ABTimedTickingPausedBuff;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.BehaviorAbilityVisitor;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.BehaviorTargetUnitVisitor;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.CBehavior;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.CBehaviorAttack;
@@ -90,6 +95,10 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.attacks.list
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.attacks.listeners.CUnitDefaultMagicImmuneDamageModListener;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.attacks.listeners.CUnitDefaultSleepListener;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.attacks.listeners.CUnitDefaultThornsListener;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.projectile.CAttackProjectile;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.projectile.CProjectile;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.projectile.listeners.CUnitAbilityProjReactionListener;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.projectile.listeners.CUnitAttackProjReactionListener;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.orders.COrder;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.orders.COrderNoTarget;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.orders.COrderTargetPoint;
@@ -105,9 +114,12 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.region.CRegion;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.region.CRegionEnumFunction;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.region.CRegionManager;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.state.CUnitState;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.timers.CTimer;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.JassGameEventsWar3;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CDamageType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CEffectType;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CFogState;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.unit.CUnitBehaviorChangeListener;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.unit.CUnitTypeJass;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.unit.CWidgetEvent;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.unit.NonStackingFx;
@@ -123,37 +135,34 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.ResourceType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.SimulationRenderComponent;
 
 public class CUnit extends CWidget {
+	private static final int CHEESY_UNIQUE_NUMBER = 1337;
+
 	private static RegionCheckerImpl regionCheckerImpl = new RegionCheckerImpl();
 
-	private War3ID typeId; // 单位的类型标识符（ID
-	private float facing; // degrees 单位的朝向，单位的朝向以角度表示（0° 到 360°）
-	private float mana; // 当前的魔法值
-	private int baseMaximumLife; // 单位的基础生命值上限
-	private int maximumLife; // 单位的当前生命值上限
-	private float lifeRegen; // 单位的生命恢复速率
-	private float lifeRegenStrengthBonus; // 单位的力量属性等因素造成的生命恢复加成。
-	private float lifeRegenBonus; // 单位的生命恢复加成。
-	private float manaRegen; // 单位的魔法恢复速率
-	private float manaRegenIntelligenceBonus; // 单位的智力属性等因素造成的魔法恢复加成。
-	private float manaRegenBonus; // 单位的魔法恢复加成。
-	private int baseMaximumMana; // 单位的基础魔法值上限
-	private int maximumMana; // 单位的当前魔法值上限
-	private int speed; // 单位的速度
-	private int agilityDefensePermanentBonus; // 单位的永久敏捷属性加成
-	private float agilityDefenseTemporaryBonus; // 单位的临时敏捷属性加成
-	private int permanentDefenseBonus; // 单位的永久防御属性加成
-	private float temporaryDefenseBonus; // 单位的临时防御属性加成
+	private War3ID typeId;
+	private float facing; // degrees
+	private float mana;
+	private int baseMaximumLife;
+	private int maximumLife;
+	private float lifeRegen;
+	private float lifeRegenStrengthBonus;
+	private float lifeRegenBonus;
+	private float manaRegen;
+	private float manaRegenIntelligenceBonus;
+	private float manaRegenBonus;
+	private int baseMaximumMana;
+	private int maximumMana;
+	private int speed;
+	private int agilityDefensePermanentBonus;
+	private float agilityDefenseTemporaryBonus;
+	private int permanentDefenseBonus;
+	private float temporaryDefenseBonus;
+	private float totalTemporaryDefenseBonus;
 
+	private int speedBonus;
 
-	private float totalTemporaryDefenseBonus; // 单位的总临时防御属性加成
-
-	private int speedBonus; // 单位的速度加成
-
-	// 反伤
 	private CUnitDefaultThornsListener flatThornsListener = null;
-	// 反伤 %
 	private CUnitDefaultThornsListener percentThornsListener = null;
-	// 生命偷取
 	private CUnitDefaultLifestealListener lifestealListener = null;
 
 	private final List<StateModBuff> stateModBuffs = new ArrayList<>();
@@ -168,17 +177,17 @@ public class CUnit extends CWidget {
 	private float currentManaRegenPerTick;
 	private CDefenseType defenseType;
 
-	// 普攻冷却时间
 	private int cooldownEndTime = 0;
 	private float flyHeight;
+	private float turnRate;
+	private float propWindow;
 	private int playerIndex;
 
 	private final List<CAbility> abilities = new ArrayList<>();
 	private final List<CAbility> disabledAbilities = new ArrayList<>();
+	private final List<Trigger> onTickTriggers = new ArrayList<>();
 
-	// 当前正在执行的行为
 	private CBehavior currentBehavior;
-	// 等待执行的指令队列
 	private final Queue<COrder> orderQueue = new LinkedList<>();
 	private CUnitType unitType;
 
@@ -186,13 +195,14 @@ public class CUnit extends CWidget {
 	private RemovablePathingMapInstance pathingInstance;
 
 	private final EnumSet<CUnitClassification> classifications = EnumSet.noneOf(CUnitClassification.class);
+	private final EnumSet<CTargetType> targetedAs = EnumSet.noneOf(CTargetType.class);
 
 	private int deathTurnTick;
-	private boolean raisable; // 可穿戴
-	private boolean decays; // 衰减 腐烂
-	private boolean corpse; // 尸体
-	private boolean boneCorpse; // 骨骸
-	private boolean falseDeath; // 虚假死亡
+	private boolean raisable;
+	private boolean decays;
+	private boolean corpse;
+	private boolean boneCorpse;
+	private boolean falseDeath;
 
 	private transient CUnitAnimationListener unitAnimationListener;
 
@@ -201,20 +211,19 @@ public class CUnit extends CWidget {
 	// which fields shouldn't be persisted if we do game state save later
 	private transient CUnitStateNotifier stateNotifier = new CUnitStateNotifier();
 	private transient List<StateListenerUpdate> stateListenersUpdates = new ArrayList<>();
-	// 采集范围
 	private float acquisitionRange;
 	private transient static AutoAttackTargetFinderEnum autoAttackTargetFinderEnum = new AutoAttackTargetFinderEnum();
 	private transient static AutocastTargetFinderEnum autocastTargetFinderEnum = new AutocastTargetFinderEnum();
 	private transient CAutocastAbility autocastAbility = null;
 
-	private transient CBehaviorMove moveBehavior; // 移动行为
-	private transient CBehaviorAttack attackBehavior; // 攻击行为
-	private transient CBehaviorAttackMove attackMoveBehavior; // 攻击并移动行为
-	private transient CBehaviorFollow followBehavior; // 跟随行为
-	private transient CBehaviorPatrol patrolBehavior; // 巡逻行为
-	private transient CBehaviorStop stopBehavior; // 停止行为
-	private transient CBehaviorHoldPosition holdPositionBehavior; // 停留位置行为
-	private transient CBehaviorBoardTransport boardTransportBehavior; // 乘坐行为
+	private transient CBehaviorMove moveBehavior;
+	private transient CBehaviorAttack attackBehavior;
+	private transient CBehaviorAttackMove attackMoveBehavior;
+	private transient CBehaviorFollow followBehavior;
+	private transient CBehaviorPatrol patrolBehavior;
+	private transient CBehaviorStop stopBehavior;
+	private transient CBehaviorHoldPosition holdPositionBehavior;
+	private transient CBehaviorBoardTransport boardTransportBehavior;
 	private boolean constructing = false;
 	private boolean constructingPaused = false;
 	private boolean structure;
@@ -225,14 +234,21 @@ public class CUnit extends CWidget {
 	private boolean acceptingOrders = true;
 	private boolean invulnerable = false;
 	private boolean magicImmune = false;
+	private boolean morphImmune = false;
 	private boolean resistant = false;
 	private boolean autoAttack = true;
+	private boolean autoCast = true;
+	private boolean assistAlly = true;
 	private boolean moveDisabled = false;
-	private CBehavior defaultBehavior; // 当前行为
-	private CBehavior interruptedDefaultBehavior; // 被打断的行为
-	private CBehavior interruptedBehavior; // 被打断的行为
-	private COrder lastStartedOrder = null; // 最后执行的命令
-	private CUnit workerInside;
+	private boolean noUnitCollision = false;
+	private boolean noBuildingCollision = false;
+	private CBehavior defaultBehavior;
+	private CBehavior interruptedDefaultBehavior;
+	private CBehavior interruptedBehavior;
+	private COrder lastStartedOrder = null;
+	private CUnit worker;
+	private boolean workerInside;
+	private int powerWorkers;
 	private final War3ID[] buildQueue = new War3ID[WarsmashConstants.BUILD_QUEUE_SIZE];
 	private final QueueItemType[] buildQueueTypes = new QueueItemType[WarsmashConstants.BUILD_QUEUE_SIZE];
 	private boolean queuedUnitFoodPaid = false;
@@ -243,18 +259,23 @@ public class CUnit extends CWidget {
 
 	private int triggerEditorCustomValue;
 
-	private List<CUnitAttack> unitSpecificAttacks; // 普攻列表
-	private List<CUnitAttack> unitSpecificCurrentAttacks; // 当前普攻列表
-	private boolean disableAttacks; // 禁用普攻
+	private List<CUnitAttack> unitSpecificAttacks;
+	private List<CUnitAttack> unitSpecificCurrentAttacks;
+	private boolean disableAttacks;
 	private final CUnitAttackVisionFogModifier attackFogMod;
 
-	private final Map<CUnitAttackPreDamageListenerPriority, List<CUnitAttackPreDamageListener>> preDamageListeners = new HashMap<>(); // onAttack 攻击受伤前处理器列表
-	private final List<CUnitAttackPostDamageListener> postDamageListeners = new ArrayList<>(); // onHit 受击 处理器列表
-	private final List<CUnitAttackDamageTakenModificationListener> damageTakenModificationListeners = new ArrayList<>(); // onDamage 伤害修改器列表
-	private final List<CUnitAttackFinalDamageTakenModificationListener> finalDamageTakenModificationListeners = new ArrayList<>(); // onDamage 最终伤害修改器列表
-	private final List<CUnitAttackDamageTakenListener> damageTakenListeners = new ArrayList<>(); // onDamage 伤害处理器列表
-	private final Map<CUnitDeathReplacementEffectPriority, List<CUnitDeathReplacementEffect>> deathReplacementEffects = new HashMap<>(); // onDeath 死亡替换效果列表
-	private final List<CUnitAttackEvasionListener> evasionListeners = new ArrayList<>(); // 闪避 监听
+	private final Map<CUnitAttackPreDamageListenerPriority, List<CUnitAttackPreDamageListener>> preDamageListeners = new HashMap<>();
+	private final List<CUnitAttackPostDamageListener> postDamageListeners = new ArrayList<>();
+	private final List<CUnitAttackDamageTakenModificationListener> damageTakenModificationListeners = new ArrayList<>();
+	private final List<CUnitAttackFinalDamageTakenModificationListener> finalDamageTakenModificationListeners = new ArrayList<>();
+	private final List<CUnitAttackDamageTakenListener> damageTakenListeners = new ArrayList<>();
+	private final Map<CUnitDeathReplacementEffectPriority, List<CUnitDeathReplacementEffect>> deathReplacementEffects = new HashMap<>();
+	private final List<CUnitAttackEvasionListener> evasionListeners = new ArrayList<>();
+	private final List<CUnitAttackProjReactionListener> attackProjReactionListeners = new ArrayList<>();
+	private final List<CUnitAbilityProjReactionListener> abilityProjReactionListeners = new ArrayList<>();
+	private final List<CUnitAbilityEffectReactionListener> abilityEffectReactionListeners = new ArrayList<>();
+
+	private final List<CUnitBehaviorChangeListener> behaviorChangeListeners = new ArrayList<>();
 
 	private transient Set<CRegion> containingRegions = new LinkedHashSet<>();
 	private transient Set<CRegion> priorContainingRegions = new LinkedHashSet<>();
@@ -264,6 +285,13 @@ public class CUnit extends CWidget {
 	private War3ID explodesOnDeathBuffId;
 	private final IntIntMap rawcodeToCooldownExpireTime = new IntIntMap();
 	private final IntIntMap rawcodeToCooldownStartTime = new IntIntMap();
+
+	private byte invisLevels = 0;
+	private CTimer fadeTimer;
+	private final List<Integer> detectorLevels = new ArrayList<>(1);
+	private long detections = 0;
+
+	private MovementType movementOverride = null;
 
 	public CUnit(final int handleId, final int playerIndex, final float x, final float y, final float life,
 			final War3ID typeId, final float facing, final float mana, final int maximumLife, final float lifeRegen,
@@ -281,9 +309,12 @@ public class CUnit extends CWidget {
 		this.maximumMana = maximumMana;
 		this.speed = speed;
 		this.flyHeight = unitType.getDefaultFlyingHeight();
+		this.turnRate = unitType.getTurnRate();
+		this.propWindow = unitType.getPropWindow();
 		this.unitType = unitType;
 		this.defenseType = unitType.getDefenseType();
 		this.classifications.addAll(unitType.getClassifications());
+		this.targetedAs.addAll(unitType.getTargetedAs());
 		this.acquisitionRange = unitType.getDefaultAcquisitionRange();
 		this.structure = unitType.isBuilding();
 		this.stopBehavior = new CBehaviorStop(this);
@@ -297,13 +328,43 @@ public class CUnit extends CWidget {
 		computeAllDerivedFields();
 	}
 
-	// 执行默认行为
-	public void performDefaultBehavior(final CSimulation game) {
-		if (this.currentBehavior != null) {
-			this.currentBehavior.end(game, true);
+	private void beginBehavior(final CSimulation game, final CBehavior behavior) {
+		if (this.currentBehavior != behavior) {
+			final int lastBehaviorHighlightOrderId = this.currentBehavior != null
+					? this.currentBehavior.getHighlightOrderId()
+					: -1;
+			if (this.currentBehavior != null) {
+				this.currentBehavior.end(game, false);
+			}
+
+			fireBehaviorChangeEvent(game, behavior, false);
+
+			this.currentBehavior = behavior;
+
+			if (this.currentBehavior != null) {
+				this.currentBehavior.begin(game);
+
+				if (this.currentBehavior.getHighlightOrderId() != lastBehaviorHighlightOrderId) {
+					this.stateNotifier.ordersChanged();
+				}
+			}
 		}
-		this.currentBehavior = this.defaultBehavior;
-		this.currentBehavior.begin(game);
+	}
+
+	public CBehavior finishMoveBehavior(final CSimulation game, final CBehavior behavior) {
+		fireBehaviorChangeEvent(game, behavior, false);
+
+		return behavior.update(game);
+	}
+
+	public void fireBehaviorChangeEvent(final CSimulation game, final CBehavior behavior, final boolean ongoing) {
+		for (final CUnitBehaviorChangeListener listener : new ArrayList<>(this.behaviorChangeListeners)) {
+			listener.onChange(game, this, this.currentBehavior, behavior, ongoing);
+		}
+	}
+
+	public void performDefaultBehavior(final CSimulation game) {
+		beginBehavior(game, this.defaultBehavior);
 	}
 
 	public void regeneratePathingInstance(final CSimulation game, final BufferedImage buildingPathingPixelMap) {
@@ -330,6 +391,23 @@ public class CUnit extends CWidget {
 	public void setLifeRegenStrengthBonus(final float lifeRegenStrengthBonus) {
 		this.lifeRegenStrengthBonus = lifeRegenStrengthBonus;
 		computeDerivedFields(NonStackingStatBuffType.HPGEN);
+	}
+
+	public void startInvisibilityTimer(final float durationSeconds, final StateModBuff stateModBuff) {
+		this.fadeTimer = new CTimerUnitFade(stateModBuff);
+		this.fadeTimer.setRepeats(false);
+	}
+
+	public void setFadeTimer(final CTimer whichTimer) {
+		this.fadeTimer = whichTimer;
+	}
+
+	public CTimer getFadeTimer() {
+		return this.fadeTimer;
+	}
+
+	public byte getInvisLevels() {
+		return this.invisLevels;
 	}
 
 	public void addNonStackingStatBuff(final NonStackingStatBuff buff) {
@@ -486,19 +564,12 @@ public class CUnit extends CWidget {
 		case DISABLE_SPECIAL_ATTACK:
 		case DISABLE_SPELLS:
 		case ETHEREAL:
-			// 定义攻击状态标志变量
 			boolean isDisableAttack = false;
-			// 近战攻击禁用标志
 			boolean isDisableMeleeAttack = false;
-			// 远程攻击禁用标志
 			boolean isDisableRangedAttack = false;
-			// 特殊攻击禁用标志
 			boolean isDisableSpecialAttack = false;
-			// 法术禁用标志
 			boolean isDisableSpells = false;
-			// 以虚无态标志
 			boolean isEthereal = false;
-
 			for (final StateModBuff buff : this.stateModBuffs) {
 				if (buff.getBuffType() == StateModBuffType.DISABLE_ATTACK) {
 					if (buff.getValue() != 0) {
@@ -564,34 +635,17 @@ public class CUnit extends CWidget {
 			notifyAttacksChanged();
 			checkDisabledAbilities(game, isDisableAttack);
 
-			// 虚无状态
 			if (isEthereal) {
-				// 添加伤害修改器
 				if (!this.damageTakenModificationListeners.contains(CUnitDefaultEtherealDamageModListener.INSTANCE)) {
 					addDamageTakenModificationListener(CUnitDefaultEtherealDamageModListener.INSTANCE);
 				}
-				// 修改角色顶点颜色 虚无 半透明
 				game.changeUnitVertexColor(this, RenderUnit.ETHEREAL);
-				// Disable physical skills
-//				for (CAbility ability : this.abilities) {
-//					if (ability.isPhysical()) {
-//						ability.setDisabled(true);
-//					}
-//				}
 			}
 			else {
-				// 移除伤害修改器
 				if (this.damageTakenModificationListeners.contains(CUnitDefaultEtherealDamageModListener.INSTANCE)) {
 					removeDamageTakenModificationListener(CUnitDefaultEtherealDamageModListener.INSTANCE);
-					// 恢复默认颜色
 					game.changeUnitVertexColor(this, RenderUnit.DEFAULT);
 				}
-				// Enable physical skills
-//				for (CAbility ability : this.abilities) {
-//					if (ability.isPhysical()) {
-//						ability.setDisabled(false);
-//					}
-//				}
 			}
 			break;
 		case DISABLE_AUTO_ATTACK:
@@ -605,7 +659,29 @@ public class CUnit extends CWidget {
 			}
 			this.autoAttack = !isDisableAutoAttack;
 			break;
-		case MAGIC_IMMUNE: // 魔法攻击免疫
+		case DISABLE_AUTO_CAST:
+			boolean isDisableAutoCast = false;
+			for (final StateModBuff buff : this.stateModBuffs) {
+				if (buff.getBuffType() == StateModBuffType.DISABLE_AUTO_CAST) {
+					if (buff.getValue() != 0) {
+						isDisableAutoCast = true;
+					}
+				}
+			}
+			this.autoCast = !isDisableAutoCast;
+			break;
+		case DISABLE_ASSIST_ALLY:
+			boolean isDisableAssistAlly = false;
+			for (final StateModBuff buff : this.stateModBuffs) {
+				if (buff.getBuffType() == StateModBuffType.DISABLE_ASSIST_ALLY) {
+					if (buff.getValue() != 0) {
+						isDisableAssistAlly = true;
+					}
+				}
+			}
+			this.assistAlly = !isDisableAssistAlly;
+			break;
+		case MAGIC_IMMUNE:
 			boolean isMagicImmune = false;
 			for (final StateModBuff buff : this.stateModBuffs) {
 				if (buff.getBuffType() == StateModBuffType.MAGIC_IMMUNE) {
@@ -628,6 +704,17 @@ public class CUnit extends CWidget {
 				}
 			}
 			break;
+		case MORPH_IMMUNE:
+			boolean isMorphImmune = false;
+			for (final StateModBuff buff : this.stateModBuffs) {
+				if (buff.getBuffType() == StateModBuffType.MORPH_IMMUNE) {
+					if (buff.getValue() != 0) {
+						isMorphImmune = true;
+					}
+				}
+			}
+			this.morphImmune = isMorphImmune;
+			break;
 		case RESISTANT:
 			boolean isResistant = false;
 			for (final StateModBuff buff : this.stateModBuffs) {
@@ -639,8 +726,8 @@ public class CUnit extends CWidget {
 			}
 			this.resistant = isResistant;
 			break;
-		case SLEEPING: // 睡眠状态
-		case STUN: // 眩晕状态
+		case SLEEPING:
+		case STUN:
 			boolean isSleeping = false;
 			boolean isStun = false;
 			for (final StateModBuff buff : this.stateModBuffs) {
@@ -711,6 +798,46 @@ public class CUnit extends CWidget {
 				}
 			}
 			break;
+		case DISABLE_UNIT_COLLISION:
+			boolean isDisableCollision = false;
+			for (final StateModBuff buff : this.stateModBuffs) {
+				if (buff.getBuffType() == StateModBuffType.DISABLE_UNIT_COLLISION) {
+					if (buff.getValue() != 0) {
+						isDisableCollision = true;
+					}
+				}
+			}
+			if (isDisableCollision) {
+				if (!this.noUnitCollision) {
+					this.noUnitCollision = true;
+				}
+			}
+			else {
+				if (this.noUnitCollision) {
+					this.noUnitCollision = false;
+				}
+			}
+			break;
+		case DISABLE_BUILDING_COLLISION:
+			boolean isDisableBuildCollision = false;
+			for (final StateModBuff buff : this.stateModBuffs) {
+				if (buff.getBuffType() == StateModBuffType.DISABLE_BUILDING_COLLISION) {
+					if (buff.getValue() != 0) {
+						isDisableBuildCollision = true;
+					}
+				}
+			}
+			if (isDisableBuildCollision) {
+				if (!this.noBuildingCollision) {
+					this.noBuildingCollision = true;
+				}
+			}
+			else {
+				if (this.noBuildingCollision) {
+					this.noBuildingCollision = false;
+				}
+			}
+			break;
 		case INVULNERABLE:
 			boolean isInvuln = false;
 			for (final StateModBuff buff : this.stateModBuffs) {
@@ -722,6 +849,40 @@ public class CUnit extends CWidget {
 			}
 			setInvulnerable(isInvuln);
 			this.stateNotifier.abilitiesChanged();
+			break;
+		case DETECTOR:
+			this.detectorLevels.clear();
+			for (final StateModBuff buff : this.stateModBuffs) {
+				if (buff.getBuffType() == StateModBuffType.DETECTOR) {
+					if (buff.getValue() != 0) {
+						this.detectorLevels.add((int) buff.getValue());
+					}
+				}
+			}
+			break;
+		case INVISIBLE:
+		case DETECTED:
+			byte invisLevels = 0;
+			for (final StateModBuff buff : this.stateModBuffs) {
+				if (buff.getBuffType() == StateModBuffType.INVISIBLE) {
+					if (buff.getValue() != 0) {
+						invisLevels = (byte) (invisLevels | buff.getValue());
+					}
+				}
+			}
+			this.invisLevels = invisLevels;
+
+			long detections = 0;
+			for (final StateModBuff buff : this.stateModBuffs) {
+				if (buff.getBuffType() == StateModBuffType.DETECTED) {
+					if (buff.getValue() != 0) {
+						if ((((byte) buff.getValue()) & this.invisLevels) == this.invisLevels) {
+							detections = (detections | (buff.getValue() >> 8));
+						}
+					}
+				}
+			}
+			this.detections = detections;
 			break;
 		default:
 			break;
@@ -1375,12 +1536,19 @@ public class CUnit extends CWidget {
 	}
 
 	private void computeAllUnitStates(final CSimulation game) {
-		this.computeUnitState(game, StateModBuffType.INVULNERABLE);
-		this.computeUnitState(game, StateModBuffType.ETHEREAL);
-		this.computeUnitState(game, StateModBuffType.DISABLE_AUTO_ATTACK);
-		this.computeUnitState(game, StateModBuffType.MAGIC_IMMUNE);
-		this.computeUnitState(game, StateModBuffType.RESISTANT);
-		this.computeUnitState(game, StateModBuffType.SNARED);
+		computeUnitState(game, StateModBuffType.DETECTOR);
+		computeUnitState(game, StateModBuffType.INVISIBLE);
+		computeUnitState(game, StateModBuffType.INVULNERABLE);
+		computeUnitState(game, StateModBuffType.ETHEREAL);
+		computeUnitState(game, StateModBuffType.DISABLE_AUTO_ATTACK);
+		computeUnitState(game, StateModBuffType.DISABLE_AUTO_CAST);
+		computeUnitState(game, StateModBuffType.DISABLE_ASSIST_ALLY);
+		computeUnitState(game, StateModBuffType.DISABLE_UNIT_COLLISION);
+		computeUnitState(game, StateModBuffType.DISABLE_BUILDING_COLLISION);
+		computeUnitState(game, StateModBuffType.MAGIC_IMMUNE);
+		computeUnitState(game, StateModBuffType.MORPH_IMMUNE);
+		computeUnitState(game, StateModBuffType.RESISTANT);
+		computeUnitState(game, StateModBuffType.SNARED);
 	}
 
 	public void setManaRegenIntelligenceBonus(final float manaRegenIntelligenceBonus) {
@@ -1456,24 +1624,33 @@ public class CUnit extends CWidget {
 		return this.unitAnimationListener;
 	}
 
+	public void registerOnTickEvent(final Trigger trigger) {
+		this.onTickTriggers.add(trigger);
+		this.stateNotifier.abilitiesChanged();
+	}
+
+	public void unregisterOnTickEvent(final Trigger trigger) {
+		this.onTickTriggers.remove(trigger);
+		this.stateNotifier.abilitiesChanged();
+	}
+
 	public void add(final CSimulation simulation, final CAbility ability) {
+		this.abilities.add(ability);
+		ability.onAddDisabled(simulation, this);
+		simulation.onAbilityAddedToUnit(this, ability);
 		if (!ability.isRequirementsMet(simulation, this)) {
 			ability.setDisabled(true, CAbilityDisableType.REQUIREMENTS);
 		}
+		if (simulation.getPlayer(this.playerIndex).isAbilityDisabled(ability.getAlias())) {
+			ability.setDisabled(true, CAbilityDisableType.PLAYER);
+		}
 		if (ability.isDisabled()) {
 			this.disabledAbilities.add(ability);
-			this.abilities.add(ability);
-			simulation.onAbilityAddedToUnit(this, ability);
-			ability.onAddDisabled(simulation, this);
-			this.stateNotifier.abilitiesChanged();
 		}
 		else {
-			this.abilities.add(ability);
-			simulation.onAbilityAddedToUnit(this, ability);
-			ability.onAddDisabled(simulation, this);
 			ability.onAdd(simulation, this);
-			this.stateNotifier.abilitiesChanged();
 		}
+		this.stateNotifier.abilitiesChanged();
 	}
 
 	public void add(final CSimulation simulation, final CBuff ability) {
@@ -1518,10 +1695,17 @@ public class CUnit extends CWidget {
 				if (!ability.isRequirementsMet(simulation, this)) {
 					ability.setDisabled(true, CAbilityDisableType.REQUIREMENTS);
 				}
+				if (simulation.getPlayer(this.playerIndex).isAbilityDisabled(ability.getAlias())) {
+					ability.setDisabled(true, CAbilityDisableType.PLAYER);
+				}
 				if (ability.isDisabled() && !this.disabledAbilities.contains(ability)) {
 //					System.err.println("Disabling ability: " + ability.getAlias().asStringValue());
 					this.disabledAbilities.add(ability);
 					ability.onRemove(simulation, this);
+					if ((this.currentBehavior != null)
+							&& ability.equals(this.currentBehavior.visit(BehaviorAbilityVisitor.INSTANCE))) {
+						performDefaultBehavior(simulation);
+					}
 				}
 			}
 		}
@@ -1530,12 +1714,16 @@ public class CUnit extends CWidget {
 				if (ability.isRequirementsMet(simulation, this)) {
 					ability.setDisabled(false, CAbilityDisableType.REQUIREMENTS);
 				}
+				if (!simulation.getPlayer(this.playerIndex).isAbilityDisabled(ability.getAlias())) {
+					ability.setDisabled(false, CAbilityDisableType.PLAYER);
+				}
 				if (!ability.isDisabled()) {
 					ability.onAdd(simulation, this);
 					this.disabledAbilities.remove(ability);
 				}
 			}
 		}
+		fireCooldownsChangedEvent();
 	}
 
 	public War3ID getTypeId() {
@@ -1583,9 +1771,13 @@ public class CUnit extends CWidget {
 		if (updateArt) {
 			this.flyHeight = this.unitType.getDefaultFlyingHeight();
 		}
+		this.turnRate = this.unitType.getTurnRate();
+		this.propWindow = this.unitType.getPropWindow();
 		this.speed = this.unitType.getSpeed();
-		this.classifications.clear();
+		this.classifications.removeAll(previousUnitType.getClassifications());
 		this.classifications.addAll(this.unitType.getClassifications());
+		this.targetedAs.removeAll(previousUnitType.getTargetedAs());
+		this.targetedAs.addAll(this.unitType.getTargetedAs());
 		this.defenseType = this.unitType.getDefenseType();
 		this.acquisitionRange = this.unitType.getDefaultAcquisitionRange();
 		this.structure = this.unitType.isBuilding();
@@ -1598,7 +1790,8 @@ public class CUnit extends CWidget {
 		sharedAbilities.retainAll(newIds); // TODO Seems wasteful, but need to avoid messing up heros on transform
 		final List<CAbility> persistedAbilities = new ArrayList<>();
 		final List<CAbility> removedAbilities = new ArrayList<>();
-		for (final CAbility ability : this.abilities) {
+		final List<CAbility> startingAbilities = new ArrayList<>(this.abilities);
+		for (final CAbility ability : startingAbilities) {
 			if (!ability.isPermanent() && !sharedAbilities.contains(ability.getAlias())
 					&& !(ability.getAbilityCategory() == CAbilityCategory.BUFF)) {
 				ability.onRemove(game, this);
@@ -1784,9 +1977,9 @@ public class CUnit extends CWidget {
 						this.constructingPaused = false;
 						this.constructionProgress = 0;
 						if (this.constructionConsumesWorker) {
-							if (this.workerInside != null) {
-								game.removeUnit(this.workerInside);
-								this.workerInside = null;
+							if (this.worker != null) {
+								game.removeUnit(this.worker);
+								this.worker = null;
 							}
 						}
 						else {
@@ -1907,7 +2100,7 @@ public class CUnit extends CWidget {
 								final CUnit trainedUnit = game.createUnit(queuedRawcode, this.playerIndex, getX(),
 										getY(), game.getGameplayConstants().getBuildingAngle());
 
-								game.removeUnit(getWorkerInside());
+								game.removeUnit(getWorker());
 
 								// dont add food cost to player 2x
 								trainedUnit.setFoodUsed(trainedUnitType.getFoodUsed());
@@ -2053,7 +2246,7 @@ public class CUnit extends CWidget {
 								game.getPlayer(this.attackFogMod.getPlayerIndex()).removeFogModifer(game,
 										this.attackFogMod);
 								this.attackFogMod.setPlayerIndex(target.getPlayerIndex());
-								game.getPlayer(target.getPlayerIndex()).addFogModifer(game, this.attackFogMod);
+								game.getPlayer(target.getPlayerIndex()).addFogModifer(game, this.attackFogMod, false);
 							}
 						}
 						else {
@@ -2064,19 +2257,7 @@ public class CUnit extends CWidget {
 							}
 						}
 
-						final CBehavior lastBehavior = this.currentBehavior;
-						final int lastBehaviorHighlightOrderId = lastBehavior.getHighlightOrderId();
-						this.currentBehavior = this.currentBehavior.update(game);
-						if (lastBehavior != this.currentBehavior) {
-							lastBehavior.end(game, false);
-							if (this.currentBehavior != null) {
-								this.currentBehavior.begin(game);
-							}
-						}
-						if ((this.currentBehavior != null)
-								&& (this.currentBehavior.getHighlightOrderId() != lastBehaviorHighlightOrderId)) {
-							this.stateNotifier.ordersChanged();
-						}
+						beginBehavior(game, this.currentBehavior.update(game));
 					}
 					else {
 						// check to auto acquire targets
@@ -2089,6 +2270,15 @@ public class CUnit extends CWidget {
 						// okay if it removes self from this during onTick() because of reverse
 						// iteration order
 						this.abilities.get(i).onTick(game, this);
+					}
+					final GlobalScope globalScope = game.getGlobalScope();
+					for (int i = this.onTickTriggers.size() - 1; i >= 0; i--) {
+						final Trigger trigger = this.onTickTriggers.get(i);
+						final TriggerExecutionScope triggerExecutionScope = CommonTriggerExecutionScope
+								.unitTriggerScope(null, trigger, this);
+						if (trigger.evaluate(globalScope, triggerExecutionScope)) {
+							trigger.execute(globalScope, triggerExecutionScope);
+						}
 					}
 				}
 			}
@@ -2137,6 +2327,10 @@ public class CUnit extends CWidget {
 					this.stateNotifier.manaChanged();
 				}
 
+				// try to remove the below line of code, once all the abilities are on tick
+				// triggers and none of them just magically assume tick to be called on all
+				// abilities regardless of what they are (just add this stuff as global,
+				// non-unit tick triggers)
 				for (int i = this.abilities.size() - 1; i >= 0; i--) {
 					// okay if it removes self from this during onTick() because of reverse
 					// iteration order
@@ -2152,21 +2346,21 @@ public class CUnit extends CWidget {
 	}
 
 	private void popoutWorker(final CSimulation game) {
-		if (this.workerInside != null) {
-			this.workerInside.setInvulnerable(false);
-			this.workerInside.setHidden(false);
-			this.workerInside.setPaused(false);
-			this.workerInside.nudgeAround(game, this);
+		if ((this.worker != null) && this.workerInside) {
+			this.worker.setInvulnerable(false);
+			this.worker.setHidden(false);
+			this.worker.setPaused(false);
+			this.worker.nudgeAround(game, this);
 			if (this.constructionConsumesWorker) {
-				game.getPlayer(this.workerInside.getPlayerIndex()).setUnitFoodUsed(this.workerInside,
-						this.workerInside.getUnitType().getFoodUsed());
+				game.getPlayer(this.worker.getPlayerIndex()).setUnitFoodUsed(this.worker,
+						this.worker.getUnitType().getFoodUsed());
 			}
-			this.workerInside = null;
 		}
+		this.worker = null;
 	}
 
 	public boolean autoAcquireTargets(final CSimulation game, final boolean disableMove) {
-		final boolean autocast = autoAcquireAutocastTargets(game, disableMove);
+		final boolean autocast = this.autoCast ? autoAcquireAutocastTargets(game, disableMove) : false;
 		if (!autocast) {
 			if (this.autoAttack) {
 				return autoAcquireAttackTargets(game, disableMove);
@@ -2209,10 +2403,8 @@ public class CUnit extends CWidget {
 		return false;
 	}
 
-	// 自动获取攻击目标的方法
 	public boolean autoAcquireAttackTargets(final CSimulation game, final boolean disableMove) {
-		// 普攻列表不为空，且当前单位不是工人
-		if (!getCurrentAttacks().isEmpty() && !this.unitType.getClassifications().contains(CUnitClassification.PEON)) {
+		if (!getCurrentAttacks().isEmpty() && !this.classifications.contains(CUnitClassification.PEON)) {
 			if (this.collisionRectangle != null) {
 				tempRect.set(this.collisionRectangle);
 			}
@@ -2231,7 +2423,6 @@ public class CUnit extends CWidget {
 		return false;
 	}
 
-
 	public float getEndingDecayTime(final CSimulation game) {
 		if (isBuilding()) {
 			return game.getGameplayConstants().getStructureDecayTime();
@@ -2242,7 +2433,6 @@ public class CUnit extends CWidget {
 		return game.getGameplayConstants().getBoneDecayTime();
 	}
 
-	// 检查指令是否是队列，是立即执行，还是添加到队列
 	public void order(final CSimulation game, final COrder order, final boolean queue) {
 		if (isDead()) {
 			return;
@@ -2254,19 +2444,13 @@ public class CUnit extends CWidget {
 			if (ability != null) {
 				if (!getAbilities().contains(ability)) {
 					// not allowed to use ability of other unit...
-					//不允许使用其他单位的能力。。。
 					return;
 				}
 				// Allow the ability to response to the order without actually placing itself in
 				// the queue, nor modifying (interrupting) the queue.
-				//允许在不实际放置自己的情况下对订单进行响应的能力
-				//也不修改（中断）队列。
 				if (!ability.checkBeforeQueue(game, this, order.getOrderId(), order.getTarget(game))) {
-					// 该段代码可能涉及一个待处理的TODO任务，
-					// 需要检查网络请求是否在调用checkBeforeQueue之前进行了checkCanUse的验证。
 					// TODO is this a possible bug vector that the network request doesn't
 					// checkCanUse like the UI before checkBeforeQueue is called??
-
 					order.fireEvents(game, this);
 					this.stateNotifier.ordersChanged();
 					return;
@@ -2274,23 +2458,14 @@ public class CUnit extends CWidget {
 			}
 		}
 
-		// TODO #如果是右键指令，并且上一个也是右键指令，就跳过
 		if ((this.lastStartedOrder != null) && this.lastStartedOrder.equals(order)
-				&& (this.lastStartedOrder.getOrderId() == OrderIds.smart)) { // 右键点击
+				&& (this.lastStartedOrder.getOrderId() == OrderIds.smart)) {
 			// I skip your spammed move orders, TODO this will probably break some repeat
 			// attack order or something later
-			//我跳过你的垃圾邮件移动订单，TODO这可能会打破一些重复
-			//攻击命令或稍后发生的事情
 			return;
 		}
-
-		// TODO #不加入队列的指令，清空之前排队的指令
-		// !queue：这表示当前的指令不是要入队，而是要立即执行。
-		// !this.acceptingOrders：这检查单位是否接受新指令。如果单位不接受指令，条件成立。
-		// 如果当前存在行为（currentBehavior），并且该行为是不可中断的（interruptable()返回false），则条件也成立。
 		if (!queue && (!this.acceptingOrders
 				|| ((this.currentBehavior != null) && !this.currentBehavior.interruptable()))) {
-			// 处理现有指令：取消队列中的指令：
 			for (final COrder queuedOrder : this.orderQueue) {
 				if (queuedOrder != null) {
 					final int abilityHandleId = queuedOrder.getAbilityHandleId();
@@ -2298,53 +2473,29 @@ public class CUnit extends CWidget {
 					ability.onCancelFromQueue(game, this, queuedOrder.getOrderId());
 				}
 			}
-			// 清空现有的指令队列，以确保不会再执行旧的指令。
 			this.orderQueue.clear();
-			// 将新的指令添加到指令队列中。
 			this.orderQueue.add(order);
-			// 调用状态通知者，发出指令发生变化的通知，以便更新相关的状态或UI（用户界面）。
 			this.stateNotifier.ordersChanged();
 			this.stateNotifier.waypointsChanged();
 		}
-		// TODO #将指令加入到队列
-		// 这一行检查当前指令是否需要入队(queue为真)。
-		// 另外，确认当前行为既不是停止行为(stopBehavior)，也不是保持位置行为(holdPositionBehavior)。这一条件的核心在于确保单位正在执行一些可进行队列操作的行为。
 		else if (queue && (this.currentBehavior != this.stopBehavior)
 				&& (this.currentBehavior != this.holdPositionBehavior)) {
-			// 检查当前指令是否是巡逻指令。
 			if (order.getOrderId() == OrderIds.patrol) {
-				// 进一步检查默认行为是否为巡逻行为。
 				if (this.defaultBehavior == this.patrolBehavior) {
-					// 如果默认行为是巡逻，则将新的巡逻点添加到巡逻行为中，调用addPatrolPoint方法。
 					this.patrolBehavior.addPatrolPoint(order.getTarget(game));
 				}
 				else {
-					// 如果默认行为不是巡逻，将当前的巡逻指令添加到指令队列中(this.orderQueue.add(order))，以等待执行。
 					this.orderQueue.add(order);
 				}
 			}
 			else {
-				// 无论当前指令是什么，如果它不是巡逻指令，直接将该指令添加到指令队列中。
 				this.orderQueue.add(order);
 			}
-			// 这一行调用状态通知者，通知系统方向点发生了变化。这通常会引发进一步的状态更新或者更新UI等操作。
 			this.stateNotifier.waypointsChanged();
 		}
-		// TODO #停止当前行为，执行新命令，并情况指令队列
 		else {
-			// 这行代码将单位的默认行为设置为停止行为（stopBehavior）。这意味着在处理新指令之前，单位将不再执行任何其他活动。
 			setDefaultBehavior(this.stopBehavior);
-			// 结束当前行为:如果当前有行为正在进行，则调用 end 方法结束该行为，传入的参数 true 可能表示以某种强制方式结束（具体含义可能根据上下文而有所不同）。
-			if (this.currentBehavior != null) {
-				this.currentBehavior.end(game, true);
-			}
-			// 开始新指令的行为: 这里调用 beginOrder 方法开始新的指令行为，将当前行为更新为新的行为。此时，order 是指当前要执行的指令。
-			this.currentBehavior = beginOrder(game, order);
-			if (this.currentBehavior != null) {
-				// 如果成功获取到新的行为，调用 begin 方法来开始这个行为。
-				this.currentBehavior.begin(game);
-			}
-			// 处理已排队的指令:这段代码遍历当前的指令队列（orderQueue），并取消队列中每一个指令的执行。对于每个非空的指令调用其对应的能力的 onCancelFromQueue 方法，表示这些指令不再执行。
+			beginBehavior(game, beginOrder(game, order));
 			for (final COrder queuedOrder : this.orderQueue) {
 				if (queuedOrder != null) {
 					final int abilityHandleId = queuedOrder.getAbilityHandleId();
@@ -2352,43 +2503,32 @@ public class CUnit extends CWidget {
 					ability.onCancelFromQueue(game, this, queuedOrder.getOrderId());
 				}
 			}
-			// 清空指令队列，确保没有残留的指令。
 			this.orderQueue.clear();
-			// 最后，调用状态通知者 (stateNotifier) 以通知系统指令和路径点（waypoints）已经发生变化。这通常用于更新用户界面或其它与状态相关的逻辑。
 			this.stateNotifier.ordersChanged();
 			this.stateNotifier.waypointsChanged();
 		}
 	}
 
-	// 检查指令 是否有对应的能力 能处理
 	public boolean order(final CSimulation simulation, final int orderId, final AbilityTarget target) {
-		// 如果是停止指令：直接创建指令处理
 		if (orderId == OrderIds.stop) {
 			order(simulation, new COrderNoTarget(0, orderId, false), false);
 			return true;
 		}
-		// 遍历所有能力，找到能处理该指令的能力
 		for (final CAbility ability : this.abilities) {
 			final BooleanAbilityActivationReceiver activationReceiver = BooleanAbilityActivationReceiver.INSTANCE;
-			// 检查能力是否可以使用
 			ability.checkCanUse(simulation, this, orderId, activationReceiver);
 			if (activationReceiver.isOk()) {
-				// 无目标的指令， 能力检测是否可以处理无目标指令，如果可以，则创建指令处理
 				if (target == null) {
 					final BooleanAbilityTargetCheckReceiver<Void> booleanTargetReceiver = BooleanAbilityTargetCheckReceiver
 							.<Void>getInstance().reset();
-					// 检查无目标是否可以使用
 					ability.checkCanTargetNoTarget(simulation, this, orderId, booleanTargetReceiver);
 					if (booleanTargetReceiver.isTargetable()) {
 						order(simulation, new COrderNoTarget(ability.getHandleId(), orderId, false), false);
 						return true;
 					}
 				}
-				// 有目标的指令， 能力检测是否可以处理该目标，如果可以，则创建指令处理
 				else {
-					// 处理不同的目标类型进行处理
 					final boolean targetable = target.visit(new AbilityTargetVisitor<Boolean>() {
-						// 处理点目标
 						@Override
 						public Boolean accept(final AbilityPointTarget target) {
 							final BooleanAbilityTargetCheckReceiver<AbilityPointTarget> booleanTargetReceiver = BooleanAbilityTargetCheckReceiver
@@ -2402,7 +2542,6 @@ public class CUnit extends CWidget {
 							return pointTargetable;
 						}
 
-						// 处理单位、可破坏物、物品等目标
 						public Boolean acceptWidget(final CWidget target) {
 							final BooleanAbilityTargetCheckReceiver<CWidget> booleanTargetReceiver = BooleanAbilityTargetCheckReceiver
 									.<CWidget>getInstance().reset();
@@ -2439,7 +2578,6 @@ public class CUnit extends CWidget {
 		return false;
 	}
 
-	// 执行指令begin方法，获取指令的行为，并设置最后执行的指令
 	private CBehavior beginOrder(final CSimulation game, final COrder order) {
 		this.lastStartedOrder = order;
 		CBehavior nextBehavior;
@@ -2483,7 +2621,6 @@ public class CUnit extends CWidget {
 		this.cooldownEndTime = cooldownEndTime;
 	}
 
-	// 普攻冷却时间
 	public int getCooldownEndTime() {
 		return this.cooldownEndTime;
 	}
@@ -2495,6 +2632,22 @@ public class CUnit extends CWidget {
 
 	public void setFlyHeight(final float flyHeight) {
 		this.flyHeight = flyHeight;
+	}
+
+	public float getTurnRate() {
+		return this.turnRate;
+	}
+
+	public void setTurnRate(final float turnRate) {
+		this.turnRate = turnRate;
+	}
+
+	public float getPropWindow() {
+		return this.propWindow;
+	}
+
+	public void setPropWindow(final float propWindow) {
+		this.propWindow = propWindow;
 	}
 
 	public int getPlayerIndex() {
@@ -2559,7 +2712,7 @@ public class CUnit extends CWidget {
 			final float centerX = newX + (checkX * 64);
 			final float centerY = newY + (checkY * 64);
 			tempRect.setCenter(centerX, centerY);
-			if (!collision.intersectsAnythingOtherThan(tempRect, this, getMovementType())
+			if (!collision.intersectsAnythingOtherThan(tempRect, this, getMovementType(), false)
 					&& pathingGrid.isPathable(centerX, centerY, getMovementType(), collisionSize)) {
 				outputX = centerX;
 				outputY = centerY;
@@ -2602,8 +2755,12 @@ public class CUnit extends CWidget {
 		return this.classifications;
 	}
 
-	public void addClassification(final CUnitClassification unitClassification) {
-		this.classifications.add(unitClassification);
+	public boolean addClassification(final CUnitClassification unitClassification) {
+		return this.classifications.add(unitClassification);
+	}
+
+	public boolean removeClassification(final CUnitClassification unitClassification) {
+		return this.classifications.remove(unitClassification);
 	}
 
 	public float getDefense() {
@@ -2649,7 +2806,7 @@ public class CUnit extends CWidget {
 
 	@Override
 	public double distance(final float x, final float y) {
-		return distance((double)x, (double)y);
+		return distance((double) x, (double) y);
 	}
 
 	public double distance(final double x, final double y) {
@@ -2675,11 +2832,44 @@ public class CUnit extends CWidget {
 			final float bonusDamage) {
 		boolean miss = false;
 		if (isAttack) {
-			for (final CUnitAttackEvasionListener listener : this.evasionListeners) {
+			for (final CUnitAttackEvasionListener listener : new ArrayList<>(this.evasionListeners)) {
 				miss = miss || listener.onAttack(simulation, source, this, isAttack, isRanged, damageType);
 			}
 		}
 		return miss;
+	}
+
+	public boolean checkForAttackProjReaction(final CSimulation simulation, final CUnit source,
+			final CAttackProjectile projectile) {
+		boolean allow = true;
+		for (final CUnitAttackProjReactionListener listener : new ArrayList<>(this.attackProjReactionListeners)) {
+			if (allow) {
+				allow = allow && listener.onHit(simulation, source, this, projectile);
+			}
+		}
+		return allow;
+	}
+
+	public boolean checkForAbilityProjReaction(final CSimulation simulation, final CUnit source,
+			final CProjectile projectile) {
+		boolean allow = true;
+		for (final CUnitAbilityProjReactionListener listener : new ArrayList<>(this.abilityProjReactionListeners)) {
+			if (allow) {
+				allow = allow && listener.onHit(simulation, source, this, projectile);
+			}
+		}
+		return allow;
+	}
+
+	public boolean checkForAbilityEffectReaction(final CSimulation simulation, final CUnit source,
+			final CAbility ability) {
+		boolean allow = true;
+		for (final CUnitAbilityEffectReactionListener listener : new ArrayList<>(this.abilityEffectReactionListeners)) {
+			if (allow) {
+				allow = allow && listener.onHit(simulation, source, this, ability);
+			}
+		}
+		return allow;
 	}
 
 	@Override
@@ -2698,18 +2888,14 @@ public class CUnit extends CWidget {
 			return 0;
 		}
 		float trueDamage = 0;
-		// 非 无敌状态
 		if (!this.invulnerable) {
 
-			// 创建伤害修改结构体
 			final CUnitAttackDamageTakenModificationListenerDamageModResult result = new CUnitAttackDamageTakenModificationListenerDamageModResult(
 					damage, bonusDamage);
-			// onDamage 伤害修改
 			for (final CUnitAttackDamageTakenModificationListener listener : this.damageTakenModificationListeners) {
 				listener.onDamage(simulation, source, this, isAttack, isRanged, attackType, damageType, result);
 			}
 
-			// 查询 攻击和防御 的伤害比例
 			final float damageRatioFromArmorClass = simulation.getGameplayConstants().getDamageRatioAgainst(attackType,
 					getDefenseType());
 			final float damageRatioFromDefense;
@@ -2725,10 +2911,8 @@ public class CUnit extends CWidget {
 				damageRatioFromDefense = 2f
 						- (float) StrictMath.pow(1f - simulation.getGameplayConstants().getDefenseArmor(), -defense);
 			}
-			// 真实伤害
 			trueDamage = damageRatioFromArmorClass * damageRatioFromDefense * result.computeFinalDamage();
 
-			// onDamage 最终伤害修改
 			for (final CUnitAttackFinalDamageTakenModificationListener listener : new ArrayList<>(
 					this.finalDamageTakenModificationListeners)) {
 				trueDamage = listener.onDamage(simulation, source, this, isAttack, isRanged, attackType, damageType,
@@ -2745,17 +2929,13 @@ public class CUnit extends CWidget {
 			}
 			this.stateNotifier.lifeChanged();
 		}
-		// onDamage 伤害监听
 		for (final CUnitAttackDamageTakenListener listener : new ArrayList<>(this.damageTakenListeners)) {
 			listener.onDamage(simulation, source, this, isAttack, isRanged, damageType, damage, bonusDamage,
 					trueDamage);
 		}
-		// 伤害音响事件
 		simulation.unitDamageEvent(this, weaponSoundType, this.unitType.getArmorType());
-		// 检查是否 死亡
 		if (!this.invulnerable && isDead()) {
 			if (!wasDead) {
-				// 击杀
 				kill(simulation, source);
 			}
 		}
@@ -2764,14 +2944,16 @@ public class CUnit extends CWidget {
 					|| ((this.currentBehavior == this.defaultBehavior) && this.currentBehavior.interruptable())) {
 				boolean foundMatchingReturnFireAttack = false;
 				if (!simulation.getPlayer(getPlayerIndex()).hasAlliance(source.getPlayerIndex(), CAllianceType.PASSIVE)
-						&& !this.unitType.getClassifications().contains(CUnitClassification.PEON)) {
+						&& !this.classifications.contains(CUnitClassification.PEON)) {
 					for (final CUnitAttack attack : getCurrentAttacks()) {
 						if (source.canBeTargetedBy(simulation, this, attack.getTargetsAllowed())) {
-							this.currentBehavior = getAttackBehavior().reset(OrderIds.attack, attack, source, false,
-									CBehaviorAttackListener.DO_NOTHING);
-							this.currentBehavior.begin(simulation);
-							foundMatchingReturnFireAttack = true;
-							break;
+							final CBehaviorAttack attackBehaviorForAtk = getAttackBehavior();
+							if (attackBehaviorForAtk != null) {
+								beginBehavior(simulation, attackBehaviorForAtk.reset(simulation, OrderIds.attack,
+										attack, source, false, CBehaviorAttackListener.DO_NOTHING));
+								foundMatchingReturnFireAttack = true;
+								break;
+							}
 						}
 					}
 				}
@@ -2779,36 +2961,32 @@ public class CUnit extends CWidget {
 						&& (this.moveBehavior != null) && (this.playerIndex != source.getPlayerIndex())) {
 					final double angleTo = source.angleTo(this);
 					final int distanceToFlee = getSpeed();
-					this.currentBehavior = this.moveBehavior.reset(OrderIds.move,
-							new AbilityPointTarget((float) (getX() + (distanceToFlee * StrictMath.cos(angleTo))),
-									(float) (getY() + (distanceToFlee * StrictMath.sin(angleTo)))));
-					this.currentBehavior.begin(simulation);
+					beginBehavior(simulation,
+							this.moveBehavior.reset(OrderIds.move,
+									new AbilityPointTarget(
+											(float) (getX() + (distanceToFlee * StrictMath.cos(angleTo))),
+											(float) (getY() + (distanceToFlee * StrictMath.sin(angleTo))))));
 				}
 			}
 		}
 		return trueDamage;
 	}
 
-	// 击杀
 	private void kill(final CSimulation simulation, final CUnit source) {
-		if (this.currentBehavior != null) {
-			this.currentBehavior.end(simulation, true);
-		}
-		this.currentBehavior = null;
+		beginBehavior(simulation, null);
 
 		final CUnitDeathReplacementResult result = new CUnitDeathReplacementResult();
 		CUnitDeathReplacementStacking allowContinue = new CUnitDeathReplacementStacking();
-		// 死亡替换效果处理器
 		for (final CUnitDeathReplacementEffectPriority priority : CUnitDeathReplacementEffectPriority.values()) {
-			if (allowContinue.isAllowStacking()) { // 是否允许堆叠
-				for (final CUnitDeathReplacementEffect effect : this.deathReplacementEffects.get(priority)) {
+			if (allowContinue.isAllowStacking()) {
+				for (final CUnitDeathReplacementEffect effect : new ArrayList<>(
+						this.deathReplacementEffects.get(priority))) {
 					if (allowContinue.isAllowSamePriorityStacking()) {
 						allowContinue = effect.onDeath(simulation, this, source, result);
 					}
 				}
 			}
 		}
-		// 复活状态
 		if (result.isReviving()) {
 			return;
 		}
@@ -2821,10 +2999,10 @@ public class CUnit extends CWidget {
 			// iteration order
 			this.abilities.get(i).onDeath(simulation, this);
 		}
-		simulation.getPlayer(this.playerIndex).addFogModifer(simulation, new CUnitDeathVisionFogModifier(this));
+		simulation.getPlayer(this.playerIndex).addFogModifer(simulation, new CUnitDeathVisionFogModifier(this), false);
 		if (source != null) {
 			simulation.getPlayer(source.getPlayerIndex()).addFogModifer(simulation,
-					new CUnitDeathVisionFogModifier(this));
+					new CUnitDeathVisionFogModifier(this), false);
 		}
 		if (this.attackFogMod.getPlayerIndex() != this.playerIndex) {
 			simulation.getPlayer(this.attackFogMod.getPlayerIndex()).removeFogModifer(simulation, this.attackFogMod);
@@ -2929,7 +3107,8 @@ public class CUnit extends CWidget {
 						final CAbilityHero heroData = receivingHero.getHeroData();
 						heroData.addXp(simulation, receivingHero,
 								(int) (availableAwardXp * (1f / xpReceivingHeroes.size())
-										* gameplayConstants.getHeroFactorXp(heroData.getHeroLevel())));
+										* gameplayConstants.getHeroFactorXp(heroData.getHeroLevel())),
+								true);
 					}
 				}
 			}
@@ -2963,18 +3142,15 @@ public class CUnit extends CWidget {
 		}
 	}
 
-	// 能否到达指定目标范围内
 	public boolean canReach(final AbilityTarget target, final float range) {
 		final double distance = distance(target);
 		if (target instanceof CUnit) {
 			final CUnit targetUnit = (CUnit) target;
 			final CUnitType targetUnitType = targetUnit.getUnitType();
-			// 如果是建筑，并且建筑修改寻路图存在
 			if (targetUnit.isBuilding() && (targetUnitType.getBuildingPathingPixelMap() != null)) {
 				final BufferedImage buildingPathingPixelMap = targetUnitType.getBuildingPathingPixelMap();
 				final float targetX = target.getX();
 				final float targetY = target.getY();
-				//
 				if (canReachToPathing(range, targetUnit.getFacing(), buildingPathingPixelMap, targetX, targetY)) {
 					return true;
 				}
@@ -2997,7 +3173,7 @@ public class CUnit extends CWidget {
 	public boolean canReach(final float x, final float y, final float range) {
 		return distance(x, y) <= range; // TODO use dist squared for performance
 	}
-	// 检查是否可以到达指定路径的函数
+
 	public boolean canReachToPathing(final float range, final float rotationForPathing,
 			final BufferedImage buildingPathingPixelMap, final float targetX, final float targetY) {
 		if (buildingPathingPixelMap == null) {
@@ -3049,7 +3225,6 @@ public class CUnit extends CWidget {
 		return false;
 	}
 
-
 	private int getRGBFromPixelData(final BufferedImage buildingPathingPixelMap, final int checkX, final int checkY,
 			final int rotation) {
 
@@ -3093,9 +3268,13 @@ public class CUnit extends CWidget {
 		return this.boneCorpse;
 	}
 
-	// 检查目标类型集合能否作为目标
 	@Override
 	public boolean canBeTargetedBy(final CSimulation simulation, final CUnit source,
+			final EnumSet<CTargetType> targetsAllowed, final AbilityTargetCheckReceiver<CWidget> receiver) {
+		return this.canBeTargetedBy(simulation, source, true, targetsAllowed, receiver);
+	}
+
+	public boolean canBeTargetedBy(final CSimulation simulation, final CUnit source, final boolean targeted,
 			final EnumSet<CTargetType> targetsAllowed, final AbilityTargetCheckReceiver<CWidget> receiver) {
 		if ((this == source) && targetsAllowed.contains(CTargetType.NOTSELF)
 				&& !targetsAllowed.contains(CTargetType.SELF)) {
@@ -3110,7 +3289,11 @@ public class CUnit extends CWidget {
 			receiver.targetCheckFailed(CommandStringErrorKeys.THAT_UNIT_IS_IMMUNE_TO_MAGIC);
 			return false;
 		}
-		if (targetsAllowed.containsAll(this.unitType.getTargetedAs()) || (!targetsAllowed.contains(CTargetType.GROUND)
+		if (targeted && !isVisible(simulation, source.getPlayerIndex())) {
+			receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_A_UNIT_WITH_THIS_ACTION);
+			return false;
+		}
+		if (targetsAllowed.containsAll(this.targetedAs) || (!targetsAllowed.contains(CTargetType.GROUND)
 				&& !targetsAllowed.contains(CTargetType.STRUCTURE) && !targetsAllowed.contains(CTargetType.AIR))) {
 			final int sourcePlayerIndex = source.getPlayerIndex();
 			final CPlayer sourcePlayer = simulation.getPlayer(sourcePlayerIndex);
@@ -3121,13 +3304,13 @@ public class CUnit extends CWidget {
 						|| sourcePlayer.hasAlliance(this.playerIndex, CAllianceType.PASSIVE)
 						|| targetsAllowed.contains(CTargetType.ENEMIES)) {
 					if (!targetsAllowed.contains(CTargetType.MECHANICAL)
-							|| this.unitType.getClassifications().contains(CUnitClassification.MECHANICAL)) {
+							|| this.classifications.contains(CUnitClassification.MECHANICAL)) {
 						if (!targetsAllowed.contains(CTargetType.ORGANIC)
-								|| !this.unitType.getClassifications().contains(CUnitClassification.MECHANICAL)) {
+								|| !this.classifications.contains(CUnitClassification.MECHANICAL)) {
 							if (!targetsAllowed.contains(CTargetType.ANCIENT)
-									|| this.unitType.getClassifications().contains(CUnitClassification.ANCIENT)) {
+									|| this.classifications.contains(CUnitClassification.ANCIENT)) {
 								if (!targetsAllowed.contains(CTargetType.NONANCIENT)
-										|| !this.unitType.getClassifications().contains(CUnitClassification.ANCIENT)) {
+										|| !this.classifications.contains(CUnitClassification.ANCIENT)) {
 									final boolean invulnerable = isInvulnerable();
 									if ((!invulnerable && (targetsAllowed.contains(CTargetType.VULNERABLE)
 											|| !targetsAllowed.contains(CTargetType.INVULNERABLE)))
@@ -3206,20 +3389,17 @@ public class CUnit extends CWidget {
 			}
 		}
 		else {
-			if (this.unitType.getTargetedAs().contains(CTargetType.GROUND)
-					&& !targetsAllowed.contains(CTargetType.GROUND)) {
+			if (this.targetedAs.contains(CTargetType.GROUND) && !targetsAllowed.contains(CTargetType.GROUND)) {
 				receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_GROUND_UNITS);
 			}
-			else if (this.unitType.getTargetedAs().contains(CTargetType.STRUCTURE)
+			else if (this.targetedAs.contains(CTargetType.STRUCTURE)
 					&& !targetsAllowed.contains(CTargetType.STRUCTURE)) {
 				receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_BUILDINGS);
 			}
-			else if (this.unitType.getTargetedAs().contains(CTargetType.AIR)
-					&& !targetsAllowed.contains(CTargetType.AIR)) {
+			else if (this.targetedAs.contains(CTargetType.AIR) && !targetsAllowed.contains(CTargetType.AIR)) {
 				receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_AIR_UNITS);
 			}
-			else if (this.unitType.getTargetedAs().contains(CTargetType.WARD)
-					&& !targetsAllowed.contains(CTargetType.WARD)) {
+			else if (this.targetedAs.contains(CTargetType.WARD) && !targetsAllowed.contains(CTargetType.WARD)) {
 				receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_WARDS);
 			}
 			else if (targetsAllowed.contains(CTargetType.GROUND)) {
@@ -3241,7 +3421,6 @@ public class CUnit extends CWidget {
 		return false;
 	}
 
-	// 是否禁止移动
 	public boolean isMovementDisabled() {
 		return (this.moveBehavior == null) || this.moveDisabled;
 		// TODO this used to directly return the state of whether our unit was a
@@ -3257,8 +3436,22 @@ public class CUnit extends CWidget {
 		if (isMovementDisabled()) {
 			return MovementType.DISABLED;
 		}
-		return getUnitType().getMovementType(); // later maybe it has unit instance override for windwalk, so this
-												// wrapper exists to later mod
+		return this.movementOverride != null ? this.movementOverride : getUnitType().getMovementType(); // later maybe
+																										// it has unit
+																										// instance
+																										// override for
+																										// windwalk, so
+																										// this
+		// wrapper exists to later mod
+	}
+
+	public void setNoCollisionMovementType(final boolean active) {
+		if (active) {
+			this.movementOverride = MovementType.FOOT_NO_COLLISION;
+		}
+		else {
+			this.movementOverride = null;
+		}
 	}
 
 	public float getAcquisitionRange() {
@@ -3474,14 +3667,13 @@ public class CUnit extends CWidget {
 			return false;
 		}
 	}
-	// 类 AutoAttackTargetFinderEnum 实现了 CUnitEnumFunction 接口，负责自动攻击目标的查找逻辑
+
 	private static final class AutoAttackTargetFinderEnum implements CUnitEnumFunction {
 		private CSimulation game;
 		private CUnit source;
 		private boolean disableMove;
 		private boolean foundAnyTarget;
 
-		// 重置函数，初始化游戏、源单位和其他参数
 		private AutoAttackTargetFinderEnum reset(final CSimulation game, final CUnit source,
 				final boolean disableMove) {
 			this.game = game;
@@ -3492,7 +3684,6 @@ public class CUnit extends CWidget {
 		}
 
 		@Override
-		// 调用函数，判断单位是否可作为攻击目标并执行攻击行为
 		public boolean call(final CUnit unit) {
 			if ((this.source.getAttackBehavior() != null)
 					&& !this.source.getFirstAbilityOfType(CAbilityAttack.class).isDisabled()) {
@@ -3512,12 +3703,9 @@ public class CUnit extends CWidget {
 									&& !(this.game.getGameplayConstants().isMagicImmuneResistsDamage()
 											&& unit.isUnitType(CUnitTypeJass.MAGIC_IMMUNE)
 											&& (attack.getAttackType() == CAttackType.MAGIC))) {
-								if (this.source.currentBehavior != null) {
-									this.source.currentBehavior.end(this.game, false);
-								}
-								this.source.currentBehavior = this.source.getAttackBehavior().reset(OrderIds.attack,
-										attack, unit, this.disableMove, CBehaviorAttackListener.DO_NOTHING);
-								this.source.currentBehavior.begin(this.game);
+								this.source.beginBehavior(this.game,
+										this.source.getAttackBehavior().reset(this.game, OrderIds.attack, attack, unit,
+												this.disableMove, CBehaviorAttackListener.DO_NOTHING));
 								this.foundAnyTarget = true;
 								return true;
 							}
@@ -3529,7 +3717,6 @@ public class CUnit extends CWidget {
 		}
 	}
 
-	// 移动行为
 	public CBehaviorMove getMoveBehavior() {
 		return this.moveBehavior;
 	}
@@ -3590,26 +3777,20 @@ public class CUnit extends CWidget {
 		return this.boardTransportBehavior;
 	}
 
-	// 处理下一个指令行为
 	public CBehavior pollNextOrderBehavior(final CSimulation game) {
-		// 如果默认行为与停止行为不相同，则返回当前的默认行为。
 		if (this.defaultBehavior != this.stopBehavior) {
 			// kind of a stupid hack, meant to align in feel with some behaviors that were
 			// observed on War3
-			// 这行代码检查当前单位的默认行为（defaultBehavior）与停止行为（stopBehavior）是否相同。这主要用于判断单位当前是否是在执行特定的行为而不是处于停止状态。
 			return this.defaultBehavior;
 		}
-		// 这行代码检查当前是否有一个中断行为（interruptedBehavior），如果有，则意味着单位在执行一个特定的动作被中断了。
 		if (this.interruptedBehavior != null) {
 			return this.interruptedBehavior;
 		}
-		// 从指令队列中获取下一个指令：
 		final COrder order = this.orderQueue.poll();
 		final CBehavior nextOrderBehavior = beginOrder(game, order);
 		this.stateNotifier.waypointsChanged();
 		return nextOrderBehavior;
 	}
-
 
 	public boolean isMoving() {
 		return getCurrentBehavior() instanceof CBehaviorMove;
@@ -3684,12 +3865,25 @@ public class CUnit extends CWidget {
 		return this.invulnerable;
 	}
 
-	public void setWorkerInside(final CUnit unit) {
-		this.workerInside = unit;
+	public void setWorker(final CUnit unit, final boolean inside) {
+		this.worker = unit;
+		this.workerInside = inside;
 	}
 
-	public CUnit getWorkerInside() {
-		return this.workerInside;
+	public CUnit getWorker() {
+		return this.worker;
+	}
+
+	public void addPowerWorker() {
+		this.powerWorkers++;
+	}
+
+	public void removePowerWorker() {
+		this.powerWorkers--;
+	}
+
+	public int getPowerWorkers() {
+		return this.powerWorkers;
 	}
 
 	private void nudgeAround(final CSimulation simulation, final CUnit structure) {
@@ -3806,7 +4000,7 @@ public class CUnit extends CWidget {
 					player.refundFor(unitType);
 					player.removeTechtreeInProgress(this.buildQueue[cancelIndex]);
 
-					getWorkerInside().setHidden(false);
+					getWorker().setHidden(false);
 					break;
 				}
 				case HERO_REVIVE: {
@@ -3890,7 +4084,7 @@ public class CUnit extends CWidget {
 	public void queueSacrificingUnit(final CSimulation game, final War3ID rawcode, final CUnit sacrifice) {
 		if (queue(game, rawcode, QueueItemType.SACRIFICE)) {
 			sacrifice.setHidden(true);
-			setWorkerInside(sacrifice);
+			setWorker(sacrifice, true);
 
 			final CPlayer player = game.getPlayer(this.playerIndex);
 			final CUnitType unitType = game.getUnitData().getUnitType(rawcode);
@@ -3925,10 +4119,7 @@ public class CUnit extends CWidget {
 	}
 
 	public static enum QueueItemType {
-		UNIT, // 单位
-		RESEARCH, // 研究一个技术或能力。
-		HERO_REVIVE, // 复活一个英雄单位
-		SACRIFICE; // 牺牲某个单位以取得某种效果。
+		UNIT, RESEARCH, HERO_REVIVE, SACRIFICE;
 	}
 
 	public void setRallyPoint(final AbilityTarget target) {
@@ -3963,7 +4154,7 @@ public class CUnit extends CWidget {
 	private static final class UseAbilityOnTargetByIdVisitor implements AbilityTargetVisitor<Void> {
 		private static final UseAbilityOnTargetByIdVisitor INSTANCE = new UseAbilityOnTargetByIdVisitor();
 		private CSimulation game;
-		private CUnit trainedUnit; // 受训单位
+		private CUnit trainedUnit;
 		private int rallyOrderId;
 
 		private UseAbilityOnTargetByIdVisitor reset(final CSimulation game, final CUnit trainedUnit,
@@ -4389,9 +4580,9 @@ public class CUnit extends CWidget {
 			return isBuilding();
 
 		case FLYING:
-			return getUnitType().getTargetedAs().contains(CTargetType.AIR);
+			return this.targetedAs.contains(CTargetType.AIR);
 		case GROUND:
-			return getUnitType().getTargetedAs().contains(CTargetType.GROUND);
+			return this.targetedAs.contains(CTargetType.GROUND);
 
 		case ATTACKS_FLYING:
 			for (final CUnitAttack attack : getCurrentAttacks()) {
@@ -4427,9 +4618,9 @@ public class CUnit extends CWidget {
 			return false;
 
 		case GIANT:
-			return getUnitType().getClassifications().contains(CUnitClassification.GIANT);
+			return this.classifications.contains(CUnitClassification.GIANT);
 		case SUMMONED:
-			return getUnitType().getClassifications().contains(CUnitClassification.SUMMONED);
+			return this.classifications.contains(CUnitClassification.SUMMONED);
 		case STUNNED:
 			return getCurrentBehavior().getHighlightOrderId() == OrderIds.stunned;
 		case PLAGUED:
@@ -4446,20 +4637,20 @@ public class CUnit extends CWidget {
 			}
 			return isSnared;
 		case UNDEAD:
-			return getUnitType().getClassifications().contains(CUnitClassification.UNDEAD);
+			return this.classifications.contains(CUnitClassification.UNDEAD);
 		case MECHANICAL:
-			return getUnitType().getClassifications().contains(CUnitClassification.MECHANICAL);
+			return this.classifications.contains(CUnitClassification.MECHANICAL);
 		case PEON:
-			return getUnitType().getClassifications().contains(CUnitClassification.PEON);
+			return this.classifications.contains(CUnitClassification.PEON);
 		case SAPPER:
-			return getUnitType().getClassifications().contains(CUnitClassification.SAPPER);
+			return this.classifications.contains(CUnitClassification.SAPPER);
 		case TOWNHALL:
-			return getUnitType().getClassifications().contains(CUnitClassification.TOWNHALL);
+			return this.classifications.contains(CUnitClassification.TOWNHALL);
 		case ANCIENT:
-			return this.unitType.getClassifications().contains(CUnitClassification.ANCIENT);
+			return this.classifications.contains(CUnitClassification.ANCIENT);
 
 		case TAUREN:
-			return getUnitType().getClassifications().contains(CUnitClassification.TAUREN);
+			return this.classifications.contains(CUnitClassification.TAUREN);
 		case POISONED:
 			throw new UnsupportedOperationException(
 					"cannot ask engine if unit is poisoned: poison is not yet implemented");
@@ -4490,6 +4681,193 @@ public class CUnit extends CWidget {
 			return isEthereal;
 		case MAGIC_IMMUNE:
 			return isMagicImmune();
+		}
+		return false;
+	}
+
+	public void addCheesyStateModBuff(final CSimulation game, final StateModBuffType type) {
+		// this might be less efficient than the original state mod buff system,
+		// and cannot access the Detector Levels, etc, with the value
+		addStateModBuff(new StateModBuff(type, CHEESY_UNIQUE_NUMBER));
+		computeUnitState(game, type);
+	}
+
+	public boolean removeCheesyStateModBuff(final CSimulation game, final StateModBuffType type) {
+		// this might be less efficient than the original state mod buff system,
+		// and cannot access the Detector Levels, etc, with the value
+		StateModBuff toRemove = null;
+		for (final StateModBuff stateModBuff : this.stateModBuffs) {
+			if ((stateModBuff.getBuffType() == type) && (stateModBuff.getValue() == CHEESY_UNIQUE_NUMBER)) {
+				toRemove = stateModBuff;
+				break;
+			}
+		}
+		if (toRemove != null) {
+			removeStateModBuff(toRemove);
+			computeUnitState(game, type);
+			return true;
+		}
+		return false;
+	}
+
+	public boolean addUnitType(final CSimulation game, final CUnitTypeJass whichUnitType) {
+		switch (whichUnitType) {
+		case HERO:
+		case ATTACKS_FLYING:
+		case ATTACKS_GROUND:
+		case MELEE_ATTACKER:
+		case RANGED_ATTACKER:
+		case PLAGUED:
+		case POISONED:
+		case POLYMORPHED:
+			// types which we are not allowing them to add and remove
+			// I read online on a Hive thing that maybe users expect the API for these types
+			// to be something that doesn't work, i.e. "IsUnitType(UNIT_TYPE_STUNNED)" would
+			// return false on a stunned unit, but would return true if they use
+			// "UnitAddType(UNIT_TYPE_STUNNED)"
+			// then check for it. Seems extremely bogus but it's possible some custom
+			// content might
+			// depend on the pointless "feature" of adding and remove a setting that doesn't
+			// work.
+			// If you are here reading this because you're playing something that depends on
+			// this
+			// "feature" then this would be the place to add it
+			return false;
+		case SNARED:
+			addCheesyStateModBuff(game, StateModBuffType.SNARED);
+			return true;
+		case STUNNED:
+			addCheesyStateModBuff(game, StateModBuffType.STUN);
+			return true;
+		case SLEEPING:
+			addCheesyStateModBuff(game, StateModBuffType.SLEEPING);
+			return true;
+		case DEAD:
+			if (!isDead()) {
+				kill(game);
+				return true;
+			}
+			return false;
+		case STRUCTURE:
+			if (!isBuilding()) {
+				// below is maybe not what wc3 actually does. the "Factory" ability
+				// for pocket factory sets it to structure kind of like this,
+				// but probably doesn't interact with its world collision (?)
+				game.getWorldCollision().removeUnit(this);
+				setStructure(true);
+				game.getWorldCollision().addUnit(this);
+				return true;
+			}
+			return false;
+		case FLYING:
+			return this.targetedAs.add(CTargetType.AIR);
+		case GROUND:
+			return this.targetedAs.add(CTargetType.GROUND);
+		case GIANT:
+			return this.classifications.add(CUnitClassification.GIANT);
+		case SUMMONED:
+			return this.classifications.add(CUnitClassification.SUMMONED);
+		case UNDEAD:
+			return this.classifications.add(CUnitClassification.UNDEAD);
+		case MECHANICAL:
+			return this.classifications.add(CUnitClassification.MECHANICAL);
+		case PEON:
+			return this.classifications.add(CUnitClassification.PEON);
+		case SAPPER:
+			return this.classifications.add(CUnitClassification.SAPPER);
+		case TOWNHALL:
+			return this.classifications.add(CUnitClassification.TOWNHALL);
+		case ANCIENT:
+			return this.classifications.add(CUnitClassification.ANCIENT);
+		case TAUREN:
+			return this.classifications.add(CUnitClassification.TAUREN);
+		case RESISTANT:
+			addCheesyStateModBuff(game, StateModBuffType.RESISTANT);
+			return true;
+		case ETHEREAL:
+			addCheesyStateModBuff(game, StateModBuffType.ETHEREAL);
+			return true;
+		case MAGIC_IMMUNE:
+			addCheesyStateModBuff(game, StateModBuffType.MAGIC_IMMUNE);
+			return true;
+		}
+		return false;
+	}
+
+	public boolean removeUnitType(final CSimulation game, final CUnitTypeJass whichUnitType) {
+		switch (whichUnitType) {
+		case HERO:
+		case ATTACKS_FLYING:
+		case ATTACKS_GROUND:
+		case MELEE_ATTACKER:
+		case RANGED_ATTACKER:
+		case PLAGUED:
+		case POISONED:
+		case POLYMORPHED:
+			// types which we are not allowing them to add and remove
+			// I read online on a Hive thing that maybe users expect the API for these types
+			// to be something that doesn't work, i.e. "IsUnitType(UNIT_TYPE_STUNNED)" would
+			// return false on a stunned unit, but would return true if they use
+			// "UnitAddType(UNIT_TYPE_STUNNED)"
+			// then check for it. Seems extremely bogus but it's possible some custom
+			// content might
+			// depend on the pointless "feature" of adding and remove a setting that doesn't
+			// work.
+			// If you are here reading this because you're playing something that depends on
+			// this
+			// "feature" then this would be the place to add it
+			return false;
+		case SNARED:
+			return removeCheesyStateModBuff(game, StateModBuffType.SNARED);
+		case STUNNED:
+			return removeCheesyStateModBuff(game, StateModBuffType.STUN);
+		case SLEEPING:
+			return removeCheesyStateModBuff(game, StateModBuffType.SLEEPING);
+		case DEAD:
+			if (isDead()) {
+				resurrect(game);
+				return true;
+			}
+			return false;
+		case STRUCTURE:
+			if (isBuilding()) {
+				// below is maybe not what wc3 actually does. the "Factory" ability
+				// for pocket factory sets it to structure kind of like this,
+				// but probably doesn't interact with its world collision (?)
+				game.getWorldCollision().removeUnit(this);
+				setStructure(false);
+				game.getWorldCollision().addUnit(this);
+				return true;
+			}
+			return false;
+		case FLYING:
+			return this.targetedAs.remove(CTargetType.AIR);
+		case GROUND:
+			return this.targetedAs.remove(CTargetType.GROUND);
+		case GIANT:
+			return this.classifications.remove(CUnitClassification.GIANT);
+		case SUMMONED:
+			return this.classifications.remove(CUnitClassification.SUMMONED);
+		case UNDEAD:
+			return this.classifications.remove(CUnitClassification.UNDEAD);
+		case MECHANICAL:
+			return this.classifications.remove(CUnitClassification.MECHANICAL);
+		case PEON:
+			return this.classifications.remove(CUnitClassification.PEON);
+		case SAPPER:
+			return this.classifications.remove(CUnitClassification.SAPPER);
+		case TOWNHALL:
+			return this.classifications.remove(CUnitClassification.TOWNHALL);
+		case ANCIENT:
+			return this.classifications.remove(CUnitClassification.ANCIENT);
+		case TAUREN:
+			return this.classifications.remove(CUnitClassification.TAUREN);
+		case RESISTANT:
+			return removeCheesyStateModBuff(game, StateModBuffType.RESISTANT);
+		case ETHEREAL:
+			return removeCheesyStateModBuff(game, StateModBuffType.ETHEREAL);
+		case MAGIC_IMMUNE:
+			return removeCheesyStateModBuff(game, StateModBuffType.MAGIC_IMMUNE);
 		}
 		return false;
 	}
@@ -4531,6 +4909,128 @@ public class CUnit extends CWidget {
 		return false;
 	}
 
+	public void fireSpellEvents(final CSimulation game, final JassGameEventsWar3 eventId, final CAbility ability,
+			final AbilityTarget target) {
+		if (target == null) {
+			fireSpellEventsNoTarget(game, eventId, ability);
+		}
+		else {
+			target.visit(new AbilityTargetVisitor<Object>() {
+
+				@Override
+				public Object accept(final AbilityPointTarget target) {
+					fireSpellEventsPointTarget(game, eventId, ability, target);
+					return null;
+				}
+
+				@Override
+				public Object accept(final CUnit target) {
+					fireSpellEventsUnitTarget(game, eventId, ability, target);
+					return null;
+				}
+
+				@Override
+				public Object accept(final CDestructable target) {
+					fireSpellEventsDestructableTarget(game, eventId, ability, target);
+					return null;
+				}
+
+				@Override
+				public Object accept(final CItem target) {
+					fireSpellEventsItemTarget(game, eventId, ability, target);
+					return null;
+				}
+
+			});
+		}
+	}
+
+	public void fireSpellEventsNoTarget(final CSimulation game, final JassGameEventsWar3 eventId,
+			final CAbility ability) {
+		final List<CWidgetEvent> eventList = getEventList(eventId);
+		if (eventList != null) {
+			for (final CWidgetEvent event : eventList) {
+				event.fire(this, CommonTriggerExecutionScope.unitSpellNoTargetScope(eventId, event.getTrigger(),
+						ability, this, ability.getAlias()));
+			}
+		}
+		game.getPlayer(this.playerIndex).fireSpellEventsNoTarget(unitSpellEventToPlayerEvent(eventId), ability, this);
+		game.fireSpellEventsNoTarget(eventId, ability, this);
+	}
+
+	public void fireSpellEventsPointTarget(final CSimulation game, final JassGameEventsWar3 eventId,
+			final CAbility ability, final AbilityPointTarget target) {
+		final List<CWidgetEvent> eventList = getEventList(eventId);
+		if (eventList != null) {
+			for (final CWidgetEvent event : eventList) {
+				event.fire(this, CommonTriggerExecutionScope.unitSpellPointScope(eventId, event.getTrigger(), ability,
+						this, target, ability.getAlias()));
+			}
+		}
+		game.getPlayer(this.playerIndex).fireSpellEventsPointTarget(unitSpellEventToPlayerEvent(eventId), ability, this,
+				target);
+		game.fireSpellEventsPointTarget(eventId, ability, this, target);
+	}
+
+	public void fireSpellEventsUnitTarget(final CSimulation game, final JassGameEventsWar3 eventId,
+			final CAbility ability, final CUnit target) {
+		final List<CWidgetEvent> eventList = getEventList(eventId);
+		if (eventList != null) {
+			for (final CWidgetEvent event : eventList) {
+				event.fire(this, CommonTriggerExecutionScope.unitSpellTargetUnitScope(eventId, event.getTrigger(),
+						ability, this, target, ability.getAlias()));
+			}
+		}
+		game.getPlayer(this.playerIndex).fireSpellEventsUnitTarget(unitSpellEventToPlayerEvent(eventId), ability, this,
+				target);
+		game.fireSpellEventsUnitTarget(eventId, ability, this, target);
+	}
+
+	public void fireSpellEventsItemTarget(final CSimulation game, final JassGameEventsWar3 eventId,
+			final CAbility ability, final CItem target) {
+		final List<CWidgetEvent> eventList = getEventList(eventId);
+		if (eventList != null) {
+			for (final CWidgetEvent event : eventList) {
+				event.fire(this, CommonTriggerExecutionScope.unitSpellTargetItemScope(eventId, event.getTrigger(),
+						ability, this, target, ability.getAlias()));
+			}
+		}
+		game.getPlayer(this.playerIndex).fireSpellEventsItemTarget(unitSpellEventToPlayerEvent(eventId), ability, this,
+				target);
+		game.fireSpellEventsItemTarget(eventId, ability, this, target);
+	}
+
+	public void fireSpellEventsDestructableTarget(final CSimulation game, final JassGameEventsWar3 eventId,
+			final CAbility ability, final CDestructable target) {
+		final List<CWidgetEvent> eventList = getEventList(eventId);
+		if (eventList != null) {
+			for (final CWidgetEvent event : eventList) {
+				event.fire(this, CommonTriggerExecutionScope.unitSpellTargetDestructableScope(eventId,
+						event.getTrigger(), ability, this, target, ability.getAlias()));
+			}
+		}
+		game.getPlayer(this.playerIndex).fireSpellEventsDestructableTarget(unitSpellEventToPlayerEvent(eventId),
+				ability, this, target);
+		game.fireSpellEventsDestructableTarget(eventId, ability, this, target);
+	}
+
+	private JassGameEventsWar3 unitSpellEventToPlayerEvent(final JassGameEventsWar3 eventId) {
+		switch (eventId) {
+		case EVENT_UNIT_SPELL_CAST:
+			return JassGameEventsWar3.EVENT_PLAYER_UNIT_SPELL_CAST;
+		case EVENT_UNIT_SPELL_CHANNEL:
+			return JassGameEventsWar3.EVENT_PLAYER_UNIT_SPELL_CHANNEL;
+		case EVENT_UNIT_SPELL_EFFECT:
+			return JassGameEventsWar3.EVENT_PLAYER_UNIT_SPELL_EFFECT;
+		case EVENT_UNIT_SPELL_FINISH:
+			return JassGameEventsWar3.EVENT_PLAYER_UNIT_SPELL_FINISH;
+		case EVENT_UNIT_SPELL_ENDCAST:
+			return JassGameEventsWar3.EVENT_PLAYER_UNIT_SPELL_ENDCAST;
+		default:
+			return null;
+		}
+	}
+
 	public void firePickUpItemEvents(final CSimulation game, final CItem item) {
 		final List<CWidgetEvent> eventList = getEventList(JassGameEventsWar3.EVENT_UNIT_PICKUP_ITEM);
 		if (eventList != null) {
@@ -4542,22 +5042,17 @@ public class CUnit extends CWidget {
 		game.getPlayer(this.playerIndex).firePickUpItemEvents(this, item, game);
 	}
 
-	// 无目标 指令 事件
 	public void fireOrderEvents(final CSimulation game, final COrderNoTarget order) {
-		// 获取无目标事件列表
 		final List<CWidgetEvent> eventList = getEventList(JassGameEventsWar3.EVENT_UNIT_ISSUED_ORDER);
 		if (eventList != null) {
-			// 遍历事件列表，执行事件
 			for (final CWidgetEvent event : eventList) {
 				event.fire(this, CommonTriggerExecutionScope.unitOrderScope(JassGameEventsWar3.EVENT_UNIT_ISSUED_ORDER,
 						event.getTrigger(), this, order.getOrderId()));
 			}
 		}
-		// 获取Player执行事件列表
 		game.getPlayer(this.playerIndex).fireOrderEvents(this, game, order);
 	}
 
-	// 坐标点 指令 事件
 	public void fireOrderEvents(final CSimulation game, final COrderTargetPoint order) {
 		final List<CWidgetEvent> eventList = getEventList(JassGameEventsWar3.EVENT_UNIT_ISSUED_POINT_ORDER);
 		if (eventList != null) {
@@ -4572,7 +5067,6 @@ public class CUnit extends CWidget {
 		game.getPlayer(this.playerIndex).fireOrderEvents(this, game, order);
 	}
 
-	// 单位/可破坏物/物品 指令 事件
 	public void fireOrderEvents(final CSimulation game, final COrderTargetWidget order) {
 		final List<CWidgetEvent> eventList = getEventList(JassGameEventsWar3.EVENT_UNIT_ISSUED_TARGET_ORDER);
 		if (eventList != null) {
@@ -4588,7 +5082,7 @@ public class CUnit extends CWidget {
 	}
 
 	public void fireConstructFinishEvents(final CSimulation game) {
-		final CUnit constructingUnit = this.workerInside; // TODO incorrect for human/undead/ancient, etc, needs work
+		final CUnit constructingUnit = this.worker;
 		final List<CWidgetEvent> eventList = getEventList(JassGameEventsWar3.EVENT_UNIT_CONSTRUCT_FINISH);
 		if (eventList != null) {
 			for (final CWidgetEvent event : eventList) {
@@ -4725,129 +5219,77 @@ public class CUnit extends CWidget {
 				final float radSq = (sightRadius * sightRadius)
 						/ (CPlayerFogOfWar.GRID_STEP * CPlayerFogOfWar.GRID_STEP);
 				final CPlayerFogOfWar fogOfWar = game.getPlayer(this.playerIndex).getFogOfWar();
-				final boolean flying = getUnitType().getMovementType() == MovementType.FLY;
+				final boolean flying = getMovementType() == MovementType.FLY;
 				final float myX = getX();
 				final float myY = getY();
 				final int myZ = flying ? Integer.MAX_VALUE : game.getTerrainHeight(myX, myY);
 				final PathingGrid pathingGrid = game.getPathingGrid();
-				fogOfWar.setState(pathingGrid.getFogOfWarIndexX(myX), pathingGrid.getFogOfWarIndexY(myY), (byte) 0);
+				byte detections = 0;
+				for (final int detectionLevel : this.detectorLevels) {
+					if ((detectionLevel >> 8) > 0) {
+						detections |= (byte) detectionLevel;
+					}
+				}
+				fogOfWar.setDetecting(pathingGrid.getFogOfWarIndexX(myX), pathingGrid.getFogOfWarIndexY(myY),
+						CFogState.VISIBLE, detections);
 
 				final int myXi = pathingGrid.getFogOfWarIndexX(myX);
 				final int myYi = pathingGrid.getFogOfWarIndexY(myY);
 				final int maxXi = pathingGrid.getFogOfWarIndexX(myX + sightRadius);
 				final int maxYi = pathingGrid.getFogOfWarIndexY(myY + sightRadius);
 				for (int a = 1; a <= Math.max(maxYi - myYi, maxXi - myXi); a++) {
-					final int distance = a * a;
+					detections = 0;
+					for (final int detectionLevel : this.detectorLevels) {
+						if ((detectionLevel >> 8) > a) {
+							detections |= (byte) detectionLevel;
+						}
+					}
 
-					if ((distance <= radSq)
-							&& (flying || !pathingGrid.isBlockVision(myX, myY - ((a - 1) * CPlayerFogOfWar.GRID_STEP)))
-							&& (fogOfWar.getState(myXi, (myYi - a) + 1) == 0)
-							&& (flying || game.isTerrainWater(myX, myY - (a * CPlayerFogOfWar.GRID_STEP))
-									|| (myZ > game.getTerrainHeight(myX, myY - (a * CPlayerFogOfWar.GRID_STEP)))
-									|| (!game.isTerrainRomp(myX, myY - (a * CPlayerFogOfWar.GRID_STEP)) && (myZ == game
-											.getTerrainHeight(myX, myY - (a * CPlayerFogOfWar.GRID_STEP)))))) {
-						fogOfWar.setState(myXi, myYi - a, (byte) 0);
-					}
-					if ((distance <= radSq)
-							&& (flying || !pathingGrid.isBlockVision(myX, myY + ((a - 1) * CPlayerFogOfWar.GRID_STEP)))
-							&& (fogOfWar.getState(myXi, (myYi + a) - 1) == 0)
-							&& (flying || game.isTerrainWater(myX, myY + (a * CPlayerFogOfWar.GRID_STEP))
-									|| (myZ > game.getTerrainHeight(myX, myY + (a * CPlayerFogOfWar.GRID_STEP)))
-									|| (!game.isTerrainRomp(myX, myY + (a * CPlayerFogOfWar.GRID_STEP)) && (myZ == game
-											.getTerrainHeight(myX, myY + (a * CPlayerFogOfWar.GRID_STEP)))))) {
-						fogOfWar.setState(myXi, myYi + a, (byte) 0);
-					}
-					if ((distance <= radSq)
-							&& (flying || !pathingGrid.isBlockVision(myX - ((a - 1) * CPlayerFogOfWar.GRID_STEP), myY))
-							&& (fogOfWar.getState((myXi - a) + 1, myYi) == 0)
-							&& (flying || game.isTerrainWater(myX - (a * CPlayerFogOfWar.GRID_STEP), myY)
-									|| (myZ > game.getTerrainHeight(myX - (a * CPlayerFogOfWar.GRID_STEP), myY))
-									|| (!game.isTerrainRomp(myX - (a * CPlayerFogOfWar.GRID_STEP), myY) && (myZ == game
-											.getTerrainHeight(myX - (a * CPlayerFogOfWar.GRID_STEP), myY))))) {
-						fogOfWar.setState(myXi - a, myYi, (byte) 0);
-					}
-					if ((distance <= radSq)
-							&& (flying || !pathingGrid.isBlockVision(myX + ((a - 1) * CPlayerFogOfWar.GRID_STEP), myY))
-							&& (fogOfWar.getState((myXi + a) - 1, myYi) == 0)
-							&& (flying || game.isTerrainWater(myX + (a * CPlayerFogOfWar.GRID_STEP), myY)
-									|| (myZ > game.getTerrainHeight(myX + (a * CPlayerFogOfWar.GRID_STEP), myY))
-									|| (!game.isTerrainRomp(myX + (a * CPlayerFogOfWar.GRID_STEP), myY) && (myZ == game
-											.getTerrainHeight(myX + (a * CPlayerFogOfWar.GRID_STEP), myY))))) {
-						fogOfWar.setState(myXi + a, myYi, (byte) 0);
+					if ((a * a) <= radSq) {
+						fogOfWar.checkCardinalVision(game, pathingGrid, detections, flying, myXi, myYi - a, myXi,
+								(myYi - a) + 1, myX, myY - (a * CPlayerFogOfWar.GRID_STEP), myX,
+								myY - ((a - 1) * CPlayerFogOfWar.GRID_STEP), myZ);
+						fogOfWar.checkCardinalVision(game, pathingGrid, detections, flying, myXi, myYi + a, myXi,
+								(myYi + a) - 1, myX, myY + (a * CPlayerFogOfWar.GRID_STEP), myX,
+								myY + ((a - 1) * CPlayerFogOfWar.GRID_STEP), myZ);
+						fogOfWar.checkCardinalVision(game, pathingGrid, detections, flying, myXi - a, myYi,
+								(myXi - a) + 1, myYi, myX - (a * CPlayerFogOfWar.GRID_STEP), myY,
+								myX - ((a - 1) * CPlayerFogOfWar.GRID_STEP), myY, myZ);
+						fogOfWar.checkCardinalVision(game, pathingGrid, detections, flying, myXi + a, myYi,
+								(myXi + a) - 1, myYi, myX + (a * CPlayerFogOfWar.GRID_STEP), myY,
+								myX + ((a - 1) * CPlayerFogOfWar.GRID_STEP), myY, myZ);
 					}
 				}
 
 				for (int y = 1; y <= (maxYi - myYi); y++) {
 					for (int x = 1; x <= (maxXi - myXi); x++) {
 						final float distance = (x * x) + (y * y);
+						detections = 0;
+						for (final int detectionLevel : this.detectorLevels) {
+							if (((detectionLevel >> 8) * (detectionLevel >> 8)) > distance) {
+								detections |= (byte) detectionLevel;
+							}
+						}
 						if (distance <= radSq) {
 							final int xf = x * CPlayerFogOfWar.GRID_STEP;
 							final int yf = y * CPlayerFogOfWar.GRID_STEP;
 
-							if ((flying || game.isTerrainWater(myX - xf, myY - yf)
-									|| (myZ > game.getTerrainHeight(myX - xf, myY - yf))
-									|| (!game.isTerrainRomp(myX - xf, myY - yf)
-											&& (myZ == game.getTerrainHeight(myX - xf, myY - yf))))
-									&& (flying || !pathingGrid.isBlockVision((myX - xf) + CPlayerFogOfWar.GRID_STEP,
-											(myY - yf) + CPlayerFogOfWar.GRID_STEP))
-									&& (fogOfWar.getState((myXi - x) + 1, (myYi - y) + 1) == 0)
-									&& ((x == y)
-											|| ((x > y) && (fogOfWar.getState((myXi - x) + 1, myYi - y) == 0)
-													&& (flying || !pathingGrid.isBlockVision(
-															(myX - xf) + CPlayerFogOfWar.GRID_STEP, myY - yf)))
-											|| ((x < y) && (fogOfWar.getState(myXi - x, (myYi - y) + 1) == 0)
-													&& (flying || !pathingGrid.isBlockVision(myX - xf,
-															(myY - yf) + CPlayerFogOfWar.GRID_STEP))))) {
-								fogOfWar.setState(myXi - x, myYi - y, (byte) 0);
-							}
-							if ((flying || game.isTerrainWater(myX - xf, myY + yf)
-									|| (myZ > game.getTerrainHeight(myX - xf, myY + yf))
-									|| (!game.isTerrainRomp(myX - xf, myY + yf)
-											&& (myZ == game.getTerrainHeight(myX - xf, myY + yf))))
-									&& (flying || !pathingGrid.isBlockVision((myX - xf) + CPlayerFogOfWar.GRID_STEP,
-											(myY + yf) - CPlayerFogOfWar.GRID_STEP))
-									&& (fogOfWar.getState((myXi - x) + 1, (myYi + y) - 1) == 0)
-									&& ((x == y)
-											|| ((x > y) && (fogOfWar.getState((myXi - x) + 1, myYi + y) == 0)
-													&& (flying || !pathingGrid.isBlockVision(
-															(myX - xf) + CPlayerFogOfWar.GRID_STEP, myY + yf)))
-											|| ((x < y) && (fogOfWar.getState(myXi - x, (myYi + y) - 1) == 0)
-													&& (flying || !pathingGrid.isBlockVision(myX - xf,
-															(myY + yf) - CPlayerFogOfWar.GRID_STEP))))) {
-								fogOfWar.setState(myXi - x, myYi + y, (byte) 0);
-							}
-							if ((flying || game.isTerrainWater(myX + xf, myY - yf)
-									|| (myZ > game.getTerrainHeight(myX + xf, myY - yf))
-									|| (!game.isTerrainRomp(myX + xf, myY - yf)
-											&& (myZ == game.getTerrainHeight(myX + xf, myY - yf))))
-									&& (flying || !pathingGrid.isBlockVision((myX + xf) - CPlayerFogOfWar.GRID_STEP,
-											(myY - yf) + CPlayerFogOfWar.GRID_STEP))
-									&& (fogOfWar.getState((myXi + x) - 1, (myYi - y) + 1) == 0)
-									&& ((x == y)
-											|| ((x > y) && (fogOfWar.getState((myXi + x) - 1, myYi - y) == 0)
-													&& (flying || !pathingGrid.isBlockVision(
-															(myX + xf) - CPlayerFogOfWar.GRID_STEP, myY - yf)))
-											|| ((x < y) && (fogOfWar.getState(myXi + x, (myYi - y) + 1) == 0)
-													&& (flying || !pathingGrid.isBlockVision(myX + xf,
-															(myY - yf) + CPlayerFogOfWar.GRID_STEP))))) {
-								fogOfWar.setState(myXi + x, myYi - y, (byte) 0);
-							}
-							if ((flying || game.isTerrainWater(myX + xf, myY + yf)
-									|| (myZ > game.getTerrainHeight(myX + xf, myY + yf))
-									|| (!game.isTerrainRomp(myX + xf, myY + yf)
-											&& (myZ == game.getTerrainHeight(myX + xf, myY + yf))))
-									&& (flying || !pathingGrid.isBlockVision((myX + xf) - CPlayerFogOfWar.GRID_STEP,
-											(myY + yf) - CPlayerFogOfWar.GRID_STEP))
-									&& (fogOfWar.getState((myXi + x) - 1, (myYi + y) - 1) == 0)
-									&& ((x == y)
-											|| ((x > y) && (fogOfWar.getState((myXi + x) - 1, myYi + y) == 0)
-													&& (flying || !pathingGrid.isBlockVision(
-															(myX + xf) - CPlayerFogOfWar.GRID_STEP, myY + yf)))
-											|| ((x < y) && (fogOfWar.getState(myXi + x, (myYi + y) - 1) == 0)
-													&& (flying || !pathingGrid.isBlockVision(myX + xf,
-															(myY + yf) - CPlayerFogOfWar.GRID_STEP))))) {
-								fogOfWar.setState(myXi + x, myYi + y, (byte) 0);
-							}
+							fogOfWar.checkDiagonalVision(game, pathingGrid, detections, flying, x, y, myXi - x,
+									myYi - y, (myXi - x) + 1, (myYi - y) + 1, myX - xf, myY - yf,
+									(myX - xf) + CPlayerFogOfWar.GRID_STEP, (myY - yf) + CPlayerFogOfWar.GRID_STEP,
+									myZ);
+							fogOfWar.checkDiagonalVision(game, pathingGrid, detections, flying, x, y, myXi - x,
+									myYi + y, (myXi - x) + 1, (myYi + y) - 1, myX - xf, myY + yf,
+									(myX - xf) + CPlayerFogOfWar.GRID_STEP, (myY + yf) - CPlayerFogOfWar.GRID_STEP,
+									myZ);
+							fogOfWar.checkDiagonalVision(game, pathingGrid, detections, flying, x, y, myXi + x,
+									myYi - y, (myXi + x) - 1, (myYi - y) + 1, myX + xf, myY - yf,
+									(myX + xf) - CPlayerFogOfWar.GRID_STEP, (myY - yf) + CPlayerFogOfWar.GRID_STEP,
+									myZ);
+							fogOfWar.checkDiagonalVision(game, pathingGrid, detections, flying, x, y, myXi + x,
+									myYi + y, (myXi + x) - 1, (myYi + y) - 1, myX + xf, myY + yf,
+									(myX + xf) - CPlayerFogOfWar.GRID_STEP, (myY + yf) - CPlayerFogOfWar.GRID_STEP,
+									myZ);
 						}
 					}
 				}
@@ -4889,16 +5331,16 @@ public class CUnit extends CWidget {
 		}
 	}
 
-	public List<CUnitAttackPostDamageListener> getPostDamageListeners() {
-		return this.postDamageListeners;
+	public List<CUnitBehaviorChangeListener> getBehaviorChangeListeners() {
+		return this.behaviorChangeListeners;
 	}
 
-	public void addPostDamageListener(final CUnitAttackPostDamageListener listener) {
-		this.postDamageListeners.add(0, listener);
+	public void addBehaviorChangeListener(final CUnitBehaviorChangeListener listener) {
+		this.behaviorChangeListeners.add(0, listener);
 	}
 
-	public void removePostDamageListener(final CUnitAttackPostDamageListener listener) {
-		this.postDamageListeners.remove(listener);
+	public void removeBehaviorChangeListener(final CUnitBehaviorChangeListener listener) {
+		this.behaviorChangeListeners.remove(listener);
 	}
 
 	public void addDamageTakenModificationListener(final CUnitAttackDamageTakenModificationListener listener) {
@@ -4927,13 +5369,11 @@ public class CUnit extends CWidget {
 		this.damageTakenListeners.remove(listener);
 	}
 
-	// 获取 死亡替换 效果处理器 列表
 	public List<CUnitDeathReplacementEffect> getDeathReplacementEffectsForPriority(
 			final CUnitDeathReplacementEffectPriority priority) {
 		return this.deathReplacementEffects.get(priority);
 	}
 
-	// 添加 死亡替换 效果处理器
 	public void addDeathReplacementEffect(final CUnitDeathReplacementEffectPriority priority,
 			final CUnitDeathReplacementEffect listener) {
 		List<CUnitDeathReplacementEffect> list = this.deathReplacementEffects.get(priority);
@@ -4943,7 +5383,6 @@ public class CUnit extends CWidget {
 		list.add(0, listener);
 	}
 
-	// 移除 死亡替换 效果处理器
 	public void removeDeathReplacementEffect(final CUnitDeathReplacementEffectPriority priority,
 			final CUnitDeathReplacementEffect listener) {
 		final List<CUnitDeathReplacementEffect> list = this.deathReplacementEffects.get(priority);
@@ -4952,14 +5391,48 @@ public class CUnit extends CWidget {
 		}
 	}
 
-	// 添加 闪避 处理器
 	public void addEvasionListener(final CUnitAttackEvasionListener listener) {
 		this.evasionListeners.add(0, listener);
 	}
 
-	// 移除 闪避 处理器
 	public void removeEvasionListener(final CUnitAttackEvasionListener listener) {
 		this.evasionListeners.remove(listener);
+	}
+
+	public void addAttackProjReactionListener(final CUnitAttackProjReactionListener listener) {
+		this.attackProjReactionListeners.add(0, listener);
+	}
+
+	public void removeAttackProjReactionListener(final CUnitAttackProjReactionListener listener) {
+		this.attackProjReactionListeners.remove(listener);
+	}
+
+	public void addAbilityProjReactionListener(final CUnitAbilityProjReactionListener listener) {
+		this.abilityProjReactionListeners.add(0, listener);
+	}
+
+	public void removeAbilityProjReactionListener(final CUnitAbilityProjReactionListener listener) {
+		this.abilityProjReactionListeners.remove(listener);
+	}
+
+	public void addAbilityEffectReactionListener(final CUnitAbilityEffectReactionListener listener) {
+		this.abilityEffectReactionListeners.add(0, listener);
+	}
+
+	public void removeAbilityEffectReactionListener(final CUnitAbilityEffectReactionListener listener) {
+		this.abilityEffectReactionListeners.remove(listener);
+	}
+
+	public List<CUnitAttackPostDamageListener> getPostDamageListeners() {
+		return this.postDamageListeners;
+	}
+
+	public void addPostDamageListener(final CUnitAttackPostDamageListener listener) {
+		this.postDamageListeners.add(0, listener);
+	}
+
+	public void removePostDamageListener(final CUnitAttackPostDamageListener listener) {
+		this.postDamageListeners.remove(listener);
 	}
 
 	public void beginCooldown(final CSimulation game, final War3ID abilityId, final float cooldownDuration) {
@@ -4996,6 +5469,14 @@ public class CUnit extends CWidget {
 		return this.decays;
 	}
 
+	public boolean isNoUnitCollision() {
+		return this.noUnitCollision;
+	}
+
+	public boolean isNoBuildingCollision() {
+		return this.noBuildingCollision;
+	}
+
 	public void setRaisable(final boolean raisable) {
 		this.raisable = raisable;
 	}
@@ -5028,15 +5509,31 @@ public class CUnit extends CWidget {
 	}
 
 	public boolean isVisible(final CSimulation simulation, final int toPlayerIndex) {
-		if ((toPlayerIndex == this.playerIndex) && ((simulation.isDay() ? this.unitType.getSightRadiusDay()
-				: this.unitType.getSightRadiusNight()) > 0)) {
-			return true;
-		}
 		final CPlayer toPlayer = simulation.getPlayer(toPlayerIndex);
-		final byte fogState = toPlayer.getFogOfWar().getState(simulation.getPathingGrid(), getX(), getY());
-		if (fogState == 0) {
+		if (((toPlayerIndex == this.playerIndex) || toPlayer.hasAlliance(this.playerIndex, CAllianceType.SHARED_VISION))
+				&& ((simulation.isDay() ? this.unitType.getSightRadiusDay()
+						: this.unitType.getSightRadiusNight()) > 0)) {
 			return true;
 		}
-		return false;
+		if ((this.invisLevels > 0) && ((this.detections & (1 << toPlayerIndex)) == 0)) {
+			return toPlayer.getFogOfWar().isDetecting(simulation, simulation.getPathingGrid(), getX(), getY(),
+					this.invisLevels);
+		}
+		return toPlayer.getFogOfWar().isVisible(simulation, simulation.getPathingGrid(), getX(), getY());
+	}
+
+	private final class CTimerUnitFade extends CTimer {
+		private final StateModBuff stateModBuff;
+
+		public CTimerUnitFade(final StateModBuff stateModBuff) {
+			this.stateModBuff = stateModBuff;
+		}
+
+		@Override
+		public void onFire(final CSimulation simulation) {
+			addStateModBuff(this.stateModBuff);
+			computeUnitState(simulation, StateModBuffType.INVISIBLE);
+		}
+
 	}
 }

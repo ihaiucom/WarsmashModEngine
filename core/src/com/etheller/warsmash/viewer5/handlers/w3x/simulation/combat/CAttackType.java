@@ -1,21 +1,21 @@
 package com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat;
 
 import com.etheller.interpreter.ast.util.CHandle;
-// CAttackType 枚举表示不同类型的攻击
+
 public enum CAttackType implements CodeKeyType, CHandle {
-	UNKNOWN,  // 未知类型
-	NORMAL,   // 正常攻击
-	PIERCE,   // 穿刺攻击
-	SIEGE,    // 围攻攻击
-	SPELLS,   // 法术攻击
-	CHAOS,    // 混沌攻击
-	MAGIC,    // 魔法攻击
-	HERO;     // 英雄攻击
+	UNKNOWN,
+	NORMAL,
+	PIERCE,
+	SIEGE,
+	SPELLS,
+	CHAOS,
+	MAGIC,
+	HERO;
 
 	public static CAttackType[] VALUES = values();
 
-	private String codeKey;  // 存储攻击类型的代码关键字
-	private String damageKey; // 存储攻击类型的伤害关键字
+	private final String codeKey;
+	private final String damageKey;
 
 	private CAttackType() {
 		final String name = name();
@@ -32,7 +32,6 @@ public enum CAttackType implements CodeKeyType, CHandle {
 		return this.damageKey;
 	}
 
-	// 解析字符串为 CAttackType 枚举类型
 	public static CAttackType parseAttackType(final String attackTypeString) {
 		final String upperCaseAttackType = attackTypeString.toUpperCase();
 		if ("SEIGE".equals(upperCaseAttackType)) {
@@ -41,8 +40,18 @@ public enum CAttackType implements CodeKeyType, CHandle {
 		return valueOf(upperCaseAttackType);
 	}
 
+	public String nameForJass() {
+		if (this == SPELLS) {
+			return "NORMAL";
+		}
+		if (this == NORMAL) {
+			return "MELEE";
+		}
+		return name();
+	}
+
 	@Override
 	public int getHandleId() {
-		return ordinal(); // 返回攻击类型的顺序
+		return ordinal();
 	}
 }

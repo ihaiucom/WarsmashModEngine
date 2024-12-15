@@ -25,17 +25,9 @@ public interface AbilityBuilderActiveAbility extends AbilityBuilderAbility, CAut
 	public Map<String, Object> getLocalStore();
 	
 	public int getChargedManaCost();
-
-	public float getArea();
-
-	public float getCastRange();
 	public void setCastRange(float castRange);
 
 	public int getOffOrderId();
-
-	public void startCooldown(CSimulation game, CUnit unit);
-
-	public void resetCooldown(CSimulation game, CUnit unit);
 	
 	public PrimaryTag getCastingPrimaryTag();
 	

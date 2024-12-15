@@ -1,26 +1,29 @@
 package com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities;
 
-public enum CAbilityDisableType {
-	// 定义一个枚举类，代表不同的操作或状态
-	REQUIREMENTS((byte) 1),
-	// 表示建造操作
-	CONSTRUCTION((byte) 2),
-	// 表示传送操作
-	TRANSFORMATION((byte) 4),
-	// 表示触发操作
-	TRIGGER((byte) 8),
-	// 表示攻击被禁用的状态
-	ATTACKDISABLED((byte) 16);
+import com.etheller.interpreter.ast.util.CHandle;
 
+public enum CAbilityDisableType implements CHandle {
+	REQUIREMENTS((byte) 1),
+	CONSTRUCTION((byte) 2),
+	TRANSFORMATION((byte) 4),
+	TRIGGER((byte) 8),
+	ATTACKDISABLED((byte) 16),
+	PLAYER((byte) 32);
 
 	private byte mask;
-	
+
 	CAbilityDisableType(byte i) {
 		this.mask = i;
 	}
-	
+
 	public byte getMask() {
-		return mask;
+		return this.mask;
 	}
 
+	@Override
+	public int getHandleId() {
+		return ordinal();
+	}
+
+	public static final CAbilityDisableType[] VALUES = values();
 }

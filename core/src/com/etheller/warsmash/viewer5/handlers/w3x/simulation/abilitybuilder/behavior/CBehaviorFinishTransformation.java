@@ -12,6 +12,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilitybuilder.abil
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilitybuilder.handler.TransformationHandler;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilitybuilder.handler.TransformationHandler.OnTransformationActions;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.CBehavior;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.CBehaviorCategory;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.CBehaviorVisitor;
 // CBehaviorFinishTransformation类实现了CBehavior接口，处理单位的变形行为
 public class CBehaviorFinishTransformation implements CBehavior {
@@ -141,6 +142,11 @@ public class CBehaviorFinishTransformation implements CBehavior {
 	@Override
 	public <T> T visit(final CBehaviorVisitor<T> visitor) {
 		return visitor.accept(this);
+	}
+
+	@Override
+	public CBehaviorCategory getBehaviorCategory() {
+		return CBehaviorCategory.SPELL;
 	}
 
 }

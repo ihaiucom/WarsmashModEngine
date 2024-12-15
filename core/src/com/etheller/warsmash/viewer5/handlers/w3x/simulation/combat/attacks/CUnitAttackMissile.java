@@ -50,21 +50,33 @@ public class CUnitAttackMissile extends CUnitAttack {
 
 	// 获取导弹的弧度
 	public float getProjectileArc() {
+		if (this.attackReplacement != null) {
+			return this.attackReplacement.getProjectileArc();
+		}
 		return this.projectileArc;
 	}
 
 	// 获取导弹的艺术表现形式
 	public String getProjectileArt() {
+		if (this.attackReplacement != null) {
+			return this.attackReplacement.getProjectileArt();
+		}
 		return this.projectileArt;
 	}
 
 	// 判断导弹是否启用自导
 	public boolean isProjectileHomingEnabled() {
+		if (this.attackReplacement != null) {
+			return this.attackReplacement.isProjectileHomingEnabled();
+		}
 		return this.projectileHomingEnabled;
 	}
 
 	// 获取导弹的速度
 	public int getProjectileSpeed() {
+		if (this.attackReplacement != null) {
+			return this.attackReplacement.getProjectileSpeed();
+		}
 		return this.projectileSpeed;
 	}
 

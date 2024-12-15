@@ -102,7 +102,9 @@ public class CAbilityRoot extends AbstractGenericSingleIconNoSmartActiveAbility 
 		}
 		unit.setFacing(game.getGameplayConstants().getRootAngle());
 		unit.setUnitSpecificCurrentAttacks(this.rootedAttacks);
-		unit.getUnitAnimationListener().addSecondaryTag(SecondaryTag.ALTERNATE);
+		if (unit.getUnitAnimationListener().addSecondaryTag(SecondaryTag.ALTERNATE)) {
+			unit.getUnitAnimationListener().forceResetCurrentAnimation();
+		}
 	}
 
 	@Override
@@ -133,7 +135,9 @@ public class CAbilityRoot extends AbstractGenericSingleIconNoSmartActiveAbility 
 			unit.setAttackMoveBehavior(null);
 			unit.setFacing(game.getGameplayConstants().getRootAngle());
 			unit.setUnitSpecificCurrentAttacks(this.rootedAttacks);
-			unit.getUnitAnimationListener().addSecondaryTag(SecondaryTag.ALTERNATE);
+			if (unit.getUnitAnimationListener().addSecondaryTag(SecondaryTag.ALTERNATE)) {
+				unit.getUnitAnimationListener().forceResetCurrentAnimation();
+			}
 		}
 		else {
 			for (final CAbility ability : this.rootedAbilities) {
@@ -168,7 +172,7 @@ public class CAbilityRoot extends AbstractGenericSingleIconNoSmartActiveAbility 
 	public CBehavior begin(final CSimulation game, final CUnit caster, final int orderId,
 			final AbilityPointTarget point) {
 		if (!this.rooted && (orderId == OrderIds.root)) {
-			return this.behaviorRoot.reset(point);
+			return this.behaviorRoot.reset(game, point);
 		}
 		return caster.pollNextOrderBehavior(game);
 	}

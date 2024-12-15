@@ -22,10 +22,16 @@ public interface AbilityBuilderAbility extends CLevelingAbility, Aliased {
 	
 	public float getCooldown();
 
+	public float getCastRange();
+
 	public void startCooldown(CSimulation game, CUnit unit);
 
 	public void resetCooldown(CSimulation game, CUnit unit);
+
+	public float getCooldownRemainingTicks(CSimulation game, CUnit unit);
 	
 	War3ID getOnTooltipOverride();
+	
+	public int getAbilityIntField(String field);
 
 }

@@ -53,6 +53,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.Variations;
 import com.etheller.warsmash.viewer5.handlers.w3x.W3xSceneLightManager;
 import com.etheller.warsmash.viewer5.handlers.w3x.W3xShaders;
 import com.etheller.warsmash.viewer5.handlers.w3x.War3MapViewer;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.CFogMaskSettings;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.players.vision.CPlayerFogOfWar;
 
 public class Terrain {
@@ -88,6 +89,10 @@ public class Terrain {
 	public float[] minDeepColor = new float[4];
 	public float[] maxShallowColor = new float[4];
 	public float[] minShallowColor = new float[4];
+	public float[] maxDeepColorApplied = new float[4];
+	public float[] minDeepColorApplied = new float[4];
+	public float[] maxShallowColorApplied = new float[4];
+	public float[] minShallowColorApplied = new float[4];
 
 	private final DataTable terrainTable;
 	private final DataTable cliffTable;
@@ -212,6 +217,7 @@ public class Terrain {
 				this.maxDeepColor[i] = this.minDeepColor[i];
 			}
 		}
+		setWaterBaseColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		// Cliff Meshes
 
@@ -458,8 +464,7 @@ public class Terrain {
 
 				float rampHeight = 0f;
 				// Check if in one of the configurations the bottom_left is a ramp
-				XLoop:
-				for (int xOffset = -1; xOffset <= 0; xOffset++) {
+				XLoop: for (int xOffset = -1; xOffset <= 0; xOffset++) {
 					for (int yOffset = -1; yOffset <= 0; yOffset++) {
 						if (((i + xOffset) >= 0) && ((i + xOffset) < (this.columns - 1)) && ((j + yOffset) >= 0)
 								&& ((j + yOffset) < (this.rows - 1))) {
@@ -701,7 +706,7 @@ public class Terrain {
 									topRight.setCliffTexture(bottomLeftCliffTex);
 									this.corners[i + ((facingLeft ? -1 : 1) * (horizontalRamp ? 1 : 0))][j
 											+ ((facingDown ? -1 : 1) * (verticalRamp ? 1 : 0))]
-													.setCliffTexture(bottomLeftCliffTex);
+											.setCliffTexture(bottomLeftCliffTex);
 
 									this.corners[i + ((facingLeft ? -1 : 1) * (horizontalRamp ? 1 : 0))][j
 											+ ((facingDown ? -1 : 1) * (verticalRamp ? 1 : 0))].romp = true;
@@ -855,8 +860,7 @@ public class Terrain {
 	}
 
 	private int realTileTexture(final int x, final int y) {
-		ILoop:
-		for (int i = -1; i < 1; i++) {
+		ILoop: for (int i = -1; i < 1; i++) {
 			for (int j = -1; j < 1; j++) {
 				if (((x + i) >= 0) && ((x + i) < this.columns) && ((y + j) >= 0) && ((y + j) < this.rows)) {
 					if (this.corners[x + i][y + j].cliff) {
@@ -1119,10 +1123,10 @@ public class Terrain {
 		gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
 
 		this.waterShader.setUniformMatrix4fv("MVP", this.camera.viewProjectionMatrix.val, 0, 16);
-		this.waterShader.setUniform4fv("shallow_color_min", this.minShallowColor, 0, 4);
-		this.waterShader.setUniform4fv("shallow_color_max", this.maxShallowColor, 0, 4);
-		this.waterShader.setUniform4fv("deep_color_min", this.minDeepColor, 0, 4);
-		this.waterShader.setUniform4fv("deep_color_max", this.maxDeepColor, 0, 4);
+		this.waterShader.setUniform4fv("shallow_color_min", this.minShallowColorApplied, 0, 4);
+		this.waterShader.setUniform4fv("shallow_color_max", this.maxShallowColorApplied, 0, 4);
+		this.waterShader.setUniform4fv("deep_color_min", this.minDeepColorApplied, 0, 4);
+		this.waterShader.setUniform4fv("deep_color_max", this.maxDeepColorApplied, 0, 4);
 		this.waterShader.setUniformf("water_offset", this.waterHeightOffset);
 		this.waterShader.setUniformi("current_texture", (int) this.waterIndex);
 		this.waterShader.setUniformf("centerOffsetX", this.centerOffset[0]);
@@ -1728,18 +1732,18 @@ public class Terrain {
 		return this.defaultCameraBounds;
 	}
 
-	public void setFogOfWarData(final CPlayerFogOfWar fogOfWarData) {
+	public void setFogOfWarData(CFogMaskSettings fogMaskSettings, final CPlayerFogOfWar fogOfWarData) {
 		this.fogOfWarData = fogOfWarData;
 		this.visualFogData = ByteBuffer.allocateDirect(fogOfWarData.getFogOfWarBuffer().capacity());
-		reloadFogOfWarDataToGPU();
+		reloadFogOfWarDataToGPU(fogMaskSettings);
 	}
 
-	public void reloadFogOfWarDataToGPU() {
+	public void reloadFogOfWarDataToGPU(CFogMaskSettings fogMaskSettings) {
 		final GL30 gl = Gdx.gl30;
 		final ByteBuffer fogOfWarBuffer = this.fogOfWarData.getFogOfWarBuffer();
 		for (int i = 0; i < this.visualFogData.capacity(); i++) {
-			this.visualFogData.put(i,
-					War3MapViewer.fadeLineOfSightColor(this.visualFogData.get(i), fogOfWarBuffer.get(i)));
+			this.visualFogData.put(i, War3MapViewer.fadeLineOfSightColor(this.visualFogData.get(i),
+					fogMaskSettings.getFogStateFromSettings(fogOfWarBuffer.get(i))));
 		}
 		gl.glBindTexture(GL30.GL_TEXTURE_2D, Terrain.this.fogOfWarMap);
 		gl.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MAG_FILTER, GL30.GL_LINEAR);
@@ -1752,5 +1756,15 @@ public class Terrain {
 
 	public int getFogOfWarMap() {
 		return this.fogOfWarMap;
+	}
+
+	public void setWaterBaseColor(float red, float green, float blue, float alpha) {
+		final float[] rgba = { red, green, blue, alpha };
+		for (int i = 0; i < 4; i++) {
+			this.maxDeepColorApplied[i] = this.maxDeepColor[i] * rgba[i];
+			this.minDeepColorApplied[i] = this.minDeepColor[i] * rgba[i];
+			this.maxShallowColorApplied[i] = this.maxShallowColor[i] * rgba[i];
+			this.minShallowColorApplied[i] = this.minShallowColor[i] * rgba[i];
+		}
 	}
 }

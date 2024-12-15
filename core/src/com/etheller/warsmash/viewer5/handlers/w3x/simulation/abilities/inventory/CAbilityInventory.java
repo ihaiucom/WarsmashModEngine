@@ -22,10 +22,13 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.inventory
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.inventory.CBehaviorGetItem;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.inventory.CBehaviorGiveItemToHero;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.orders.COrderNoTarget;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.orders.COrderTargetPoint;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.orders.COrderTargetWidget;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.orders.OrderIds;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.players.CAllianceType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.AbilityActivationReceiver;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.AbilityTargetCheckReceiver;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.BooleanAbilityTargetCheckReceiver;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.CommandStringErrorKeys;
 
 // 物品栏位数为
@@ -185,7 +188,7 @@ public class CAbilityInventory extends AbstractGenericNoIconAbility {
 		}
 		final CItem targetItem = target.visit(AbilityTargetVisitor.ITEM);
 		if (targetItem != null) {
-			return this.behaviorGetItem.reset((CItem) target);
+			return this.behaviorGetItem.reset(game, (CItem) target);
 		}
 		return caster.pollNextOrderBehavior(game);
 	}
@@ -193,13 +196,13 @@ public class CAbilityInventory extends AbstractGenericNoIconAbility {
 	// 开始丢弃物品的行为
 	public CBehavior beginDropItem(final CSimulation game, final CUnit caster, final int orderId,
 			final CItem itemToDrop, final AbilityPointTarget target) {
-		return this.behaviorDropItem.reset(itemToDrop, target);
+		return this.behaviorDropItem.reset(game, itemToDrop, target);
 	}
 
 	// 开始给予物品给英雄的行为
 	public CBehavior beginDropItem(final CSimulation game, final CUnit caster, final int orderId,
 			final CItem itemToDrop, final CUnit targetHero) {
-		return this.behaviorGiveItem.reset(itemToDrop, targetHero);
+		return this.behaviorGiveItem.reset(game, itemToDrop, targetHero);
 	}
 
 	// 开始行为，使用给定的位置目标
@@ -459,8 +462,27 @@ public class CAbilityInventory extends AbstractGenericNoIconAbility {
 							hero.add(simulation, abilityFromItem);
 							if (abilityFromItem instanceof SingleOrderAbility) {
 								final int baseOrderId = ((SingleOrderAbility) abilityFromItem).getBaseOrderId();
-								hero.order(simulation,
-										new COrderNoTarget(abilityFromItem.getHandleId(), baseOrderId, false), false);
+
+								final BooleanAbilityTargetCheckReceiver<CWidget> booleanUnitTargetReceiver = BooleanAbilityTargetCheckReceiver
+										.<CWidget>getInstance().reset();
+								abilityFromItem.checkCanTarget(simulation, hero, baseOrderId, hero, booleanUnitTargetReceiver);
+								if (booleanUnitTargetReceiver.isTargetable()) {
+									hero.order(simulation,
+											new COrderTargetWidget(abilityFromItem.getHandleId(), baseOrderId, hero.getHandleId(), false), false);
+									
+								} else {
+									final BooleanAbilityTargetCheckReceiver<AbilityPointTarget> booleanTargetReceiver = BooleanAbilityTargetCheckReceiver
+											.<AbilityPointTarget>getInstance().reset();
+									AbilityPointTarget tar = new AbilityPointTarget(hero.getX(), hero.getY());
+									abilityFromItem.checkCanTarget(simulation, hero, baseOrderId, tar, booleanTargetReceiver);
+									
+									if (booleanTargetReceiver.isTargetable()) {hero.order(simulation,
+										new COrderTargetPoint(abilityFromItem.getHandleId(), baseOrderId, tar, false), false);
+									} else {
+										hero.order(simulation,
+												new COrderNoTarget(abilityFromItem.getHandleId(), baseOrderId, false), false);
+									}
+								}
 							}
 							addedAbilities.add(abilityFromItem);
 						}

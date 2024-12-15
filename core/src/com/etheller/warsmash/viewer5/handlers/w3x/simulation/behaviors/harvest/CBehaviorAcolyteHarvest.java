@@ -12,6 +12,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.mine.CAbi
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.targeting.AbilityTargetStillAliveVisitor;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.CAbstractRangedBehavior;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.CBehavior;
+import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.CBehaviorCategory;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.orders.OrderIds;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.CommandStringErrorKeys;
 
@@ -25,9 +26,8 @@ public class CBehaviorAcolyteHarvest extends CAbstractRangedBehavior {
 		this.abilityAcolyteHarvest = abilityWispHarvest;
 	}
 
-	public CBehaviorAcolyteHarvest reset(final CWidget target) {
-		innerReset(target, false);
-		return this;
+	public CBehavior reset(CSimulation game, final CWidget target) {
+		return innerReset(game, target, false);
 	}
 
 	@Override
@@ -147,5 +147,10 @@ public class CBehaviorAcolyteHarvest extends CAbstractRangedBehavior {
 	@Override
 	public boolean interruptable() {
 		return true;
+	}
+
+	@Override
+	public CBehaviorCategory getBehaviorCategory() {
+		return CBehaviorCategory.SPELL;
 	}
 }

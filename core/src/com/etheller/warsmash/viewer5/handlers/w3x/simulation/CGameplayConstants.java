@@ -12,7 +12,6 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.CDefenseType
  * maybe be faster than a map.
  */
 public class CGameplayConstants {
-	// 允许攻击朝向目标的角度范围一半值
 	private final float attackHalfAngle;
 	private final float[][] damageBonusTable;
 	private final float maxCollisionRadius;
@@ -20,7 +19,7 @@ public class CGameplayConstants {
 	private final float boneDecayTime;
 	private final float dissipateTime;
 	private final float bulletDeathTime;
-	private final float closeEnoughRange; // 足够接近的范围
+	private final float closeEnoughRange;
 	private final float dawnTimeGameHours;
 	private final float duskTimeGameHours;
 	private final float gameDayHours;
@@ -35,16 +34,16 @@ public class CGameplayConstants {
 
 	private final float defenseArmor;
 
-	private final float etherealDamageBonusSpells; // 虚无法术伤害
-	private final float etherealDamageBonusMagic; // 虚无魔法伤害
-	private final boolean etherealDamageBonusAlly; // 虚无是否受伤害
+	private final float etherealDamageBonusSpells;
+	private final float etherealDamageBonusMagic;
+	private final boolean etherealDamageBonusAlly;
 	
-    // 该类用于定义角色在魔法免疫下的各种抗性属性
-	private final boolean magicImmuneResistsDamage;  // 魔法免疫抵抗伤害
-	private final boolean magicImmuneResistsLeech;   // 魔法免疫抵抗吸取效果
-	private final boolean magicImmuneResistsThorns;   // 魔法免疫抵抗荆棘效果
-	private final boolean magicImmuneResistsUltimates; // 魔法免疫抵抗终极技能
-
+	private final boolean magicImmuneResistsDamage;
+	private final boolean magicImmuneResistsLeech;
+	private final boolean magicImmuneResistsThorns;
+	private final boolean magicImmuneResistsUltimates;
+	
+	private final boolean defendDeflection;
 
 	private final int heroMaxReviveCostGold;
 	private final int heroMaxReviveCostLumber;
@@ -127,11 +126,8 @@ public class CGameplayConstants {
 	private final float minBldgSpeed;
 	private final float maxBldgSpeed;
 	
-	// 概述：该类包含关于击中和伤害的属性。
 	private final float chanceToMiss;
-	// 未命中伤害减免
 	private final float missDamageReduction;
-
 
 	public CGameplayConstants(final DataTable parsedDataTable) {
 		final Element miscData = parsedDataTable.get("Misc");
@@ -218,6 +214,8 @@ public class CGameplayConstants {
 		this.magicImmuneResistsLeech = miscData.getFieldValue("MagicImmunesResistLeech") != 0;
 		this.magicImmuneResistsThorns = miscData.getFieldValue("MagicImmunesResistThorns") != 0;
 		this.magicImmuneResistsUltimates = miscData.getFieldValue("MagicImmunesResistUltimates") != 0;
+		
+		this.defendDeflection = miscData.getFieldValue("DefendDeflection") != 0;
 
 		this.globalExperience = miscData.getFieldValue("GlobalExperience") != 0;
 		this.maxLevelHeroesDrainExp = miscData.getFieldValue("MaxLevelHeroesDrainExp") != 0;
@@ -421,6 +419,9 @@ public class CGameplayConstants {
 	public boolean isMagicImmuneResistsUltimates() {
 		return magicImmuneResistsUltimates;
 	}
+	public boolean isDefendDeflection() {
+		return defendDeflection;
+	}
 
 	public boolean isGlobalExperience() {
 		return this.globalExperience;
@@ -599,7 +600,6 @@ public class CGameplayConstants {
 		return chanceToMiss;
 	}
 
-	// 未命中伤害减免
 	public float getMissDamageReduction() {
 		return missDamageReduction;
 	}

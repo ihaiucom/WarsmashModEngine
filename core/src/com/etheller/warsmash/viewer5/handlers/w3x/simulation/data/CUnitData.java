@@ -185,6 +185,9 @@ public class CUnitData {
 	private static final String BUILD_TIME = "bldtm"; // replaced from 'ubld'
 	private static final String FOOD_USED = "fused"; // replaced from 'ufoo'
 	private static final String FOOD_MADE = "fmade"; // replaced from 'ufma'
+	private static final String GOLD_REPAIR_COST = "goldRep";
+	private static final String LUMBER_REPAIR_COST = "lumberRep";
+	private static final String REPAIR_TIME = "reptm";
 
 	private static final String REQUIRE_PLACE = "requirePlace"; // replaced from 'upar'
 	private static final String PREVENT_PLACE = "preventPlace"; // replaced from 'upap'
@@ -401,7 +404,8 @@ public class CUnitData {
 		unit.setUnitSpecificAttacks(unitSpecificAttacks);
 		unit.setUnitSpecificCurrentAttacks(
 				getEnabledAttacks(unitSpecificAttacks, unitTypeInstance.getAttacksEnabled()));
-		if (!unit.getCurrentAttacks().isEmpty()) {
+		final CAbilityAttack preAttack = unit.getFirstAbilityOfType(CAbilityAttack.class);
+		if (!unit.getCurrentAttacks().isEmpty() && (preAttack == null)) {
 			unit.add(simulation, new CAbilityAttack(handleIdAllocator.createId()));
 		}
 		final List<War3ID> structuresBuilt = unitTypeInstance.getStructuresBuilt();
@@ -688,6 +692,10 @@ public class CUnitData {
 			final int lumberCost = unitType.getFieldAsInteger(LUMBER_COST, 0);
 			final int buildTime = (int) Math
 					.ceil(unitType.getFieldAsInteger(BUILD_TIME, 0) * WarsmashConstants.GAME_SPEED_TIME_FACTOR);
+			final int goldRepairCost = unitType.getFieldAsInteger(GOLD_REPAIR_COST, 0);
+			final int lumberRepairCost = unitType.getFieldAsInteger(LUMBER_REPAIR_COST, 0);
+			final int repairTime = (int) Math
+					.ceil(unitType.getFieldAsInteger(REPAIR_TIME, 0) * WarsmashConstants.GAME_SPEED_TIME_FACTOR);
 			final int foodUsed = unitType.getFieldAsInteger(FOOD_USED, 0);
 			final int foodMade = unitType.getFieldAsInteger(FOOD_MADE, 0);
 
@@ -777,13 +785,14 @@ public class CUnitData {
 					decay, defenseType, impactZ, buildingPathingPixelMap, deathTime, targetedAs, acquisitionRange,
 					minimumAttackRange, structuresBuilt, unitsTrained, researchesAvailable, upgradesUsed,
 					upgradeClassToType, upgradesTo, itemsSold, itemsMade, unitRace, goldCost, lumberCost, foodUsed,
-					foodMade, buildTime, preventedPathingTypes, requiredPathingTypes, propWindow, turnRate,
-					requirements, requirementTiers, unitLevel, hero, strength, strPlus, agility, agiPlus, intelligence,
-					intPlus, primaryAttribute, heroAbilityList, heroProperNames, properNamesCount, canFlee, priority,
-					revivesHeroes, pointValue, castBackswingPoint, castPoint, canBeBuiltOnThem, canBuildOnMe,
-					defenseUpgradeBonus, sightRadiusDay, sightRadiusNight, extendedLineOfSight, goldBountyAwardedBase,
-					goldBountyAwardedDice, goldBountyAwardedSides, lumberBountyAwardedBase, lumberBountyAwardedDice,
-					lumberBountyAwardedSides, neutralBuildingShowMinimapIcon);
+					foodMade, buildTime, goldRepairCost, lumberRepairCost, repairTime, preventedPathingTypes,
+					requiredPathingTypes, propWindow, turnRate, requirements, requirementTiers, unitLevel, hero,
+					strength, strPlus, agility, agiPlus, intelligence, intPlus, primaryAttribute, heroAbilityList,
+					heroProperNames, properNamesCount, canFlee, priority, revivesHeroes, pointValue, castBackswingPoint,
+					castPoint, canBeBuiltOnThem, canBuildOnMe, defenseUpgradeBonus, sightRadiusDay, sightRadiusNight,
+					extendedLineOfSight, goldBountyAwardedBase, goldBountyAwardedDice, goldBountyAwardedSides,
+					lumberBountyAwardedBase, lumberBountyAwardedDice, lumberBountyAwardedSides,
+					neutralBuildingShowMinimapIcon);
 			this.unitIdToUnitType.put(typeId, unitTypeInstance);
 			this.jassLegacyNameToUnitId.put(legacyName, typeId);
 		}

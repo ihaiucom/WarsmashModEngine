@@ -19,7 +19,7 @@ public class CAbilityProjectile extends CProjectile {
 	// 当投射物击中目标时调用的方法，通知监听器投射物已击中目标
 	@Override
 	protected void onHitTarget(CSimulation game) {
-		projectileListener.onHit(game, getTarget());
+		projectileListener.onHit(game, this, getTarget());
 	}
 }
 

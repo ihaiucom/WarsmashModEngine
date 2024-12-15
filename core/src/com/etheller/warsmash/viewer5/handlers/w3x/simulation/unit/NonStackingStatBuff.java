@@ -1,73 +1,48 @@
 package com.etheller.warsmash.viewer5.handlers.w3x.simulation.unit;
-/**
- * 非叠加状态增益类
- */
-public class NonStackingStatBuff {
+
+import com.etheller.interpreter.ast.util.CHandle;
+
+public class NonStackingStatBuff implements CHandle {
 	public static final String ALLOW_STACKING_KEY = "STACK";
 
-	private NonStackingStatBuffType buffType; // 状态增益类型
-	private String stackingKey; // 叠加键
-	private float value; // 增益值
+	private NonStackingStatBuffType buffType;
+	private String stackingKey;
+	private float value;
 
-	/**
-	 * 构造函数，初始化非叠加状态增益属性
-	 * @param buffType 状态增益类型
-	 * @param stackingKey 叠加键
-	 * @param value 增益值
-	 */
-	public NonStackingStatBuff(NonStackingStatBuffType buffType, String stackingKey, float value) {
+	public NonStackingStatBuff(final NonStackingStatBuffType buffType, final String stackingKey, final float value) {
 		super();
 		this.buffType = buffType;
 		this.stackingKey = stackingKey;
 		this.value = value;
 	}
 
-	/**
-	 * 获取状态增益类型
-	 * @return 状态增益类型
-	 */
 	public NonStackingStatBuffType getBuffType() {
-		return buffType;
+		return this.buffType;
 	}
 
-	/**
-	 * 设置状态增益类型
-	 * @param buffType 状态增益类型
-	 */
-	public void setBuffType(NonStackingStatBuffType buffType) {
+	public void setBuffType(final NonStackingStatBuffType buffType) {
 		this.buffType = buffType;
 	}
 
-	/**
-	 * 获取叠加键
-	 * @return 叠加键
-	 */
 	public String getStackingKey() {
-		return stackingKey;
+		return this.stackingKey;
 	}
 
-	/**
-	 * 设置叠加键
-	 * @param stackingKey 叠加键
-	 */
-	public void setStackingKey(String stackingKey) {
+	public void setStackingKey(final String stackingKey) {
 		this.stackingKey = stackingKey;
 	}
 
-	/**
-	 * 获取增益值
-	 * @return 增益值
-	 */
 	public float getValue() {
-		return value;
+		return this.value;
 	}
 
-	/**
-	 * 设置增益值
-	 * @param value 增益值
-	 */
-	public void setValue(float value) {
+	public void setValue(final float value) {
 		this.value = value;
 	}
-}
 
+	@Override
+	public int getHandleId() {
+		// NOTE: these are all zero right now, so jass doesnt crash, but it's useless
+		return 0;
+	}
+}

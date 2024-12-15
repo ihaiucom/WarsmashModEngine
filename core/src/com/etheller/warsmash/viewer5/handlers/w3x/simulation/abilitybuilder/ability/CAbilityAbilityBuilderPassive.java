@@ -3,6 +3,7 @@ package com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilitybuilder.abi
 import java.util.List;
 import java.util.Map;
 
+import com.etheller.warsmash.units.GameObject;
 import com.etheller.warsmash.util.War3ID;
 import com.etheller.warsmash.util.WarsmashConstants;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.CItem;
@@ -18,7 +19,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilitybuilder.type
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.players.CPlayer;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.AbilityActivationReceiver;
 
-public class CAbilityAbilityBuilderPassive extends AbilityGenericSingleIconPassiveAbility implements AbilityBuilderAbility {
+public class CAbilityAbilityBuilderPassive extends AbilityGenericSingleIconPassiveAbility implements AbilityBuilderPassiveAbility {
 
 	protected List<CAbilityTypeAbilityBuilderLevelData> levelData;
 	protected AbilityBuilderConfiguration config;
@@ -28,6 +29,7 @@ public class CAbilityAbilityBuilderPassive extends AbilityGenericSingleIconPassi
 	
 	protected float cooldown = 0;
 	protected float area = 0;
+	protected float range = 0;
 
 	private War3ID onTooltipOverride = null;
 
@@ -46,10 +48,15 @@ public class CAbilityAbilityBuilderPassive extends AbilityGenericSingleIconPassi
 			CAbilityTypeAbilityBuilderLevelData levelDataLevel = this.levelData.get(this.getLevel() - 1);
 			this.cooldown = levelDataLevel.getCooldown();
 			this.area = levelDataLevel.getArea();
+			this.range = levelDataLevel.getCastRange();
 		}
 		if (this.config.getOverrideFields() != null) {
 			if (this.config.getOverrideFields().getAreaOverride() != null) {
 				this.area = this.config.getOverrideFields().getAreaOverride().callback(game, unit, localStore, 0);
+			}
+			if (this.config.getOverrideFields().getRangeOverride() != null) {
+				this.range = this.config.getOverrideFields().getRangeOverride().callback(game, unit, localStore,
+						0);
 			}
 			if (this.config.getOverrideFields().getCooldownOverride() != null) {
 				this.cooldown = this.config.getOverrideFields().getCooldownOverride().callback(game, unit, localStore,
@@ -60,6 +67,12 @@ public class CAbilityAbilityBuilderPassive extends AbilityGenericSingleIconPassi
 						localStore, 0);
 			}
 		}
+	}
+	
+	@Override
+	public int getAbilityIntField(String field) {
+		GameObject editorData = (GameObject) localStore.get(ABLocalStoreKeys.ABILITYEDITORDATA);
+		return editorData.getFieldValue(field);
 	}
 
 	@Override
@@ -83,6 +96,11 @@ public class CAbilityAbilityBuilderPassive extends AbilityGenericSingleIconPassi
 	}
 
 	@Override
+	public float getCastRange() {
+		return range;
+	}
+
+	@Override
 	public float getCooldown() {
 		return cooldown;
 	}
@@ -93,6 +111,15 @@ public class CAbilityAbilityBuilderPassive extends AbilityGenericSingleIconPassi
 		if (cdID != War3ID.NONE) {
 			unit.beginCooldown(game, cdID, this.cooldown);
 		}
+	}
+
+	@Override
+	public float getCooldownRemainingTicks(CSimulation game, CUnit unit) {
+		War3ID cdID = getCooldownId();
+		if (cdID != War3ID.NONE) {
+			return unit.getCooldownRemainingTicks(game, cdID);
+		}
+		return unit.getCooldownRemainingTicks(game, this.getCode());
 	}
 
 	@Override
@@ -121,6 +148,11 @@ public class CAbilityAbilityBuilderPassive extends AbilityGenericSingleIconPassi
 		this.item = item;
 		this.localStore.put(ABLocalStoreKeys.ITEM, item);
 		this.localStore.put(ABLocalStoreKeys.ITEMSLOT, slot);
+	}
+
+	@Override
+	public CItem getItem() {
+		return this.item;
 	}
 
 	@Override

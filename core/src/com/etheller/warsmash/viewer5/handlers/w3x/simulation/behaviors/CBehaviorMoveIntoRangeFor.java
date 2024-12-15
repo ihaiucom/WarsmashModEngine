@@ -21,11 +21,11 @@ public class CBehaviorMoveIntoRangeFor extends CAbstractRangedBehavior {
 		super(unit);
 	}
 
-	public CBehavior reset(final int higlightOrderId, final CWidget target,
+	public CBehavior reset(final CSimulation game, final int higlightOrderId, final CWidget target,
 			final PairAbilityLocator pairAbilityLocator) {
 		this.higlightOrderId = higlightOrderId;
 		this.pairAbilityLocator = pairAbilityLocator;
-		return innerReset(target);
+		return innerReset(game, target);
 	}
 
 	@Override
@@ -100,6 +100,11 @@ public class CBehaviorMoveIntoRangeFor extends CAbstractRangedBehavior {
 	@Override
 	public boolean interruptable() {
 		return true;
+	}
+
+	@Override
+	public CBehaviorCategory getBehaviorCategory() {
+		return CBehaviorCategory.MOVEMENT;
 	}
 
 	public static interface PairAbilityLocator {

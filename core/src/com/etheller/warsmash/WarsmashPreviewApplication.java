@@ -16,7 +16,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
-import com.etheller.warsmash.datasources.CascDataSource;
 import com.etheller.warsmash.datasources.CompoundDataSource;
 import com.etheller.warsmash.datasources.DataSource;
 import com.etheller.warsmash.datasources.FolderDataSource;
@@ -142,7 +141,8 @@ public class WarsmashPreviewApplication extends ApplicationAdapter implements Ca
 
 	public MdlxModel loadCustomModel(final String filename) {
 		clearMainInstance();
-		this.viewer.setDataSource(new CompoundDataSource(Arrays.asList(getCodebase(), new FolderDataSource(Paths.get(filename).getParent()))));
+		this.viewer.setDataSource(new CompoundDataSource(
+				Arrays.asList(getCodebase(), new FolderDataSource(Paths.get(filename).getParent()))));
 		final MdxModel mdx = (MdxModel) this.mdxHandler.construct(new ResourceHandlerConstructionParams(this.viewer,
 				this.mdxHandler, ".mdx", PathSolver.DEFAULT, filename));
 		final MdlxModel mdlxModel;

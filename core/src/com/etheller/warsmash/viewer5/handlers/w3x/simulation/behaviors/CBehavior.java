@@ -46,6 +46,8 @@ public interface CBehavior {
 	 * @return 如果可中断则返回 true， 否则返回 false
 	 */
 	boolean interruptable();
+	
+	CBehaviorCategory getBehaviorCategory();
 
 	/**
 	 * 访问者模式方法，允许对CBehavior进行操作。
