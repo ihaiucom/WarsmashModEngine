@@ -22,6 +22,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.C
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.AbilityTargetCheckReceiver;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.CommandStringErrorKeys;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.SimulationRenderComponentModel;
+// 补充魔法和生命值 恢复一个目标单位的魔法和生命值。
 
 public class CAbilityMoonWell extends CAbilitySpellBase implements CAutocastAbility {
 	private boolean autoCastActive = false;

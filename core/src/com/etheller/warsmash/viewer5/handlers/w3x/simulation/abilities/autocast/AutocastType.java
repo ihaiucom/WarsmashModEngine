@@ -1,5 +1,6 @@
 package com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.autocast;
 
+// 自动施法类型
 public enum AutocastType {
 	NONE,  //表示没有自动施法的状态。
 	LOWESTHP,  //表示目标中生命值最低的单位。

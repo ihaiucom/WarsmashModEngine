@@ -17,6 +17,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.orders.OrderIds;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CEffectType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.AbilityTargetCheckReceiver;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.CommandStringErrorKeys;
+// 吞食树木 吞食一棵树木以在<Aeat,Dur1>秒内恢复<Aeat,DataC1>点的生命值。
 
 public class CAbilityEatTree extends CAbilityTargetSpellBase {
 	private float ripDelay;

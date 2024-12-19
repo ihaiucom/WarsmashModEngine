@@ -10,6 +10,10 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.generic.C
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.item.CAbilityItemPermanentStatGain;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAbilityType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAbilityTypeLevelData;
+// 能提高智力的物品 智力之书
+// 能增加力量的物品
+// 能增加敏捷度的物品
+// 能提高英雄三个属性的物品
 
 public class CAbilityTypeItemPermanentStatGain extends CAbilityType<CAbilityTypeItemStatBonusLevelData> {
 

@@ -21,6 +21,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.AbilityTargetC
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.CommandStringErrorKeys;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.SimulationRenderComponentLightning;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.TextTagConfigType;
+//法力燃烧 射出一道能量波来消耗掉目标单位一定的魔法值，目标单位的魔法值在燃烧的过程中,也会对其造成同等数量的伤害值。|n|n|cffffcc00等级 1|r - 消耗掉目标<AEmb,DataA1>点魔法。|n|cffffcc00等级 2|r - 消耗掉目标<AEmb,DataA2>点魔法。|n|cffffcc00等级 3|r - 消耗掉目标<AEmb,DataA3>点魔法。
 
 public class CAbilityManaBurn extends CAbilityTargetSpellBase {
 	private War3ID lightningId;

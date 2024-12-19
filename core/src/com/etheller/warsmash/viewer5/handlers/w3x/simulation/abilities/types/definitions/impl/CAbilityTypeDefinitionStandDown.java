@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAbilityTypeLevelData;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeStandDown;
+// 卸载苦工 使得地洞内的苦工重新回到自己的工作岗位上。
 
 public class CAbilityTypeDefinitionStandDown extends AbstractCAbilityTypeDefinition<CAbilityTypeLevelData>
 		implements CAbilityTypeDefinition {

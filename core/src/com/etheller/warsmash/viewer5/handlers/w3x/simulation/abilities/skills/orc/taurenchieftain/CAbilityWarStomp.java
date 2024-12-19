@@ -14,6 +14,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.orders.OrderIds;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CDamageType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CEffectType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CWeaponSoundTypeJass;
+// 战争践踏 重击地面，对周围的地面单位造成一定的伤害。|n|n|cffffcc00等级 1|r - <AOws,DataA1>点伤害，<AOws,Dur1>秒眩晕效果。|n|cffffcc00等级 2|r - <AOws,DataA2>点伤害，<AOws,Dur2>秒眩晕效果。|n|cffffcc00等级 3|r - <AOws,DataA3>点伤害，<AOws,Dur3>秒眩晕效果。
 
 public class CAbilityWarStomp extends CAbilityNoTargetSpellBase {
 

@@ -43,7 +43,7 @@ public abstract class CAbstractRangedBehavior implements CRangedBehavior {
 		return this;
 	}
 
-	// 抽象方法，更新逻辑
+	// 抽象方法，已经到达范围内，更新逻辑
 	protected abstract CBehavior update(CSimulation simulation, boolean withinFacingWindow);
 
 	// 抽象方法，更新无效目标的逻辑
@@ -56,6 +56,8 @@ public abstract class CAbstractRangedBehavior implements CRangedBehavior {
 	protected abstract void resetBeforeMoving(CSimulation simulation);
 
 	// 更新方法，返回行为状态
+	// 如果目标有效，如果还没到达目标范围；如果可移动就进入移动行为，否则进入下一条指令
+	// 如果达到范围内，如果不是可移动的就进入转向到目标
 	@Override
 	public final CBehavior update(final CSimulation simulation) {
 		// 检查目标是否仍然有效

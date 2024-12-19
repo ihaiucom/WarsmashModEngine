@@ -9,7 +9,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.CAbility;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.generic.CLevelingAbility;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.skills.human.bloodmage.phoenix.CAbilityPhoenixFire;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAbilityType;
-
+// 凤凰火焰
 public class CAbilityTypePhoenixFire extends CAbilityType<CAbilityTypePhoenixFireLevelData> {
 
 	public CAbilityTypePhoenixFire(final War3ID alias, final War3ID code,

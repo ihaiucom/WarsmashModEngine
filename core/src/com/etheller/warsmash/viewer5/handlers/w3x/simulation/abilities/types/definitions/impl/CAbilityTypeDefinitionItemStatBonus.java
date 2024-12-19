@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeItemStatBonus;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeItemStatBonusLevelData;
+// 增加攻击力的物品 攻击之抓 +10
 
 public class CAbilityTypeDefinitionItemStatBonus
 		extends AbstractCAbilityTypeDefinition<CAbilityTypeItemStatBonusLevelData> implements CAbilityTypeDefinition {

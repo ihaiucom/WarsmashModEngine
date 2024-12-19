@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeHumanRepair;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeHumanRepairLevelData;
+// 修理 修理建筑物和机械单位，需要消耗资源。
 
 public class CAbilityTypeDefinitionHumanRepair extends AbstractCAbilityTypeDefinition<CAbilityTypeHumanRepairLevelData>
 		implements CAbilityTypeDefinition {

@@ -1,5 +1,6 @@
 {
-	"abilityList": [{
+	"abilityList": [
+		{
 		"ids": [{"id":"AUts"}],
 		"type": "PASSIVE",
 		"onAddAbility": [{
@@ -224,7 +225,8 @@
 					"type": "getLastCreatedBuff"
 				}
 		}]
-	},{
+	},
+		{
 		"ids": [{"id":"AHbh"},{"id":"AOcr"},{"id":"ANdb"}],
 		"type": "PASSIVE",
 		"onAddAbility": [{
@@ -439,7 +441,8 @@
 					"type": "getLastCreatedEvasionListener"
 				}
 		}]
-	},{
+	},
+		{
 		"ids": [{"id":"AEev"}],
 		"type": "PASSIVE",
 		"onAddAbility": [{
@@ -472,7 +475,8 @@
 					"type": "getLastCreatedEvasionListener"
 				}
 		}]
-	},{
+	},
+		{
 		"ids": [{"id":"AOre"},{"id":"ACrn"}],
 		"type": "PASSIVE",
 		"onAddAbility": [{
@@ -563,7 +567,8 @@
 					"type": "getLastCreatedDeathReplacement"
 				}
 		}]
-	},{
+	},
+		{
 		"ids": [{"id":"Aetl"}],
 		"type": "PASSIVE",
 		"onAddAbility": [{
@@ -587,7 +592,8 @@
 				"type": "getLastCreatedStateModBuff"
 			}
 		}]
-	},{
+	},
+		{
 		"ids": [{"id":"Amim"}],
 		"type": "PASSIVE",
 		"onAddAbility": [{
@@ -611,7 +617,8 @@
 				"type": "getLastCreatedStateModBuff"
 			}
 		}]
-	},{
+	},
+		{
 		"ids": [{"id":"Arsk"}],
 		"type": "PASSIVE",
 		"onAddAbility": [{

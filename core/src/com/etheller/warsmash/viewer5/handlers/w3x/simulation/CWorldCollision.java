@@ -205,44 +205,68 @@ public class CWorldCollision {
 		});
 	}
 
+	/**
+	 * 检查新的可能矩形是否与除指定单位外的任何其他单位相交。
+	 *
+	 * @param newPossibleRectangle 新的可能矩形
+	 * @param sourceUnitToIgnore   要忽略的第一个单位
+	 * @param movementType         移动类型
+	 * @return 如果相交则返回true，否则返回false
+	 */
 	public boolean intersectsAnythingOtherThan(final Rectangle newPossibleRectangle, final CUnit sourceUnitToIgnore,
-			final MovementType movementType) {
+											   final MovementType movementType) {
+		// 调用重载方法，默认忽略第二个单位
 		return this.intersectsAnythingOtherThan(newPossibleRectangle, sourceUnitToIgnore, null, movementType);
 	}
 
+	/**
+	 * 检查新的可能矩形是否与除指定两个单位外的任何其他单位相交。
+	 *
+	 * @param newPossibleRectangle     新的可能矩形
+	 * @param sourceUnitToIgnore       要忽略的第一个单位
+	 * @param sourceSecondUnitToIgnore 要忽略的第二个单位
+	 * @param movementType             移动类型
+	 * @return 如果相交则返回true，否则返回false
+	 */
 	public boolean intersectsAnythingOtherThan(final Rectangle newPossibleRectangle, final CUnit sourceUnitToIgnore,
-			final CUnit sourceSecondUnitToIgnore, final MovementType movementType) {
+											   final CUnit sourceSecondUnitToIgnore, final MovementType movementType) {
 		if (movementType != null) {
 			switch (movementType) {
-			case AMPHIBIOUS:
-				if (this.seaUnitCollision.intersect(newPossibleRectangle,
-						this.anyUnitExceptTwoIntersector.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore))) {
-					return true;
-				}
-				if (this.groundUnitCollision.intersect(newPossibleRectangle,
-						this.anyUnitExceptTwoIntersector.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore))) {
-					return true;
-				}
-				return false;
-			case FLOAT:
-				return this.seaUnitCollision.intersect(newPossibleRectangle,
-						this.anyUnitExceptTwoIntersector.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore));
-			case FLY:
-				return this.airUnitCollision.intersect(newPossibleRectangle,
-						this.anyUnitExceptTwoIntersector.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore));
-			case DISABLED:
-			case FOOT_NO_COLLISION:
-				return false;
-			default:
-			case FOOT:
-			case HORSE:
-			case HOVER:
-				return this.groundUnitCollision.intersect(newPossibleRectangle,
-						this.anyUnitExceptTwoIntersector.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore));
+				case AMPHIBIOUS:
+					// 检查两栖移动类型是否与海面或地面单位相交
+					if (this.seaUnitCollision.intersect(newPossibleRectangle,
+							this.anyUnitExceptTwoIntersector.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore))) {
+						return true;
+					}
+					if (this.groundUnitCollision.intersect(newPossibleRectangle,
+							this.anyUnitExceptTwoIntersector.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore))) {
+						return true;
+					}
+					return false;
+				case FLOAT:
+					// 检查漂浮移动类型是否与海面单位相交
+					return this.seaUnitCollision.intersect(newPossibleRectangle,
+							this.anyUnitExceptTwoIntersector.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore));
+				case FLY:
+					// 检查飞行移动类型是否与空中单位相交
+					return this.airUnitCollision.intersect(newPossibleRectangle,
+							this.anyUnitExceptTwoIntersector.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore));
+				case DISABLED:
+				case FOOT_NO_COLLISION:
+					// 如果移动类型被禁用或步行无碰撞，则不相交
+					return false;
+				default:
+				case FOOT:
+				case HORSE:
+				case HOVER:
+					// 检查步行、马匹、悬停移动类型是否与地面单位相交
+					return this.groundUnitCollision.intersect(newPossibleRectangle,
+							this.anyUnitExceptTwoIntersector.reset(sourceUnitToIgnore, sourceSecondUnitToIgnore));
 			}
 		}
 		return false;
 	}
+
 
 	public void translate(final CUnit unit, final float xShift, final float yShift) {
 		final MovementType movementType = unit.getMovementType();

@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAbilityTypeLevelData;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeInvulnerable;
+// 无敌的 (中立)
 
 public class CAbilityTypeDefinitionInvulnerable extends AbstractCAbilityTypeDefinition<CAbilityTypeLevelData>
 		implements CAbilityTypeDefinition {

@@ -1,5 +1,8 @@
 package com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities;
 
+/**
+ * 能力禁用类型
+ */
 public enum CAbilityDisableType {
 	// 定义一个枚举类，代表不同的操作或状态
 	REQUIREMENTS((byte) 1),

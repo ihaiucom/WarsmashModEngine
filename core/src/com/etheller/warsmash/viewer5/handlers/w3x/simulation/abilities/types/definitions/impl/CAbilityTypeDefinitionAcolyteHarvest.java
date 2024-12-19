@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeAcolyteHarvest;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeAcolyteHarvestLevelData;
+//  采集(侍僧采集黄金)
 
 public class CAbilityTypeDefinitionAcolyteHarvest
 		extends AbstractCAbilityTypeDefinition<CAbilityTypeAcolyteHarvestLevelData> implements CAbilityTypeDefinition {

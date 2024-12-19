@@ -258,7 +258,7 @@ public class OrderIds {
 	public static final int healoff = 852065;
 	public static final int healon = 852064;
 	public static final int hex = 852502;
-	public static final int holdposition = 851993;
+	public static final int holdposition = 851993; // 静止移动
 	public static final int holybolt = 852092;
 	public static final int howlofterror = 852588;
 	public static final int humanbuild = 851995;

@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeChannelTest;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeChannelTestLevelData;
+// 通魔 可作为大多数主动技能的模板，可以被魔法护盾护身符抵挡
 
 public class CAbilityTypeDefinitionChannelTest extends AbstractCAbilityTypeDefinition<CAbilityTypeChannelTestLevelData>
 		implements CAbilityTypeDefinition {

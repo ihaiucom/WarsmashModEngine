@@ -7,37 +7,65 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.CUnit;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.players.CPlayer;
 
 public class CUnitAttackVisionFogModifier extends CFogModifier {
-	private CUnit unit;
-	private int playerIndex;
+	// 定义一个名为CUnitAttackVisionFogModifier的类，继承自CFogModifier类
+	private CUnit unit; // 定义一个私有的CUnit类型的成员变量unit
+	private int playerIndex; // 定义一个私有的整型成员变量playerIndex
 
+	/**
+	 * 构造函数，用于创建CUnitAttackVisionFogModifier对象
+	 *
+	 * @param unit        CUnit类型的参数，表示要修改视野雾效果的单元
+	 * @param playerIndex 整型参数，表示玩家的索引
+	 */
 	public CUnitAttackVisionFogModifier(final CUnit unit, final int playerIndex) {
-		this.unit = unit;
-		this.playerIndex = playerIndex;
+		this.unit = unit; // 将传入的unit参数赋值给成员变量unit
+		this.playerIndex = playerIndex; // 将传入的playerIndex参数赋值给成员变量playerIndex
 	}
 
+	/**
+	 * 获取玩家的索引
+	 *
+	 * @return 返回玩家的索引
+	 */
 	public int getPlayerIndex() {
-		return playerIndex;
+		return playerIndex; // 返回成员变量playerIndex的值
 	}
 
+	/**
+	 * 设置玩家的索引
+	 *
+	 * @param playerIndex 整型参数，表示要设置的玩家索引
+	 */
 	public void setPlayerIndex(int playerIndex) {
-		this.playerIndex = playerIndex;
+		this.playerIndex = playerIndex; // 将传入的playerIndex参数赋值给成员变量playerIndex
 	}
+
 
 	@Override
 	public void update(final CSimulation game, final CPlayer player, final PathingGrid pathingGrid,
 			final CPlayerFogOfWar fogOfWar) {
 		if (!this.unit.isDead() && !this.unit.isHidden() && ATTACKING_UNIT_VISION_RADIUS > 0) {
+			// 判断单位是否具有飞行能力
 			final boolean flying = this.unit.getUnitType().getMovementType() == MovementType.FLY;
+			// 获取单位的X坐标
 			final float myX = this.unit.getX();
+			// 获取单位的Y坐标
 			final float myY = this.unit.getY();
+			// 如果单位能飞，则Z坐标设为最大整数值，否则设为地形高度
 			final int myZ = flying ? Integer.MAX_VALUE : game.getTerrainHeight(myX, myY);
+			// 设置战争迷雾状态，将单位所在位置的迷雾清除
 			fogOfWar.setState(game.getPathingGrid().getFogOfWarIndexX(myX),
 					game.getPathingGrid().getFogOfWarIndexY(myY), (byte) 0);
 
+			// 计算单位所在位置的迷雾索引X坐标
 			int myXi = game.getPathingGrid().getFogOfWarIndexX(myX);
+			// 计算单位所在位置的迷雾索引Y坐标
 			int myYi = game.getPathingGrid().getFogOfWarIndexY(myY);
+			// 计算单位攻击视野半径范围内的迷雾索引X坐标最大值
 			int maxXi = game.getPathingGrid().getFogOfWarIndexX(myX + ATTACKING_UNIT_VISION_RADIUS);
+			// 计算单位攻击视野半径范围内的迷雾索引Y坐标最大值
 			int maxYi = game.getPathingGrid().getFogOfWarIndexY(myY + ATTACKING_UNIT_VISION_RADIUS);
+
 			for (int a = 1; a <= Math.max(maxYi - myYi, maxXi - myXi); a++) {
 				int distance = a * a;
 

@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeGoldMine;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeGoldMineLevelData;
+// 金矿能力
 
 public class CAbilityTypeDefinitionGoldMine extends AbstractCAbilityTypeDefinition<CAbilityTypeGoldMineLevelData>
 		implements CAbilityTypeDefinition {

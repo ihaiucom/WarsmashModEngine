@@ -2456,14 +2456,27 @@ public class War3MapViewer extends AbstractMdxModelViewer {
 		return this.simulation.getPlayer(this.localPlayerIndex).getFogOfWar();
 	}
 
+	/**
+	 * 根据前一个雾的颜色状态和当前状态，计算出一个新的颜色值，用于实现视线颜色的渐变效果。
+	 *
+	 * @param lastFogStateColor 前一个雾的颜色状态，byte类型
+	 * @param state             当前的颜色状态，byte类型
+	 * @return 计算后的新颜色值，byte类型
+	 */
 	public static byte fadeLineOfSightColor(final byte lastFogStateColor, final byte state) {
+		// 将lastFogStateColor转换为无符号的short类型，以便进行计算
 		final short prevValue = (short) (lastFogStateColor & 0xFF);
+		// 将state转换为无符号的short类型，以便进行计算
 		final short newValue = (short) (state & 0xFF);
+		// 计算新旧颜色值的差值
 		final short delta = (short) (newValue - prevValue);
+		// 计算应用的变化幅度，最大值为9
 		final short appliedMagnitude = (short) Math.min(9, Math.abs(delta));
 
+		// 根据差值的正负，决定是增加还是减少颜色值，并确保结果在byte范围内
 		return (byte) ((prevValue + (appliedMagnitude * (delta < 0 ? -1 : 1))) & 0xFF);
 	}
+
 
 	public final class MapLoader {
 		private final LinkedList<LoadMapTask> loadMapTasks = new LinkedList<>();

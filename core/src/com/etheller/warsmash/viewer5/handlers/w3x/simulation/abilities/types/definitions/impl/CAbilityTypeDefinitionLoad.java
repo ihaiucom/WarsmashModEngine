@@ -10,6 +10,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.def
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeLoad;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeLoadLevelData;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.data.CUnitData;
+// 装载  (地精飞艇) 装载一个指定的友方地面单位。
 
 public class CAbilityTypeDefinitionLoad extends AbstractCAbilityTypeDefinition<CAbilityTypeLoadLevelData>
 		implements CAbilityTypeDefinition {

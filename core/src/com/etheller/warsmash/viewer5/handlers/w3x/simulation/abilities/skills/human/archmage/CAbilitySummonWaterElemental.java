@@ -12,12 +12,20 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.def
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.impl.AbstractCAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.orders.OrderIds;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CEffectType;
-
+// 召唤水元素
 public class CAbilitySummonWaterElemental extends CAbilityNoTargetSpellBase {
+	// 定义召唤水元素生物的ID
 	private War3ID summonUnitId;
+
+	// 定义召唤水元素生物的数量
 	private int summonUnitCount;
+
+	// 定义要施加的增益效果的ID
 	private War3ID buffId;
+
+	// 定义技能的影响范围
 	private float areaOfEffect;
+
 
 	public CAbilitySummonWaterElemental(final int handleId, final War3ID alias) {
 		super(handleId, alias);
@@ -38,18 +46,28 @@ public class CAbilitySummonWaterElemental extends CAbilityNoTargetSpellBase {
 
 	@Override
 	public boolean doEffect(final CSimulation simulation, final CUnit unit, final AbilityTarget target) {
+		// 获取单位的朝向角度
 		final float facing = unit.getFacing();
+		// 将朝向角度转换为弧度
 		final float facingRad = (float) StrictMath.toRadians(facing);
+		// 计算水元素生物的生成位置，基于单位的当前位置和朝向
 		final float x = unit.getX() + ((float) StrictMath.cos(facingRad) * areaOfEffect);
 		final float y = unit.getY() + ((float) StrictMath.sin(facingRad) * areaOfEffect);
+		// 循环创建指定数量的水元素生物
 		for (int i = 0; i < summonUnitCount; i++) {
+			// 创建一个新的水元素生物单位
 			final CUnit summonedUnit = simulation.createUnitSimple(summonUnitId, unit.getPlayerIndex(), x, y, facing);
+			// 设置新单位为召唤物分类
 			summonedUnit.addClassification(CUnitClassification.SUMMONED);
+			// 为新单位添加一个定时生命值增益效果
 			summonedUnit.add(simulation,
 					new CBuffTimedLife(simulation.getHandleIdAllocator().createId(), buffId, getDuration(), false));
+			// 在新单位上创建一个临时的法术效果
 			simulation.createTemporarySpellEffectOnUnit(summonedUnit, getAlias(), CEffectType.TARGET);
 		}
+		// 返回false，表示召唤操作完成
 		return false;
+
 	}
 
 	public War3ID getSummonUnitId() {

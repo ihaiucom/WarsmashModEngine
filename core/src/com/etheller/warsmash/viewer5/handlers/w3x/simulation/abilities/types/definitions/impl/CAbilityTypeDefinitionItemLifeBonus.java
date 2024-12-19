@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeItemLifeBonus;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeItemLifeBonusLevelData;
+// 能增加血量回复速度的物品
 
 public class CAbilityTypeDefinitionItemLifeBonus
 		extends AbstractCAbilityTypeDefinition<CAbilityTypeItemLifeBonusLevelData> implements CAbilityTypeDefinition {

@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeCargoHoldEntangledMine;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeCargoHoldLevelData;
+//  (缠绕金矿)  让某个小精灵进入金矿。
 
 public class CAbilityTypeDefinitionCargoHoldEntangledMine
 		extends AbstractCAbilityTypeDefinition<CAbilityTypeCargoHoldLevelData> implements CAbilityTypeDefinition {

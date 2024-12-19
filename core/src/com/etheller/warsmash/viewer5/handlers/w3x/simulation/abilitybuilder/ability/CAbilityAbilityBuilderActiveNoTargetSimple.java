@@ -20,16 +20,33 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.AbilityActivat
 @Deprecated
 public class CAbilityAbilityBuilderActiveNoTargetSimple extends CAbilityNoTargetSpellBase {
 
+	// 定义一个列表，用于存储不同等级的能力类型构建数据
 	List<CAbilityTypeAbilityBuilderLevelData> levelData;
+
+	// 能力构建器的配置信息
 	private AbilityBuilderConfiguration config;
+
+	// 本地存储，用于存储一些临时数据
 	private Map<String, Object> localStore;
+
+	// 订单ID，用于标识特定的订单
 	private int orderId;
+
+	// 自动施法开启ID，用于标识自动施法开启的状态
 	private int autoCastOnId = 0;
+
+	// 自动施法关闭ID，用于标识自动施法关闭的状态
 	private int autoCastOffId = 0;
+
+	// 是否正在自动施法的标志
 	private boolean autocasting = false;
+
+	// 是否已经初始化的标志
 	private boolean initialized;
-	
+
+	// 施法ID，用于标识特定的施法动作
 	private int castId = 0;
+
 
 	public CAbilityAbilityBuilderActiveNoTargetSimple(int handleId, War3ID alias,
 			List<CAbilityTypeAbilityBuilderLevelData> levelData, AbilityBuilderConfiguration config,

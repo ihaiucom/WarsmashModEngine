@@ -10,6 +10,8 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.build.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.build.CAbilityRepair;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.generic.CLevelingAbility;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAbilityType;
+// 更新
+// 恢复 使得侍僧能修复建筑物和机械单位。
 
 public class CAbilityTypeRepair extends CAbilityType<CAbilityTypeHumanRepairLevelData> {
 

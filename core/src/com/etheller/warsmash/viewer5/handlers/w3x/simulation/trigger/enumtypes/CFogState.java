@@ -3,9 +3,9 @@ package com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes;
 import com.etheller.interpreter.ast.util.CHandle;
 
 public enum CFogState implements CHandle {
-	MASKED,
-	FOGGED,
-	VISIBLE;
+	MASKED, // -128 遮罩
+	FOGGED, // 127 迷雾
+	VISIBLE; // 0 可见
 
 	public static CFogState[] VALUES = values();
 

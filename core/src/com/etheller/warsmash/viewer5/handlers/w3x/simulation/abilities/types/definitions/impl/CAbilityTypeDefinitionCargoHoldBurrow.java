@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeCargoHoldBurrow;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeCargoHoldBurrowLevelData;
+// 货物保持 (兽族地洞) 吞噬货物使单位能够容纳别的单位，可以配合装载类技能和卸载类技能的使用。该技能能使单位失去攻击能力直到装载其他单位
 
 public class CAbilityTypeDefinitionCargoHoldBurrow
 		extends AbstractCAbilityTypeDefinition<CAbilityTypeCargoHoldBurrowLevelData> implements CAbilityTypeDefinition {

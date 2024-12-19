@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeNeutralBuilding;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeNeutralBuildingLevelData;
+// 选择英雄
 
 public class CAbilityTypeDefinitionNeutralBuilding
 		extends AbstractCAbilityTypeDefinition<CAbilityTypeNeutralBuildingLevelData> implements CAbilityTypeDefinition {

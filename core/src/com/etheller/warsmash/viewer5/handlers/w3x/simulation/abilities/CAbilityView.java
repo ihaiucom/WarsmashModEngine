@@ -13,6 +13,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.AbilityTargetC
  * 检查技能能否使用
  * 检查目标能否使用
  * 检查单位是否满足条件
+ *
  */
 public interface CAbilityView extends CHandle {
 	/**

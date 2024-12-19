@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeNeutralBuildingLevelData;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeShopSharing;
+// 共享商店，联盟建筑物。
 
 public class CAbilityTypeDefinitionShopSharing
 		extends AbstractCAbilityTypeDefinition<CAbilityTypeNeutralBuildingLevelData> implements CAbilityTypeDefinition {

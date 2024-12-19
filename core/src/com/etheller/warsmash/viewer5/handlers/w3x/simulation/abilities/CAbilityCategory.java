@@ -1,6 +1,6 @@
 package com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities;
 
-// 表示角色能力的枚举类
+// 能力分类类型
 public enum CAbilityCategory {
 	ATTACK,  // 攻击
 	MOVEMENT, // 移动

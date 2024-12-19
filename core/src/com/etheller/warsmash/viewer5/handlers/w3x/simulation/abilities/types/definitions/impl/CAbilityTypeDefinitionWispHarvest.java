@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeWispHarvest;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeWispHarvestLevelData;
+// 采集 (小精灵能采集黄金和木材)
 
 public class CAbilityTypeDefinitionWispHarvest extends AbstractCAbilityTypeDefinition<CAbilityTypeWispHarvestLevelData>
 		implements CAbilityTypeDefinition {

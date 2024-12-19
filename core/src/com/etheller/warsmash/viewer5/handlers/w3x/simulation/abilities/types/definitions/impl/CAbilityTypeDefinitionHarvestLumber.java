@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeHarvestLumber;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeHarvestLumberLevelData;
+// 采集 (采集木材)
 
 public class CAbilityTypeDefinitionHarvestLumber
 		extends AbstractCAbilityTypeDefinition<CAbilityTypeHarvestLumberLevelData> implements CAbilityTypeDefinition {

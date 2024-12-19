@@ -27,7 +27,9 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.data.CUnitData;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.orders.OrderIds;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.AbilityActivationReceiver;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.AbilityTargetCheckReceiver;
-
+/**
+ * CAbilityRoot类表示一个固根能力，它使单位根植于地面并具有特定的行为和攻击模式。
+ */
 public class CAbilityRoot extends AbstractGenericSingleIconNoSmartActiveAbility {
 	private boolean rooted;
 
@@ -50,6 +52,19 @@ public class CAbilityRoot extends AbstractGenericSingleIconNoSmartActiveAbility 
 
 	private List<CUnitAttack> uprootedAttacks;
 
+	/**
+	 * CAbilityRoot构造函数，初始化能力的基本属性。
+	 *
+	 * @param handleId                 处理ID
+	 * @param code                     能力代码
+	 * @param alias                    能力别名
+	 * @param rootedWeaponsAttackBits  固根状态下的武器攻击位
+	 * @param uprootedWeaponsAttackBits 翻起状态下的武器攻击位
+	 * @param rootedTurning            固根时是否允许转向
+	 * @param uprootedDefenseType      翻起状态下的防御类型
+	 * @param duration                 持续时间
+	 * @param offDuration              离开的持续时间
+	 */
 	public CAbilityRoot(final int handleId, final War3ID code, final War3ID alias, final int rootedWeaponsAttackBits,
 			final int uprootedWeaponsAttackBits, final boolean rootedTurning, final CDefenseType uprootedDefenseType,
 			final float duration, final float offDuration) {
@@ -74,6 +89,7 @@ public class CAbilityRoot extends AbstractGenericSingleIconNoSmartActiveAbility 
 
 	@Override
 	public void onAdd(final CSimulation game, final CUnit unit) {
+		// 添加固根能力时清空能力列表并进行初始化。
 		this.uprootedAbilities.clear();
 		this.rootedAbilities.clear();
 		for (final CAbility ability : unit.getAbilities()) {
@@ -107,6 +123,7 @@ public class CAbilityRoot extends AbstractGenericSingleIconNoSmartActiveAbility 
 
 	@Override
 	public void onSetUnitType(final CSimulation game, final CUnit unit) {
+		// 单位类型变化时更新能力列表和攻击模式。
 		this.uprootedAbilities.clear();
 		this.rootedAbilities.clear();
 		for (final CAbility ability : unit.getAbilities()) {
@@ -153,10 +170,12 @@ public class CAbilityRoot extends AbstractGenericSingleIconNoSmartActiveAbility 
 
 	@Override
 	public void onTick(final CSimulation game, final CUnit unit) {
+		// 每个游戏回合的更新逻辑。
 	}
 
 	@Override
 	public void onCancelFromQueue(final CSimulation game, final CUnit unit, final int orderId) {
+		// 取消队列中能力的逻辑。
 	}
 
 	@Override
@@ -167,6 +186,7 @@ public class CAbilityRoot extends AbstractGenericSingleIconNoSmartActiveAbility 
 	@Override
 	public CBehavior begin(final CSimulation game, final CUnit caster, final int orderId,
 			final AbilityPointTarget point) {
+		// 开始固根能力的逻辑。
 		if (!this.rooted && (orderId == OrderIds.root)) {
 			return this.behaviorRoot.reset(point);
 		}
@@ -175,6 +195,7 @@ public class CAbilityRoot extends AbstractGenericSingleIconNoSmartActiveAbility 
 
 	@Override
 	public CBehavior beginNoTarget(final CSimulation game, final CUnit caster, final int orderId) {
+		// 开始翻起能力的逻辑。
 		if (this.rooted && (orderId == OrderIds.unroot)) {
 			return this.behaviorUproot.reset();
 		}
@@ -190,6 +211,7 @@ public class CAbilityRoot extends AbstractGenericSingleIconNoSmartActiveAbility 
 	@Override
 	protected void innerCheckCanTarget(final CSimulation game, final CUnit unit, final int orderId,
 			final AbilityPointTarget target, final AbilityTargetCheckReceiver<AbilityPointTarget> receiver) {
+		// 检查是否可以以目标点为目标。
 		if (!this.rooted && (orderId == OrderIds.root)) {
 			receiver.targetOk(target);
 		}
@@ -201,6 +223,7 @@ public class CAbilityRoot extends AbstractGenericSingleIconNoSmartActiveAbility 
 	@Override
 	protected void innerCheckCanTargetNoTarget(final CSimulation game, final CUnit unit, final int orderId,
 			final AbilityTargetCheckReceiver<Void> receiver) {
+		// 检查是否可以执行无目标的能力。
 		if (this.rooted && (orderId == OrderIds.unroot)) {
 			receiver.targetOk(null);
 		}
@@ -212,6 +235,7 @@ public class CAbilityRoot extends AbstractGenericSingleIconNoSmartActiveAbility 
 	@Override
 	protected void innerCheckCanUse(final CSimulation game, final CUnit unit, final int orderId,
 			final AbilityActivationReceiver receiver) {
+		// 检查能力是否可以使用。
 		if (unit.isBuildQueueActive()) {
 			receiver.disabled();
 		}
@@ -220,10 +244,22 @@ public class CAbilityRoot extends AbstractGenericSingleIconNoSmartActiveAbility 
 		}
 	}
 
+	/**
+	 * 判断单位是否处于固根状态。
+	 *
+	 * @return true如果单位处于固根状态，否则为false。
+	 */
 	public boolean isRooted() {
 		return this.rooted;
 	}
 
+	/**
+	 * 设置单位的固根状态，并执行相关逻辑。
+	 *
+	 * @param rooted 指定的固根状态
+	 * @param unit   受影响的单位
+	 * @param game   当前游戏实例
+	 */
 	public void setRooted(final boolean rooted, final CUnit unit, final CSimulation game) {
 		final boolean rooting = !this.rooted && rooted;
 		final boolean uprooting = this.rooted && !rooted;

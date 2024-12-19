@@ -150,6 +150,7 @@ public class CAbilityCargoHold extends AbstractGenericNoIconAbility {
 		return cargoUnits.get(index);
 	}
 
+	// 装载单位到货仓单位列表
 	public void addUnit(final CUnit cargoHoldUnit, final CUnit target) {
 		this.cargoUnits.add(target);
 	}
@@ -178,6 +179,7 @@ public class CAbilityCargoHold extends AbstractGenericNoIconAbility {
 		this.targetsAllowed = targetsAllowed;
 	}
 
+	// 获取货仓容量剩余空间是否可以装载目标需要的容量
 	public boolean hasCapacity(final int cargoCapacityOfNewUnit) {
 		if (cargoCapacityOfNewUnit == 0) {
 			return false;

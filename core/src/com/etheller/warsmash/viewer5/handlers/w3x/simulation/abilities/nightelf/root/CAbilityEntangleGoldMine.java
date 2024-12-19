@@ -33,6 +33,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.AbilityActivat
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.AbilityTargetCheckReceiver;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.CommandStringErrorKeys;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.SimulationRenderComponent;
+// 缠绕金矿 在小精灵采集金矿之前，你必须先将金矿缠绕。
 
 public class CAbilityEntangleGoldMine extends CAbilityTargetSpellBase {
 	private War3ID resultingTypeId;

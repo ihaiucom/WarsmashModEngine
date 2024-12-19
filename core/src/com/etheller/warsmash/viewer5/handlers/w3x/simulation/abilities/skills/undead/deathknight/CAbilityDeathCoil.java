@@ -22,6 +22,8 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.CommandStringE
  * Thanks to Spellbound for making this ability (some edits were later made by
  * Retera)
  */
+// 死亡缠绕 能治疗友军的某个不死单位或者伤害敌人的某个单位。|n|n|cffffcc00等级 1|r - 恢复<AUdc,DataA1>点生命值。|n|cffffcc00等级 2|r - 恢复<AUdc,DataA2>点生命值。|n|cffffcc00等级 3|r - 恢复<AUdc,DataA3>点生命值。
+
 public class CAbilityDeathCoil extends CAbilityTargetSpellBase {
 	private float missileSpeed;
 	private float healAmount;

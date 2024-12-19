@@ -14,6 +14,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.behaviors.CBehavior
  * onDeath 单位 死亡时
  * onSetUnitType 单位 类型改变时
  * onCancelFromQueue 单位 取消技能时
+ *
  */
 public interface CAbility extends CAbilityView {
 	/* should fire when ability added to unit */

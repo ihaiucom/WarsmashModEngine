@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAbilityTypeLevelData;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeShopPurchaseItem;
+// 商店购买物品
 
 public class CAbilityTypeDefinitionShopPurchaseItem extends AbstractCAbilityTypeDefinition<CAbilityTypeLevelData>
 		implements CAbilityTypeDefinition {

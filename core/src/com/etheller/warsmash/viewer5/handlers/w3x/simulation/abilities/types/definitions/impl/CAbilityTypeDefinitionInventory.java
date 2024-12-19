@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeInventory;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeInventoryLevelData;
+// 物品栏  (英雄)
 
 public class CAbilityTypeDefinitionInventory extends AbstractCAbilityTypeDefinition<CAbilityTypeInventoryLevelData>
 		implements CAbilityTypeDefinition {

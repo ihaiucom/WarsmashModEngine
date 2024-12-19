@@ -6,6 +6,8 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.targeting
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.targeting.AbilityTarget;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.orders.OrderIds;
 
+// 如果没有在攻击范围就移动到目标点，并且每帧查找攻击目标，如果找到攻击目标就会进入攻击行为
+// 如果已经在攻击范围但是没有攻击目标，就会停止行为
 public class CBehaviorAttackMove implements CRangedBehavior {
 
 	private final CUnit unit;
@@ -30,6 +32,7 @@ public class CBehaviorAttackMove implements CRangedBehavior {
 
 	@Override
 	public boolean isWithinRange(final CSimulation simulation) {
+		// 查找可攻击的目标，并将目标设置给攻击行为，启动攻击行为
 		if (this.justAutoAttacked = this.unit.autoAcquireAttackTargets(simulation, false)) {
 			// kind of a hack
 			return true;
@@ -43,14 +46,18 @@ public class CBehaviorAttackMove implements CRangedBehavior {
 
 	@Override
 	public CBehavior update(final CSimulation simulation) {
+		// 已经找到攻击目标，并且设置了攻击行为，所有直接范围当前攻击行为（就是unit.autoAcquireAttackTargets里设置的攻击行为）
 		if (this.justAutoAttacked) {
 			this.justAutoAttacked = false;
 			return this.unit.getCurrentBehavior();
 		}
+		// 检测是否到了攻击范围
 		if (innerIsWithinRange()) {
+			// 如果到了攻击范围，就停止行为
 			this.unit.setDefaultBehavior(this.unit.getStopBehavior());
 			return this.unit.pollNextOrderBehavior(simulation);
 		}
+		// 否则，继续移动到攻击目标
 		return this.unit.getMoveBehavior().reset(this.target, this, false);
 	}
 

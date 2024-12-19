@@ -156,17 +156,28 @@ public class CUnit extends CWidget {
 	// 生命偷取
 	private CUnitDefaultLifestealListener lifestealListener = null;
 
+	// 保存状态修改增益效果的列表
 	private final List<StateModBuff> stateModBuffs = new ArrayList<>();
+	// 存储非叠加状态增益效果的映射
 	private final Map<NonStackingStatBuffType, Map<String, List<NonStackingStatBuff>>> nonStackingBuffs = new HashMap<>();
+	// 存储非叠加特效的映射
 	private final Map<String, List<NonStackingFx>> nonStackingFx = new HashMap<>();
+	// 存储非叠加显示增益效果的映射
 	private final Map<String, List<CBuff>> nonStackingDisplayBuffs = new HashMap<>();
 
+	// 当前防御显示值
 	private int currentDefenseDisplay;
+	// 当前防御值
 	private float currentDefense;
+	// 每次迭代的基础生命回复值
 	private float baseLifeRegenPerTick;
+	// 当前生命回复值
 	private float currentLifeRegenPerTick;
+	// 当前法力回复值
 	private float currentManaRegenPerTick;
+	// 防御类型
 	private CDefenseType defenseType;
+
 
 	// 普攻冷却时间
 	private int cooldownEndTime = 0;
@@ -180,14 +191,21 @@ public class CUnit extends CWidget {
 	private CBehavior currentBehavior;
 	// 等待执行的指令队列
 	private final Queue<COrder> orderQueue = new LinkedList<>();
+	// 定义一个私有的CUnitType类型的变量unitType，用于存储单位的类型
 	private CUnitType unitType;
 
+	// 定义一个私有的Rectangle类型的变量collisionRectangle，用于存储单位的碰撞矩形
 	private Rectangle collisionRectangle;
+
+	// 定义一个私有的RemovablePathingMapInstance类型的变量pathingInstance，用于存储单位的寻路地图实例
 	private RemovablePathingMapInstance pathingInstance;
 
+	// 定义一个私有的、不可变的EnumSet<CUnitClassification>类型的变量classifications，初始化为空集合，用于存储单位的分类
 	private final EnumSet<CUnitClassification> classifications = EnumSet.noneOf(CUnitClassification.class);
 
+	// 定义一个私有的int类型的变量deathTurnTick，用于存储单位死亡的回合数
 	private int deathTurnTick;
+
 	private boolean raisable; // 可穿戴
 	private boolean decays; // 衰减 腐烂
 	private boolean corpse; // 尸体
@@ -203,8 +221,11 @@ public class CUnit extends CWidget {
 	private transient List<StateListenerUpdate> stateListenersUpdates = new ArrayList<>();
 	// 采集范围
 	private float acquisitionRange;
+	// 自动攻击目标查找器
 	private transient static AutoAttackTargetFinderEnum autoAttackTargetFinderEnum = new AutoAttackTargetFinderEnum();
+	// 自动施法目标查找器
 	private transient static AutocastTargetFinderEnum autocastTargetFinderEnum = new AutocastTargetFinderEnum();
+	// 当前自动施法的技能
 	private transient CAutocastAbility autocastAbility = null;
 
 	private transient CBehaviorMove moveBehavior; // 移动行为
@@ -215,36 +236,73 @@ public class CUnit extends CWidget {
 	private transient CBehaviorStop stopBehavior; // 停止行为
 	private transient CBehaviorHoldPosition holdPositionBehavior; // 停留位置行为
 	private transient CBehaviorBoardTransport boardTransportBehavior; // 乘坐行为
-	private boolean constructing = false;
-	private boolean constructingPaused = false;
-	private boolean structure;
-	private War3ID upgradeIdType = null;
-	private float constructionProgress;
-	private boolean hidden = false;
-	private boolean paused = false;
-	private boolean acceptingOrders = true;
-	private boolean invulnerable = false;
-	private boolean magicImmune = false;
-	private boolean resistant = false;
+	// 表示当前是否正在构建中
+	 private boolean constructing = false;
+
+	 // 表示构建过程是否暂停
+	 private boolean constructingPaused = false;
+
+	 // 表示结构状态，具体含义需结合上下文
+	 private boolean structure;
+
+	 // 表示升级ID类型，War3ID是一个类，具体含义需结合上下文
+	 private War3ID upgradeIdType = null;
+
+	 // 表示构建进度，范围从0.0到1.0
+	 private float constructionProgress;
+
+	 // 表示是否隐藏
+	 private boolean hidden = false;
+
+	 // 表示是否暂停
+	 private boolean paused = false;
+
+	 // 表示是否接受命令
+	 private boolean acceptingOrders = true;
+
+	 // 表示是否无敌
+	 private boolean invulnerable = false;
+
+	 // 表示是否魔法免疫
+	 private boolean magicImmune = false;
+
+	 // 表示是否抵抗某种效果
+	 private boolean resistant = false;
+
+	// 自动攻击
 	private boolean autoAttack = true;
 	private boolean moveDisabled = false;
 	private CBehavior defaultBehavior; // 当前行为
 	private CBehavior interruptedDefaultBehavior; // 被打断的行为
 	private CBehavior interruptedBehavior; // 被打断的行为
 	private COrder lastStartedOrder = null; // 最后执行的命令
-	private CUnit workerInside;
-	private final War3ID[] buildQueue = new War3ID[WarsmashConstants.BUILD_QUEUE_SIZE];
-	private final QueueItemType[] buildQueueTypes = new QueueItemType[WarsmashConstants.BUILD_QUEUE_SIZE];
-	private boolean queuedUnitFoodPaid = false;
-	private AbilityTarget rallyPoint;
+	// 定义一个CUnit类型的私有变量workerInside，用于存储当前正在工作的单位
+	 private CUnit workerInside;
 
-	private int foodMade;
-	private int foodUsed;
+	 // 定义一个War3ID类型的数组buildQueue，大小为WarsmashConstants.BUILD_QUEUE_SIZE，用于存储建造队列中的单位ID
+	 private final War3ID[] buildQueue = new War3ID[WarsmashConstants.BUILD_QUEUE_SIZE];
 
-	private int triggerEditorCustomValue;
+	 // 定义一个QueueItemType类型的数组buildQueueTypes，大小为WarsmashConstants.BUILD_QUEUE_SIZE，用于存储建造队列中的单位类型
+	 private final QueueItemType[] buildQueueTypes = new QueueItemType[WarsmashConstants.BUILD_QUEUE_SIZE];
+
+	 // 定义一个布尔类型的私有变量queuedUnitFoodPaid，用于标记是否已经支付了队列中单位的资源费用
+	 private boolean queuedUnitFoodPaid;
+
+	 // 定义一个AbilityTarget类型的私有变量rallyPoint，用于存储集结点的位置
+	 private AbilityTarget rallyPoint;
+
+	 // 定义一个整型变量foodMade，用于记录产生的食物总量
+	 private int foodMade;
+
+	 // 定义一个整型变量foodUsed，用于记录使用的食物总量
+	 private int foodUsed;
+
+	 // 定义一个整型变量triggerEditorCustomValue，用于存储触发器编辑器的自定义值
+	 private int triggerEditorCustomValue;
+
 
 	private List<CUnitAttack> unitSpecificAttacks; // 普攻列表
-	private List<CUnitAttack> unitSpecificCurrentAttacks; // 当前普攻列表
+	private List<CUnitAttack> unitSpecificCurrentAttacks; // 当前能用的普攻列表
 	private boolean disableAttacks; // 禁用普攻
 	private final CUnitAttackVisionFogModifier attackFogMod;
 
@@ -259,12 +317,37 @@ public class CUnit extends CWidget {
 	private transient Set<CRegion> containingRegions = new LinkedHashSet<>();
 	private transient Set<CRegion> priorContainingRegions = new LinkedHashSet<>();
 
+	// 建造过程中是否消耗工人
 	private boolean constructionConsumesWorker;
+
+	// 该单位死亡时是否爆炸
 	private boolean explodesOnDeath;
+
+	// 死亡时爆炸效果的War3ID
 	private War3ID explodesOnDeathBuffId;
+
+	// 冷却到期时间
 	private final IntIntMap rawcodeToCooldownExpireTime = new IntIntMap();
+	// 冷却开始时间
 	private final IntIntMap rawcodeToCooldownStartTime = new IntIntMap();
 
+	/**
+	 * CUnit类构造函数，用于创建一个新的CUnit实例。
+	 *
+	 * @param handleId 单位的唯一句柄ID
+	 * @param playerIndex 玩家索引
+	 * @param x 单位在地图上的X坐标
+	 * @param y 单位在地图上的Y坐标
+	 * @param life 单位的当前生命值
+	 * @param typeId 单位的类型ID
+	 * @param facing 单位的朝向角度
+	 * @param mana 单位的当前魔法值
+	 * @param maximumLife 单位的最大生命值
+	 * @param lifeRegen 单位的生命恢复率
+	 * @param maximumMana 单位的最大魔法值
+	 * @param speed 单位的移动速度
+	 * @param unitType 单位的类型信息
+	 */
 	public CUnit(final int handleId, final int playerIndex, final float x, final float y, final float life,
 			final War3ID typeId, final float facing, final float mana, final int maximumLife, final float lifeRegen,
 			final int maximumMana, final int speed, final CUnitType unitType) {
@@ -297,13 +380,19 @@ public class CUnit extends CWidget {
 		computeAllDerivedFields();
 	}
 
+
 	// 执行默认行为
 	public void performDefaultBehavior(final CSimulation game) {
+		// 如果当前行为不为空，则结束当前行为
 		if (this.currentBehavior != null) {
+			// 调用当前行为的结束方法，并传入游戏实例和true表示正常结束
 			this.currentBehavior.end(game, true);
 		}
+		// 将当前行为设置默认行为
 		this.currentBehavior = this.defaultBehavior;
+		// 开始默认行为
 		this.currentBehavior.begin(game);
+
 	}
 
 	public void regeneratePathingInstance(final CSimulation game, final BufferedImage buildingPathingPixelMap) {
@@ -459,17 +548,33 @@ public class CUnit extends CWidget {
 		}
 		computeDerivedFields(buff.getBuffType());
 	}
-
+	/**
+	 * 向状态修改增益列表中添加一个新的监听器。
+	 * 如果列表中不包含该监听器，则将其添加到列表的开头。
+	 *
+	 * @param listener 要添加的状态修改增益监听器
+	 */
 	public void addStateModBuff(final StateModBuff listener) {
 		if (!this.stateModBuffs.contains(listener)) {
 			this.stateModBuffs.add(0, listener);
 		}
 	}
 
+	/**
+	 * 从状态修改增益列表中移除指定的监听器。
+	 *
+	 * @param listener 要移除的状态修改增益监听器
+	 */
 	public void removeStateModBuff(final StateModBuff listener) {
 		this.stateModBuffs.remove(listener);
 	}
 
+	/**
+	 * 移除所有指定类型的状态修改增益监听器。
+	 * 从列表的末尾开始向前遍历，以避免在遍历过程中修改列表导致的索引错位问题。
+	 *
+	 * @param type 要移除的状态修改增益监听器的类型
+	 */
 	public void removeAllStateModBuffs(final StateModBuffType type) {
 		for (int i = this.stateModBuffs.size() - 1; i >= 0; i--) {
 			if (this.stateModBuffs.get(i).getBuffType() == type) {
@@ -478,90 +583,132 @@ public class CUnit extends CWidget {
 		}
 	}
 
+
 	public void computeUnitState(final CSimulation game, final StateModBuffType type) {
 		switch (type) {
+		// 禁用攻击
 		case DISABLE_ATTACK:
+		// 禁用近战攻击
 		case DISABLE_MELEE_ATTACK:
+		// 禁用远程攻击
 		case DISABLE_RANGED_ATTACK:
+		// 禁用特殊攻击
 		case DISABLE_SPECIAL_ATTACK:
+		// 禁用法术
 		case DISABLE_SPELLS:
+		// 使角色处于虚无状态，不受物理伤害
 		case ETHEREAL:
-			// 定义攻击状态标志变量
+
+			// 禁用攻击
 			boolean isDisableAttack = false;
-			// 近战攻击禁用标志
+			// 禁用近战攻击
 			boolean isDisableMeleeAttack = false;
-			// 远程攻击禁用标志
+			// 禁用远程攻击
 			boolean isDisableRangedAttack = false;
-			// 特殊攻击禁用标志
+			// 禁用特殊攻击
 			boolean isDisableSpecialAttack = false;
-			// 法术禁用标志
+			// 禁用法术
 			boolean isDisableSpells = false;
-			// 以虚无态标志
+			// 虚无态标志
 			boolean isEthereal = false;
 
+			// 遍历状态效果增益列表
 			for (final StateModBuff buff : this.stateModBuffs) {
+				// 检查增益类型是否为禁止攻击
 				if (buff.getBuffType() == StateModBuffType.DISABLE_ATTACK) {
+					// 如果增益值不为0，则设置禁止攻击标志为true
 					if (buff.getValue() != 0) {
 						isDisableAttack = true;
 					}
 				}
+				// 检查增益类型是否为禁止近战攻击
 				if (buff.getBuffType() == StateModBuffType.DISABLE_MELEE_ATTACK) {
+					// 如果增益值不为0，则设置禁止近战攻击标志为true
 					if (buff.getValue() != 0) {
 						isDisableMeleeAttack = true;
 					}
 				}
+				// 检查增益类型是否为禁止远程攻击
 				if (buff.getBuffType() == StateModBuffType.DISABLE_RANGED_ATTACK) {
+					// 如果增益值不为0，则设置禁止远程攻击标志为true
 					if (buff.getValue() != 0) {
 						isDisableRangedAttack = true;
 					}
 				}
+				// 检查增益类型是否为禁止特殊攻击
 				if (buff.getBuffType() == StateModBuffType.DISABLE_SPECIAL_ATTACK) {
+					// 如果增益值不为0，则设置禁止特殊攻击标志为true
 					if (buff.getValue() != 0) {
 						isDisableSpecialAttack = true;
 					}
 				}
+				// 检查增益类型是否为禁止使用法术
 				if (buff.getBuffType() == StateModBuffType.DISABLE_SPELLS) {
+					// 如果增益值不为0，则设置禁止使用法术标志为true
 					if (buff.getValue() != 0) {
 						isDisableSpells = true;
 					}
 				}
+				// 检查增益类型是否为虚无状态
 				if (buff.getBuffType() == StateModBuffType.ETHEREAL) {
+					// 如果增益值不为0，则设置虚无状态标志为true
 					if (buff.getValue() != 0) {
 						isEthereal = true;
 					}
 				}
 			}
+
 //			CAbility attack = this.getFirstAbilityOfType(CAbilityAttack.class);
 //			if (attack != null) {
 //				attack.setDisabled(isDisableAttack, CAbilityDisableType.ATTACKDISABLED);
 //			}
+
+			// 遍历当前对象的所有能力
 			for (final CAbility ability : this.abilities) {
-				if (((isDisableAttack || isEthereal) && (ability.getAbilityCategory() == CAbilityCategory.ATTACK))
-						|| (isDisableSpells && (ability.getAbilityCategory() == CAbilityCategory.SPELL)
-								&& !ability.isPhysical())
-						|| (isEthereal && ability.isPhysical()
-								&& ((ability.getAbilityCategory() == CAbilityCategory.SPELL)
-										|| (ability.getAbilityCategory() == CAbilityCategory.CORE)))) {
+				// 如果满足以下任一条件，则将能力设置为禁用状态
+				if (
+					// 如果攻击被禁用或者是虚无状态，并且能力类别是攻击
+						((isDisableAttack || isEthereal) && (ability.getAbilityCategory() == CAbilityCategory.ATTACK))
+								// 如果法术被禁用，并且能力类别是法术且不是物理攻击
+								|| (isDisableSpells && (ability.getAbilityCategory() == CAbilityCategory.SPELL) && !ability.isPhysical())
+								// 如果是虚无状态，并且是物理攻击，同时能力类别是法术或核心
+								|| (isEthereal && ability.isPhysical() && ((ability.getAbilityCategory() == CAbilityCategory.SPELL) || (ability.getAbilityCategory() == CAbilityCategory.CORE)))
+				) {
+					// 设置能力为禁用状态，禁用类型为攻击禁用
 					ability.setDisabled(true, CAbilityDisableType.ATTACKDISABLED);
-				}
-				else {
+				} else {
+					// 否则，设置能力为启用状态
 					ability.setDisabled(false, CAbilityDisableType.ATTACKDISABLED);
 				}
 			}
+
 			final List<CUnitAttack> newAttackList = new ArrayList<CUnitAttack>();
 			for (int i = 0; i < this.unitSpecificAttacks.size(); i++) {
 				final CUnitAttack attack = this.unitSpecificAttacks.get(i);
-				if (((getUnitType().getAttacksEnabled() & (i + 1)) != 0) && !isDisableAttack
-						&& (!isDisableMeleeAttack || !attack.getWeaponType().equals(CWeaponType.NORMAL))
-						&& (!isDisableRangedAttack || attack.getWeaponType().equals(CWeaponType.NORMAL))
-						&& (!isDisableSpecialAttack || !((attack.getTargetsAllowed().size() == 1)
-								&& attack.getTargetsAllowed().equals(EnumSet.of(CTargetType.TREE))))) {
+				// 检查是否应该添加攻击到新攻击列表
+				if (/* 攻击类型是否启用 */ ((getUnitType().getAttacksEnabled() & (i + 1)) != 0) &&
+						// 检查攻击是否未被禁用
+						!isDisableAttack &&
+						// 检查近战攻击是否未被禁用，或者武器类型不是普通类型
+						(!isDisableMeleeAttack || !attack.getWeaponType().equals(CWeaponType.NORMAL)) &&
+						// 检查远程攻击是否未被禁用，或者武器类型是普通类型
+						(!isDisableRangedAttack || attack.getWeaponType().equals(CWeaponType.NORMAL)) &&
+						// 检查特殊攻击是否未被禁用，或者目标不是单一的树
+						(!isDisableSpecialAttack || !((attack.getTargetsAllowed().size() == 1) &&
+								attack.getTargetsAllowed().equals(EnumSet.of(CTargetType.TREE))))) {
+					// 如果所有条件都满足，则添加攻击到新列表
 					newAttackList.add(attack);
 				}
 
+
 			}
+			// 设置当前可用攻击列表
 			setUnitSpecificCurrentAttacks(newAttackList);
+
+			// 通知攻击列表已更改
 			notifyAttacksChanged();
+
+			// 检测禁用技能列表
 			checkDisabledAbilities(game, isDisableAttack);
 
 			// 虚无状态
@@ -594,6 +741,7 @@ public class CUnit extends CWidget {
 //				}
 			}
 			break;
+		// 禁用自动攻击
 		case DISABLE_AUTO_ATTACK:
 			boolean isDisableAutoAttack = false;
 			for (final StateModBuff buff : this.stateModBuffs) {
@@ -605,73 +753,100 @@ public class CUnit extends CWidget {
 			}
 			this.autoAttack = !isDisableAutoAttack;
 			break;
-		case MAGIC_IMMUNE: // 魔法攻击免疫
+		// 魔法攻击免疫
+		case MAGIC_IMMUNE:
+			// 检查单位是否对魔法免疫
 			boolean isMagicImmune = false;
+			// 遍历状态修改增益列表
 			for (final StateModBuff buff : this.stateModBuffs) {
+				// 如果增益类型是魔法免疫
 				if (buff.getBuffType() == StateModBuffType.MAGIC_IMMUNE) {
+					// 并且增益值不为0，则单位对魔法免疫
 					if (buff.getValue() != 0) {
 						isMagicImmune = true;
 					}
 				}
 			}
+			// 设置单位的魔法免疫状态
 			setMagicImmune(isMagicImmune);
+			// 如果单位对魔法免疫
 			if (isMagicImmune) {
+				// 并且没有添加默认的魔法免疫伤害修改监听器
 				if (!this.finalDamageTakenModificationListeners
 						.contains(CUnitDefaultMagicImmuneDamageModListener.INSTANCE)) {
+					// 添加默认的魔法免疫伤害修改监听器
 					addFinalDamageTakenModificationListener(CUnitDefaultMagicImmuneDamageModListener.INSTANCE);
 				}
-			}
-			else {
+			} else {
+				// 如果单位不对魔法免疫，并且已经添加了默认的魔法免疫伤害修改监听器
 				if (this.finalDamageTakenModificationListeners
 						.contains(CUnitDefaultMagicImmuneDamageModListener.INSTANCE)) {
+					// 移除默认的魔法免疫伤害修改监听器
 					removeFinalDamageTakenModificationListener(CUnitDefaultMagicImmuneDamageModListener.INSTANCE);
 				}
 			}
+
 			break;
+		// 检查是否具有抗性状态
 		case RESISTANT:
+			// 初始化isResistant标志为false
 			boolean isResistant = false;
+			// 遍历所有状态效果增益
 			for (final StateModBuff buff : this.stateModBuffs) {
+				// 如果增益类型是抗性
 				if (buff.getBuffType() == StateModBuffType.RESISTANT) {
+					// 并且增益值不为0
 					if (buff.getValue() != 0) {
+						// 设置isResistant为true
 						isResistant = true;
 					}
 				}
 			}
+			// 更新抗性状态
 			this.resistant = isResistant;
 			break;
+
 		case SLEEPING: // 睡眠状态
 		case STUN: // 眩晕状态
+			// 检查是否有睡眠或眩晕状态效果
 			boolean isSleeping = false;
 			boolean isStun = false;
 			for (final StateModBuff buff : this.stateModBuffs) {
+				// 如果状态效果是睡眠且值不为0，则设置isSleeping为true
 				if (buff.getBuffType() == StateModBuffType.SLEEPING) {
 					if (buff.getValue() != 0) {
 						isSleeping = true;
 					}
 				}
+				// 如果状态效果是眩晕且值不为0，则设置isStun为true
 				if (buff.getBuffType() == StateModBuffType.STUN) {
 					if (buff.getValue() != 0) {
 						isStun = true;
 					}
 				}
 			}
+
+			// 如果存在睡眠或眩晕状态
 			if (isSleeping || isStun) {
+				// 如果当前行为为空或者不是眩晕状态，则中断当前行为
 				if ((this.currentBehavior == null)
 						|| (this.currentBehavior.getHighlightOrderId() != OrderIds.stunned)) {
 					if (this.currentBehavior != null) {
+						// 保存中断的行为
 						this.interruptedBehavior = this.currentBehavior;
 						this.interruptedDefaultBehavior = this.defaultBehavior;
 					}
+					// 设置当前行为为眩晕行为
 					this.currentBehavior = new CBehaviorStun(this);
 					this.currentBehavior.begin(game);
 					setDefaultBehavior(this.currentBehavior);
 					this.stateNotifier.ordersChanged();
 				}
-			}
-			else {
+			} else {
+				// 如果当前行为是眩晕状态，则恢复默认行为并获取下一个行为
 				if ((this.currentBehavior != null)
 						&& (this.currentBehavior.getHighlightOrderId() == OrderIds.stunned)) {
-//					this.setAcceptingOrders(true);
+					// 恢复中断的行为
 					setDefaultBehavior(this.interruptedDefaultBehavior);
 					this.currentBehavior = pollNextOrderBehavior(game);
 					this.interruptedBehavior = null;
@@ -680,48 +855,71 @@ public class CUnit extends CWidget {
 				}
 			}
 
+
+			// 如果单位处于睡眠状态
 			if (isSleeping) {
+				// 如果伤害监听器列表中不包含默认睡眠监听器实例，则添加
 				if (!this.damageTakenListeners.contains(CUnitDefaultSleepListener.INSTANCE)) {
 					addDamageTakenListener(CUnitDefaultSleepListener.INSTANCE);
 				}
-			}
-			else {
+			} else {
+				// 如果单位不处于睡眠状态，并且伤害监听器列表中包含默认睡眠监听器实例，则移除
 				if (this.damageTakenListeners.contains(CUnitDefaultSleepListener.INSTANCE)) {
 					removeDamageTakenListener(CUnitDefaultSleepListener.INSTANCE);
 				}
 			}
+
 			break;
+		//缠绕 束缚
 		case SNARED:
+			// 初始化一个布尔变量isSnared，用于标记是否被缠绕
 			boolean isSnared = false;
+			// 遍历当前对象的状态修改增益列表
 			for (final StateModBuff buff : this.stateModBuffs) {
+				// 如果增益类型是缠绕
 				if (buff.getBuffType() == StateModBuffType.SNARED) {
+					// 如果缠绕的值不为0，则表示被缠绕
 					if (buff.getValue() != 0) {
 						isSnared = true;
 					}
 				}
 			}
+			// 如果被缠绕
 			if (isSnared) {
+				// 设置飞行高度为0
 				setFlyHeight(0);
+				// 并且禁用移动
 				this.moveDisabled = true;
-			}
-			else {
+			} else {
+				// 如果没有被缠绕且移动被禁用
 				if (this.moveDisabled) {
+					// 恢复默认飞行高度
 					setFlyHeight(this.unitType.getDefaultFlyingHeight());
+					// 并且启用移动
 					this.moveDisabled = false;
 				}
 			}
 			break;
+		// 无敌
 		case INVULNERABLE:
+			// 初始化无敌状态标志为false
 			boolean isInvuln = false;
+			// 遍历所有的状态修改增益效果
 			for (final StateModBuff buff : this.stateModBuffs) {
+				// 如果增益效果类型为无敌
 				if (buff.getBuffType() == StateModBuffType.INVULNERABLE) {
+					// 并且增益效果的值不为0
 					if (buff.getValue() != 0) {
+						// 设置无敌状态标志为true
 						isInvuln = true;
 					}
 				}
 			}
+			// 根据无敌状态标志设置是否无敌
 			setInvulnerable(isInvuln);
+			// 通知状态变化
 			this.stateNotifier.abilitiesChanged();
+
 			break;
 		default:
 			break;
@@ -1382,154 +1580,277 @@ public class CUnit extends CWidget {
 		this.computeUnitState(game, StateModBuffType.RESISTANT);
 		this.computeUnitState(game, StateModBuffType.SNARED);
 	}
-
+	/**
+	 * 设置智力对法力回复的加成。
+	 * @param manaRegenIntelligenceBonus 智力对法力回复的加成值
+	 */
 	public void setManaRegenIntelligenceBonus(final float manaRegenIntelligenceBonus) {
 		this.manaRegenIntelligenceBonus = manaRegenIntelligenceBonus;
+		// 计算派生字段
 		computeDerivedFields(NonStackingStatBuffType.MPGEN);
 	}
 
+	/**
+	 * 设置生命回复加成。
+	 * @param lifeRegenBonus 生命回复加成值
+	 */
 	public void setLifeRegenBonus(final float lifeRegenBonus) {
 		this.lifeRegenBonus = lifeRegenBonus;
+		// 计算派生字段
 		computeDerivedFields(NonStackingStatBuffType.HPGEN);
 	}
 
+	/**
+	 * 设置法力回复加成。
+	 * @param manaRegenBonus 法力回复加成值
+	 */
 	public void setManaRegenBonus(final float manaRegenBonus) {
 		this.manaRegenBonus = manaRegenBonus;
+		// 计算派生字段
 		computeDerivedFields(NonStackingStatBuffType.MPGEN);
 	}
 
+	/**
+	 * 设置基础法力回复值。
+	 * @param manaRegen 基础法力回复值
+	 */
 	public void setManaRegen(final float manaRegen) {
 		this.manaRegen = manaRegen;
+		// 计算派生字段
 		computeDerivedFields(NonStackingStatBuffType.MPGEN);
 	}
 
+	/**
+	 * 获取法力回复加成值。
+	 * @return 法力回复加成值
+	 */
 	public float getManaRegenBonus() {
 		return this.manaRegenBonus;
 	}
 
+	/**
+	 * 获取基础法力回复值。
+	 * @return 基础法力回复值
+	 */
 	public float getManaRegen() {
 		return this.manaRegen;
 	}
 
+	/**
+	 * 设置永久敏捷防御加成。
+	 * @param agilityDefensePermanentBonus 永久敏捷防御加成值
+	 */
 	public void setAgilityDefensePermanentBonus(final int agilityDefensePermanentBonus) {
 		this.agilityDefensePermanentBonus = agilityDefensePermanentBonus;
+		// 计算派生字段
 		computeDerivedFields(NonStackingStatBuffType.DEF);
 	}
 
+	/**
+	 * 设置临时敏捷防御加成。
+	 * @param agilityDefenseTemporaryBonus 临时敏捷防御加成值
+	 */
 	public void setAgilityDefenseTemporaryBonus(final float agilityDefenseTemporaryBonus) {
 		this.agilityDefenseTemporaryBonus = agilityDefenseTemporaryBonus;
+		// 计算派生字段
 		computeDerivedFields(NonStackingStatBuffType.DEF);
 	}
 
+	/**
+	 * 设置永久防御加成。
+	 * @param permanentDefenseBonus 永久防御加成值
+	 */
 	public void setPermanentDefenseBonus(final int permanentDefenseBonus) {
 		this.permanentDefenseBonus = permanentDefenseBonus;
+		// 计算派生字段
 		computeDerivedFields(NonStackingStatBuffType.DEF);
 	}
 
+	/**
+	 * 获取永久防御加成。
+	 * @return 永久防御加成值
+	 */
 	public int getPermanentDefenseBonus() {
 		return this.permanentDefenseBonus;
 	}
 
+	/**
+	 * 设置临时防御加成。
+	 * @param temporaryDefenseBonus 临时防御加成值
+	 */
 	public void setTemporaryDefenseBonus(final float temporaryDefenseBonus) {
 		this.temporaryDefenseBonus = temporaryDefenseBonus;
+		// 计算派生字段
 		computeDerivedFields(NonStackingStatBuffType.DEF);
 	}
 
+	/**
+	 * 获取临时防御加成。
+	 * @return 临时防御加成值
+	 */
 	public float getTemporaryDefenseBonus() {
 		return this.temporaryDefenseBonus;
 	}
 
+	/**
+	 * 获取总临时防御加成。
+	 * @return 总临时防御加成值
+	 */
 	public float getTotalTemporaryDefenseBonus() {
 		return this.totalTemporaryDefenseBonus;
 	}
 
+	/**
+	 * 获取当前防御显示值。
+	 * @return 当前防御显示值
+	 */
 	public int getCurrentDefenseDisplay() {
 		return this.currentDefenseDisplay;
 	}
 
+	/**
+	 * 设置单位动画监听器。
+	 * @param unitAnimationListener 单位动画监听器
+	 */
 	public void setUnitAnimationListener(final CUnitAnimationListener unitAnimationListener) {
 		this.unitAnimationListener = unitAnimationListener;
+		// 播放动画
 		this.unitAnimationListener.playAnimation(true, PrimaryTag.STAND, SequenceUtils.EMPTY, 1.0f, true);
 	}
 
+	/**
+	 * 获取单位动画监听器。
+	 * @return 单位动画监听器
+	 */
 	public CUnitAnimationListener getUnitAnimationListener() {
 		return this.unitAnimationListener;
 	}
 
 	public void add(final CSimulation simulation, final CAbility ability) {
-		if (!ability.isRequirementsMet(simulation, this)) {
-			ability.setDisabled(true, CAbilityDisableType.REQUIREMENTS);
-		}
-		if (ability.isDisabled()) {
-			this.disabledAbilities.add(ability);
-			this.abilities.add(ability);
-			simulation.onAbilityAddedToUnit(this, ability);
-			ability.onAddDisabled(simulation, this);
-			this.stateNotifier.abilitiesChanged();
-		}
-		else {
-			this.abilities.add(ability);
-			simulation.onAbilityAddedToUnit(this, ability);
-			ability.onAddDisabled(simulation, this);
-			ability.onAdd(simulation, this);
-			this.stateNotifier.abilitiesChanged();
-		}
+		 // 检查能力是否满足要求，如果不满足，则禁用该能力
+		 if (!ability.isRequirementsMet(simulation, this)) {
+			 ability.setDisabled(true, CAbilityDisableType.REQUIREMENTS);
+		 }
+		 // 如果能力被禁用
+		 if (ability.isDisabled()) {
+			 // 将禁用的能力添加到禁用列表
+			 this.disabledAbilities.add(ability);
+			 // 将能力添加到总的能力列表
+			 this.abilities.add(ability);
+			 // 通知模拟对象有新能力被添加到单位
+			 simulation.onAbilityAddedToUnit(this, ability);
+			 // 调用能力的禁用添加回调
+			 ability.onAddDisabled(simulation, this);
+			 // 通知状态变化
+			 this.stateNotifier.abilitiesChanged();
+		 } else {
+			 // 如果能力未被禁用，直接添加到总的能力列表
+			 this.abilities.add(ability);
+			 // 通知模拟对象有新能力被添加到单位
+			 simulation.onAbilityAddedToUnit(this, ability);
+			 // 调用能力的添加回调
+			 ability.onAddDisabled(simulation, this);
+			 // 调用能力的正常添加回调
+			 ability.onAdd(simulation, this);
+			 // 通知状态变化
+			 this.stateNotifier.abilitiesChanged();
+		 }
 	}
 
+	/**
+	 * 向单位添加能力（Buff）。
+	 * 如果该能力已存在且是定时能力，则更新其过期时间。
+	 * 否则，添加新能力，并通知模拟器和能力本身。
+	 *
+	 * @param simulation 当前模拟环境
+	 * @param ability    要添加的能力（Buff）
+	 */
 	public void add(final CSimulation simulation, final CBuff ability) {
+		// 如果能力已存在且是定时能力类型
 		if (this.abilities.contains(ability) && (ability instanceof ABGenericTimedBuff)) {
+			// 更新定时能力的过期时间
 			((ABGenericTimedBuff) ability).updateExpiration(simulation, this);
-		}
-		else {
+		} else {
+			// 添加新能力
 			this.abilities.add(ability);
+			// 通知模拟器有新能力被添加到单位
 			simulation.onAbilityAddedToUnit(this, ability);
+			// 通知能力本身被添加
 			ability.onAdd(simulation, this);
+			// 通知状态变化
 			this.stateNotifier.abilitiesChanged();
 		}
 	}
 
-	public void remove(final CSimulation simulation, final CAbility ability) {
+
+	/**
+	  * 移除一个能力（CAbility）从单位中。
+	  * 如果这个能力已经被禁用，则同时从禁用能力列表中移除，并通知模拟器和能力对象。
+	  * 如果这个能力没有被禁用，则只从能力列表中移除，并通知模拟器和能力对象。
+	  *
+	  * @param simulation 当前的模拟器实例
+	  * @param ability 要移除的能力对象
+	  */
+	 public void remove(final CSimulation simulation, final CAbility ability) {
 		if (this.disabledAbilities.contains(ability)) {
-			this.abilities.remove(ability);
-			this.disabledAbilities.remove(ability);
-			simulation.onAbilityRemovedFromUnit(this, ability);
-			ability.onRemoveDisabled(simulation, this);
-			this.stateNotifier.abilitiesChanged();
+			this.abilities.remove(ability); // 从能力列表中移除
+			this.disabledAbilities.remove(ability); // 从禁用能力列表中移除
+			simulation.onAbilityRemovedFromUnit(this, ability); // 通知模拟器能力被移除
+			ability.onRemoveDisabled(simulation, this); // 通知能力对象它已被禁用并移除
+			this.stateNotifier.abilitiesChanged(); // 通知状态变化
 		}
 		else {
-			this.abilities.remove(ability);
-			simulation.onAbilityRemovedFromUnit(this, ability);
-			ability.onRemove(simulation, this);
-			ability.onRemoveDisabled(simulation, this);
-			this.stateNotifier.abilitiesChanged();
+			this.abilities.remove(ability); // 从能力列表中移除
+			simulation.onAbilityRemovedFromUnit(this, ability); // 通知模拟器能力被移除
+			ability.onRemove(simulation, this); // 通知能力对象它已被移除
+			ability.onRemoveDisabled(simulation, this); // 通知能力对象它已被禁用
+			this.stateNotifier.abilitiesChanged(); // 通知状态变化
 		}
-	}
+	 }
 
-	public void remove(final CSimulation simulation, final CBuff ability) {
-		this.abilities.remove(ability);
-		simulation.onAbilityRemovedFromUnit(this, ability);
-		ability.onRemove(simulation, this);
-		this.stateNotifier.abilitiesChanged();
-	}
+	 /**
+	  * 移除一个增益效果（CBuff）从单位中。
+	  * 只从能力列表中移除，并通知模拟器和增益效果对象。
+	  *
+	  * @param simulation 当前的模拟器实例
+	  * @param ability 要移除的增益效果对象
+	  */
+	 public void remove(final CSimulation simulation, final CBuff ability) {
+		this.abilities.remove(ability); // 从能力列表中移除
+		simulation.onAbilityRemovedFromUnit(this, ability); // 通知模拟器增益效果被移除
+		ability.onRemove(simulation, this); // 通知增益效果对象它已被移除
+		this.stateNotifier.abilitiesChanged(); // 通知状态变化
+	 }
 
+	/**
+	 * 检查并更新能力的禁用状态。
+	 *
+	 * @param simulation 当前的模拟环境。
+	 * @param disable     是否禁用能力。
+	 */
 	public void checkDisabledAbilities(final CSimulation simulation, final boolean disable) {
 		if (disable) {
+			// 遍历所有能力
 			for (final CAbility ability : this.abilities) {
+				// 如果能力的要求未被满足，则禁用该能力
 				if (!ability.isRequirementsMet(simulation, this)) {
 					ability.setDisabled(true, CAbilityDisableType.REQUIREMENTS);
 				}
+				// 如果能力已被禁用且未被记录在禁用能力列表中，则进行记录并调用onRemove方法
 				if (ability.isDisabled() && !this.disabledAbilities.contains(ability)) {
-//					System.err.println("Disabling ability: " + ability.getAlias().asStringValue());
+					// System.err.println("Disabling ability: " + ability.getAlias().asStringValue());
 					this.disabledAbilities.add(ability);
 					ability.onRemove(simulation, this);
 				}
 			}
-		}
-		else {
+		} else {
+			// 创建禁用能力列表的副本，以防在迭代过程中修改原列表
 			for (final CAbility ability : new ArrayList<>(this.disabledAbilities)) {
+				// 如果能力的要求已被满足，则启用该能力
 				if (ability.isRequirementsMet(simulation, this)) {
 					ability.setDisabled(false, CAbilityDisableType.REQUIREMENTS);
 				}
+				// 如果能力未被禁用，则调用onAdd方法并从禁用能力列表中移除
 				if (!ability.isDisabled()) {
 					ability.onAdd(simulation, this);
 					this.disabledAbilities.remove(ability);
@@ -1537,6 +1858,7 @@ public class CUnit extends CWidget {
 			}
 		}
 	}
+
 
 	public War3ID getTypeId() {
 		return this.typeId;
@@ -1548,18 +1870,21 @@ public class CUnit extends CWidget {
 	public float getFacing() {
 		return this.facing;
 	}
-
+	// 获取当前法力值
 	public float getMana() {
 		return this.mana;
 	}
 
+	// 获取最大法力值
 	public int getMaximumMana() {
 		return this.maximumMana;
 	}
 
+	// 获取最大生命值
 	public int getMaximumLife() {
 		return this.maximumLife;
 	}
+
 
 	public void setTypeId(final CSimulation game, final War3ID typeId) {
 		setTypeId(game, typeId, true);
@@ -1650,17 +1975,19 @@ public class CUnit extends CWidget {
 		this.facing = ((facing % 360) + 360) % 360;
 	}
 
+	// 设置魔法值
 	public void setMana(final float mana) {
 		this.mana = mana;
 		this.stateNotifier.manaChanged();
 	}
-
+	// 设置最大生命值
 	public void setMaximumLife(final int maximumLife) {
 		this.baseMaximumLife = maximumLife;
 		computeDerivedFields(NonStackingStatBuffType.MAXHPPCT);
 		computeDerivedFields(NonStackingStatBuffType.MAXHPGENPCT);
 	}
 
+	// 添加相对最大生命值
 	public void addMaxLifeRelative(final CSimulation game, final int hitPointBonus) {
 		final int oldMaximumLife = getMaximumLife();
 		final float oldLife = getLife();
@@ -1670,106 +1997,150 @@ public class CUnit extends CWidget {
 		setLife(game, newLife);
 	}
 
+	// 设置最大魔法值
 	public void setMaximumMana(final int maximumMana) {
 		this.baseMaximumMana = maximumMana;
 		computeDerivedFields(NonStackingStatBuffType.MAXMPPCT);
 		computeDerivedFields(NonStackingStatBuffType.MAXMPGENPCT);
 	}
 
+	// 设置速度
 	public void setSpeed(final int speed) {
 		this.speed = speed;
 		computeDerivedFields(NonStackingStatBuffType.MVSPD);
 	}
 
+	// 获取速度
 	public int getSpeed() {
 		return this.speed + this.speedBonus;
 	}
+
 
 	/**
 	 * Updates one tick of simulation logic and return true if it's time to remove
 	 * this unit from the game.
 	 */
 	public boolean update(final CSimulation game) {
+		// 遍历所有的状态监听器更新
 		for (final StateListenerUpdate update : this.stateListenersUpdates) {
+			// 根据更新的类型执行不同的操作
 			switch (update.getUpdateType()) {
-			case ADD:
-				this.stateNotifier.subscribe(update.listener);
-				break;
-			case REMOVE:
-				this.stateNotifier.unsubscribe(update.listener);
-				break;
+			  case ADD:
+				  // 如果是添加操作，则订阅监听器
+				  /**
+				   * 订阅一个新的状态监听器。
+				   * @param listener 要订阅的状态监听器
+				   */
+				  this.stateNotifier.subscribe(update.listener);
+				  break;
+			  case REMOVE:
+				  // 如果是移除操作，则取消订阅监听器
+				  /**
+				   * 取消订阅一个已有的状态监听器。
+				   * @param listener 要取消订阅的状态监听器
+				   */
+				  this.stateNotifier.unsubscribe(update.listener);
+				  break;
 			}
 		}
+		// 清除状态监听器更新
 		this.stateListenersUpdates.clear();
+
+		// 如果单位已死亡
 		if (isDead()) {
+			// 如果不是假死亡
 			if (!this.falseDeath) {
+				// 获取当前游戏回合数
 				final int gameTurnTick = game.getGameTurnTick();
+
+				// 如果单位还没有变成尸体
 				if (!this.corpse) {
+					// 如果有碰撞矩形，从世界碰撞系统中移除单位，避免在迭代时写入导致的问题
 					if (this.collisionRectangle != null) {
-						// Moved this here because doing it on "kill" was able to happen in some cases
-						// while also iterating over the units that are in the collision system, and
-						// then it hit the "writing while iterating" problem.
 						game.getWorldCollision().removeUnit(this);
 					}
+
+					// 如果当前回合数大于死亡回合数加上死亡时间
 					if (gameTurnTick > (this.deathTurnTick
 							+ (int) (this.unitType.getDeathTime() / WarsmashConstants.SIMULATION_STEP_TIME))) {
+						// 单位变成尸体
 						this.corpse = true;
+
+						// 如果单位不能复活，变成骨头尸体并立即开始最终阶段
 						if (!isRaisable()) {
 							this.boneCorpse = true;
-							// start final phase immediately for "cant raise" case
 						}
-						if (!this.unitType.isHero()) {
-							if (!isDecays()) {
-								// if we dont raise AND dont decay, then now that death anim is over
-								// we just delete the unit
-								return true;
-							}
+
+						// 如果不是英雄单位，并且不会腐烂，死亡动画结束后删除单位
+						if (!this.unitType.isHero() && !isDecays()) {
+							return true;
 						}
+
+						// 如果是英雄单位，触发英雄死亡事件
 						else {
 							game.heroDeathEvent(this);
 						}
+
+						// 更新死亡回合数
 						this.deathTurnTick = gameTurnTick;
 					}
 				}
+				// 如果单位已经是尸体但不是骨头尸体
 				else if (!this.boneCorpse) {
+					// 如果当前回合数大于死亡回合数加上腐烂时间
 					if (game.getGameTurnTick() > (this.deathTurnTick + (int) (game.getGameplayConstants().getDecayTime()
 							/ WarsmashConstants.SIMULATION_STEP_TIME))) {
+						// 单位变成骨头尸体
 						this.boneCorpse = true;
+						// 更新死亡回合数
+
 						this.deathTurnTick = gameTurnTick;
 
+						// 如果单位可以复活，重新添加到世界碰撞系统中
 						if (isRaisable()) {
 							game.getWorldCollision().addUnit(this);
 						}
 					}
 				}
+				// 如果单位已经是骨头尸体，并且当前回合数大于死亡回合数加上结束腐烂时间
 				else if (game.getGameTurnTick() > (this.deathTurnTick
 						+ (int) (getEndingDecayTime(game) / WarsmashConstants.SIMULATION_STEP_TIME))) {
-					if (this.unitType.isHero()) {
-						if (!getHeroData().isAwaitingRevive()) {
-							setHidden(true);
-							getHeroData().setAwaitingRevive(true);
-							game.heroDissipateEvent(this);
-						}
-						return false;
+					// 如果是英雄单位，并且没有等待复活，隐藏单位，设置等待复活状态，并触发英雄消散事件
+					if (this.unitType.isHero() && !getHeroData().isAwaitingRevive()) {
+						setHidden(true);
+						getHeroData().setAwaitingRevive(true);
+						game.heroDissipateEvent(this);
 					}
-					return true;
+					// 返回false表示单位应该被移除
+					return false;
 				}
 			}
 		}
 		else {
+			// 如果单位没有暂停
 			if (!this.paused) {
+				// 检查当前对象的集结点是否不是自身，并且集结点是一个CUnit实例
+				// 同时，检查该集结点是否已经死亡
 				if ((this.rallyPoint != this) && (this.rallyPoint instanceof CUnit)
-						&& ((CUnit) this.rallyPoint).isDead()) {
+					// 如果条件满足，则将当前对象设置为其自身的集结点
+					&& ((CUnit) this.rallyPoint).isDead()) {
+					// 设置集结点为自身
 					setRallyPoint(this);
 				}
+				// 如果正在建造中
 				if (this.constructing) {
+					// 如果没有暂停建造，则增加建造进度
 					if (!this.constructingPaused) {
 						this.constructionProgress += WarsmashConstants.SIMULATION_STEP_TIME;
 					}
+					// 定义建造时间变量
 					final int buildTime;
+					// // 判断是否在升级中
 					final boolean upgrading = isUpgrading();
 					if (!upgrading) {
+						// 如果不是升级，则获取当前单位的建造时间
 						buildTime = this.unitType.getBuildTime();
+						// 如果没有暂停建造，则根据建造进度增加生命值
 						if (!this.constructingPaused) {
 							final float healthGain = (WarsmashConstants.SIMULATION_STEP_TIME / buildTime)
 									* (this.maximumLife * (1.0f - WarsmashConstants.BUILDING_CONSTRUCT_START_LIFE));
@@ -1777,12 +2148,16 @@ public class CUnit extends CWidget {
 						}
 					}
 					else {
+						// 如果是升级，则获取升级后的单位的建造时间
 						buildTime = game.getUnitData().getUnitType(this.upgradeIdType).getBuildTime();
 					}
+					// 如果建造进度达到或超过建造时间，则完成建造或升级
 					if (this.constructionProgress >= buildTime) {
+						// 重置建造相关状态
 						this.constructing = false;
 						this.constructingPaused = false;
 						this.constructionProgress = 0;
+						// 如果建造消耗工人，则移除工人
 						if (this.constructionConsumesWorker) {
 							if (this.workerInside != null) {
 								game.removeUnit(this.workerInside);
@@ -1790,46 +2165,77 @@ public class CUnit extends CWidget {
 							}
 						}
 						else {
+							// 否则弹出工人
 							popoutWorker(game);
 						}
+						// 更新能力状态
 						final Iterator<CAbility> abilityIterator = this.abilities.iterator();
+						// 遍历能力迭代器中的所有能力
 						while (abilityIterator.hasNext()) {
-							final CAbility ability = abilityIterator.next();
-							if (ability instanceof CAbilityBuildInProgress) {
-								abilityIterator.remove();
-							}
-							else {
-								ability.setDisabled(false, CAbilityDisableType.CONSTRUCTION);
-								ability.setIconShowing(true);
-							}
+							  // 获取当前能力对象
+							  final CAbility ability = abilityIterator.next();
+							  // 判断当前能力是否是正在构建中的能力
+							  if (ability instanceof CAbilityBuildInProgress) {
+								  // 如果是，则从迭代器中移除该能力
+								  abilityIterator.remove();
+							  } else {
+								  // 如果不是，则启用该能力，并设置禁用类型为CONSTRUCTION
+								  ability.setDisabled(false, CAbilityDisableType.CONSTRUCTION);
+								  // 设置能力的图标显示为true，即显示图标
+								  ability.setIconShowing(true);
+							  }
 						}
+
+						// 检查游戏中禁用的能力
 						checkDisabledAbilities(game, false);
+
+						// 获取当前玩家对象
 						final CPlayer player = game.getPlayer(this.playerIndex);
+
+						// 如果正在升级
 						if (upgrading) {
-							if (this.unitType.getFoodMade() != 0) {
-								player.setFoodCap(player.getFoodCap() - this.unitType.getFoodMade());
-							}
-							setTypeId(game, this.upgradeIdType);
-							this.upgradeIdType = null;
+							  // 如果单位类型制作的食物不为0
+							  if (this.unitType.getFoodMade() != 0) {
+								  // 减少玩家的食物上限
+								  player.setFoodCap(player.getFoodCap() - this.unitType.getFoodMade());
+							  }
+							  // 设置新的单位类型ID
+							  setTypeId(game, this.upgradeIdType);
+							  // 清空升级ID类型
+							  this.upgradeIdType = null;
 						}
+
+						// 如果单位类型制作的食物不为0
 						if (this.unitType.getFoodMade() != 0) {
-							player.setFoodCap(player.getFoodCap() + this.unitType.getFoodMade());
+							  // 增加玩家的食物上限
+							  player.setFoodCap(player.getFoodCap() + this.unitType.getFoodMade());
 						}
+
+						// 移除玩家正在进行的科技树进度
 						player.removeTechtreeInProgress(this.unitType.getTypeId());
+						// 添加玩家解锁的科技树节点
 						player.addTechtreeUnlocked(game, this.unitType.getTypeId());
+
+						// 如果不是升级
 						if (!upgrading) {
-							game.unitConstructFinishEvent(this);
-							fireConstructFinishEvents(game);
+							  // 触发单位建造完成事件
+							  game.unitConstructFinishEvent(this);
+							  // 触发建造完成事件
+							  fireConstructFinishEvents(game);
+						} else {
+							  // 触发单位升级完成事件
+							  game.unitUpgradeFinishEvent(this);
 						}
-						else {
-							game.unitUpgradeFinishEvent(this);
-						}
+
+						// 如果正在升级或者总是执行
 						if (upgrading || true) {
-							// TODO shouldnt need to play stand here, probably
-							getUnitAnimationListener().playAnimation(false, PrimaryTag.STAND, SequenceUtils.EMPTY, 1.0f,
-									true);
+							  // 播放单位站立动画
+							  getUnitAnimationListener().playAnimation(false, PrimaryTag.STAND, SequenceUtils.EMPTY, 1.0f, true);
 						}
+
+						// 通知状态变化
 						this.stateNotifier.ordersChanged();
+
 					}
 				}
 				else {
@@ -2046,23 +2452,29 @@ public class CUnit extends CWidget {
 						this.stateNotifier.manaChanged();
 					}
 					if (this.currentBehavior != null) {
+						// 获取当前行为 的目标单位
 						final CUnit target = this.currentBehavior.visit(BehaviorTargetUnitVisitor.INSTANCE);
-						if ((target != null) && !game.getPlayer(this.playerIndex).hasAlliance(target.getPlayerIndex(),
-								CAllianceType.SHARED_VISION)) {
+						// 如果目标不为空且当前玩家与目标玩家没有共享视野联盟
+						if ((target != null) && !game.getPlayer(this.playerIndex).hasAlliance(target.getPlayerIndex(), CAllianceType.SHARED_VISION)) {
+							// 如果攻击雾效果影响的玩家索引不等于目标玩家索引
 							if (this.attackFogMod.getPlayerIndex() != target.getPlayerIndex()) {
-								game.getPlayer(this.attackFogMod.getPlayerIndex()).removeFogModifer(game,
-										this.attackFogMod);
+								// 移除当前攻击雾效果影响的玩家的雾效果
+								game.getPlayer(this.attackFogMod.getPlayerIndex()).removeFogModifer(game, this.attackFogMod);
+								// 设置攻击雾效果影响的玩家索引为目标玩家索引
 								this.attackFogMod.setPlayerIndex(target.getPlayerIndex());
+								// 给目标玩家添加雾效果
 								game.getPlayer(target.getPlayerIndex()).addFogModifer(game, this.attackFogMod);
 							}
-						}
-						else {
+						} else {
+							// 如果攻击雾效果影响的玩家索引不等于当前玩家索引
 							if (this.attackFogMod.getPlayerIndex() != this.playerIndex) {
-								game.getPlayer(this.attackFogMod.getPlayerIndex()).removeFogModifer(game,
-										this.attackFogMod);
+								// 移除当前攻击雾效果影响的玩家的雾效果
+								game.getPlayer(this.attackFogMod.getPlayerIndex()).removeFogModifer(game, this.attackFogMod);
+								// 设置攻击雾效果影响的玩家索引为当前玩家索引
 								this.attackFogMod.setPlayerIndex(this.playerIndex);
 							}
 						}
+
 
 						final CBehavior lastBehavior = this.currentBehavior;
 						final int lastBehaviorHighlightOrderId = lastBehavior.getHighlightOrderId();
@@ -2079,6 +2491,7 @@ public class CUnit extends CWidget {
 						}
 					}
 					else {
+						// 检测自动施法技能自动施法
 						// check to auto acquire targets
 						autoAcquireTargets(game, this.moveDisabled);
 					}
@@ -2151,41 +2564,72 @@ public class CUnit extends CWidget {
 
 	}
 
-	private void popoutWorker(final CSimulation game) {
-		if (this.workerInside != null) {
-			this.workerInside.setInvulnerable(false);
-			this.workerInside.setHidden(false);
-			this.workerInside.setPaused(false);
-			this.workerInside.nudgeAround(game, this);
-			if (this.constructionConsumesWorker) {
-				game.getPlayer(this.workerInside.getPlayerIndex()).setUnitFoodUsed(this.workerInside,
-						this.workerInside.getUnitType().getFoodUsed());
-			}
-			this.workerInside = null;
-		}
-	}
+	 /**
+	  * 将工人从建筑中移出，并恢复其正常状态。
+	  * 如果建筑消耗工人，则更新玩家的食物使用量。
+	  *
+	  * @param game 当前的游戏模拟对象
+	  */
+	 private void popoutWorker(final CSimulation game) {
+		 // 检查是否有工人在建筑内
+		 if (this.workerInside != null) {
+			 // 恢复工人的状态
+			 this.workerInside.setInvulnerable(false); // 设置工人可受伤
+			 this.workerInside.setHidden(false); // 设置工人可见
+			 this.workerInside.setPaused(false); // 设置工人不暂停
+			 // 让工人在游戏中移动
+			 this.workerInside.nudgeAround(game, this);
+			 // 如果建筑消耗工人，则更新玩家的食物使用量
+			 if (this.constructionConsumesWorker) {
+				 game.getPlayer(this.workerInside.getPlayerIndex())
+					 .setUnitFoodUsed(this.workerInside,
+									this.workerInside.getUnitType().getFoodUsed());
+			 }
+			 // 清除建筑内的工人引用
+			 this.workerInside = null;
+		 }
+	 }
 
+
+	// 自动获取目标的方法： 检测自动施法技能是否攻击目标， 检测普攻是否攻击目标
 	public boolean autoAcquireTargets(final CSimulation game, final boolean disableMove) {
+		// 调用自动获取施法目标的方法；查找目标，找到目标就执行技能指令
 		final boolean autocast = autoAcquireAutocastTargets(game, disableMove);
 		if (!autocast) {
+			// 如果没有自动施法且开启了自动攻击
 			if (this.autoAttack) {
+				// 查找可攻击的目标，并将目标设置给攻击行为，启动攻击行为
 				return autoAcquireAttackTargets(game, disableMove);
 			}
 		}
+		// 返回自动施法的结果
 		return autocast;
 	}
 
+	/**
+	 * 自动获取自动施法目标； 如果找到目标， 执行技能指令
+	 *
+	 * @param game           游戏实例
+	 * @param disableMove    是否禁用移动
+	 * @return              是否成功下达命令
+	 */
 	public boolean autoAcquireAutocastTargets(final CSimulation game, final boolean disableMove) {
+		// 当前自动技能存在，并且是可用的
 		if ((this.autocastAbility != null) && !this.autocastAbility.isDisabled()) {
+			// 自动技能的目标类型： 没有有效目标的状态
 			if (this.autocastAbility.getAutocastType() == AutocastType.NOTARGET) {
 				final BooleanAbilityTargetCheckReceiver<Void> booleanTargetReceiver = BooleanAbilityTargetCheckReceiver
 						.<Void>getInstance().reset();
+				// 检查单位是否可以在没有目标的情况下自动施法
 				this.autocastAbility.checkCanAutoTargetNoTarget(game, this, this.autocastAbility.getBaseOrderId(),
 						booleanTargetReceiver);
+				// 可以使用
 				if (booleanTargetReceiver.isTargetable()) {
+					// 执行技能的指令
 					return this.order(game, this.autocastAbility.getBaseOrderId(), null);
 				}
 			}
+			// 自动技能的目标类型： 不为无
 			else if (this.autocastAbility.getAutocastType() != AutocastType.NONE) {
 				if (this.collisionRectangle != null) {
 					tempRect.set(this.collisionRectangle);
@@ -2198,9 +2642,11 @@ public class CUnit extends CWidget {
 				tempRect.y -= halfSize;
 				tempRect.width += halfSize * 2;
 				tempRect.height += halfSize * 2;
+				// 查找目标
 				game.getWorldCollision().enumUnitsInRect(tempRect,
 						autocastTargetFinderEnum.reset(game, this, this.autocastAbility, disableMove));
 				if (autocastTargetFinderEnum.currentUnitTarget != null) {
+					// 执行技能的指令
 					this.order(game, this.autocastAbility.getBaseOrderId(), autocastTargetFinderEnum.currentUnitTarget);
 					return true;
 				}
@@ -2209,7 +2655,8 @@ public class CUnit extends CWidget {
 		return false;
 	}
 
-	// 自动获取攻击目标的方法
+
+	// 查找可攻击的目标，并将目标设置给攻击行为，启动攻击行为
 	public boolean autoAcquireAttackTargets(final CSimulation game, final boolean disableMove) {
 		// 普攻列表不为空，且当前单位不是工人
 		if (!getCurrentAttacks().isEmpty() && !this.unitType.getClassifications().contains(CUnitClassification.PEON)) {
@@ -2219,13 +2666,16 @@ public class CUnit extends CWidget {
 			else {
 				tempRect.set(getX(), getY(), 0, 0);
 			}
+			// 采集范围半径
 			final float halfSize = this.acquisitionRange;
 			tempRect.x -= halfSize;
 			tempRect.y -= halfSize;
 			tempRect.width += halfSize * 2;
 			tempRect.height += halfSize * 2;
+			// 查找可攻击的目标，并将目标设置给攻击行为，启动攻击行为
 			game.getWorldCollision().enumUnitsInRect(tempRect,
 					autoAttackTargetFinderEnum.reset(game, this, disableMove));
+			// 是否找到攻击目标
 			return autoAttackTargetFinderEnum.foundAnyTarget;
 		}
 		return false;
@@ -2451,25 +2901,31 @@ public class CUnit extends CWidget {
 		}
 		return nextBehavior;
 	}
-
+	// 获取当前行为
 	public CBehavior getCurrentBehavior() {
 		return this.currentBehavior;
 	}
 
+	// 获取能力列表
 	public List<CAbility> getAbilities() {
 		return this.abilities;
 	}
 
+	// 使用访问者模式遍历能力并返回访问结果
 	public <T> T getAbility(final CAbilityVisitor<T> visitor) {
+		// 遍历此对象的能力列表，并使用访问者模式访问每个能力
 		for (final CAbility ability : this.abilities) {
 			final T visited = ability.visit(visitor);
 			if (visited != null) {
-				return visited;
+				return visited; // 如果访问结果不为null，则返回访问结果
 			}
 		}
-		return null;
+		return null; // 如果所有能力均未返回有效的访问结果，则返回null
+
 	}
 
+
+	// 获取指定类型的第一个能力
 	public <T extends CAbility> T getFirstAbilityOfType(final Class<T> cAbilityClass) {
 		for (final CAbility ability : this.abilities) {
 			if (cAbilityClass.isAssignableFrom(ability.getClass())) {
@@ -2478,6 +2934,7 @@ public class CUnit extends CWidget {
 		}
 		return null;
 	}
+
 
 	public void setCooldownEndTime(final int cooldownEndTime) {
 		this.cooldownEndTime = cooldownEndTime;
@@ -2534,43 +2991,57 @@ public class CUnit extends CWidget {
 		checkRegionEvents(regionManager);
 	}
 
+	// 传送到指定坐标：会传送到检测能附近没有建筑物的地方
 	public void setPointAndCheckUnstuck(final float newX, final float newY, final CSimulation game) {
-		final CWorldCollision collision = game.getWorldCollision();
-		final PathingGrid pathingGrid = game.getPathingGrid();
-		;
-		float outputX = newX, outputY = newY;
-		int checkX = 0;
-		int checkY = 0;
-		float collisionSize;
+		final CWorldCollision collision = game.getWorldCollision(); // 获取游戏世界碰撞检测对象
+		final PathingGrid pathingGrid = game.getPathingGrid(); // 获取寻路网格对象
+
+		float outputX = newX, outputY = newY; // 初始化输出坐标
+		int checkX = 0; // 初始化检查点X坐标
+		int checkY = 0; // 初始化检查点Y坐标
+		float collisionSize; // 碰撞大小
+
+		// 如果是建筑并且有建筑寻路像素图，则设置临时矩形的大小为建筑寻路像素图的宽高乘以32
 		if (isBuilding() && (this.unitType.getBuildingPathingPixelMap() != null)) {
 			tempRect.setSize(this.unitType.getBuildingPathingPixelMap().getWidth() * 32,
 					this.unitType.getBuildingPathingPixelMap().getHeight() * 32);
-			collisionSize = tempRect.getWidth() / 2;
+			collisionSize = tempRect.getWidth() / 2; // 设置碰撞大小为临时矩形宽度的一半
 		}
+		// 如果有碰撞矩形，则设置临时矩形为碰撞矩形，并获取单位类型的碰撞大小
 		else if (this.collisionRectangle != null) {
 			tempRect.set(this.collisionRectangle);
 			collisionSize = this.unitType.getCollisionSize();
 		}
+		// 否则设置临时矩形的大小为16x16，并获取单位类型的碰撞大小
 		else {
 			tempRect.setSize(16, 16);
 			collisionSize = this.unitType.getCollisionSize();
 		}
+
+		// 循环300次寻找合适的坐标
 		for (int i = 0; i < 300; i++) {
-			final float centerX = newX + (checkX * 64);
-			final float centerY = newY + (checkY * 64);
-			tempRect.setCenter(centerX, centerY);
+			final float centerX = newX + (checkX * 64); // 计算中心点X坐标
+			final float centerY = newY + (checkY * 64); // 计算中心点Y坐标
+			tempRect.setCenter(centerX, centerY); // 设置临时矩形的中心点
+
+			// 如果中心点不与任何其他物体碰撞并且寻路网格可通行，则设置输出坐标并跳出循环
 			if (!collision.intersectsAnythingOtherThan(tempRect, this, getMovementType())
 					&& pathingGrid.isPathable(centerX, centerY, getMovementType(), collisionSize)) {
 				outputX = centerX;
 				outputY = centerY;
 				break;
 			}
+
+			// 计算角度并更新检查点坐标
 			final double angle = (((int) Math.floor(Math.sqrt((4 * i) + 1)) % 4) * Math.PI) / 2;
 			checkX -= (int) Math.cos(angle);
 			checkY -= (int) Math.sin(angle);
 		}
+
+		// 设置新的点坐标，并通知游戏单位已重新定位
 		setPoint(outputX, outputY, collision, game.getRegionManager());
 		game.unitRepositioned(this);
+
 	}
 
 	public void setPoint(final float newX, final float newY, final CWorldCollision collision,
@@ -2583,28 +3054,52 @@ public class CUnit extends CWidget {
 		checkRegionEvents(regionManager);
 	}
 
+	/**
+	 * 检查区域事件的方法，用于处理单位与区域的交互。
+	 * 该方法首先交换当前包含区域和之前的包含区域集合，然后清空当前包含区域集合。
+	 * 接着，使用区域管理器检查区域，并处理单位离开区域的事件。
+	 *
+	 * @param regionManager 区域管理器实例，用于检查区域和处理单位与区域的交互。
+	 */
 	private void checkRegionEvents(final CRegionManager regionManager) {
+		// 交换当前包含区域和之前的包含区域集合
 		final Set<CRegion> temp = this.containingRegions;
 		this.containingRegions = this.priorContainingRegions;
 		this.priorContainingRegions = temp;
+		// 清空当前包含区域集合
 		this.containingRegions.clear();
+		// 使用区域管理器检查区域，传入碰撞矩形或默认矩形，以及重置后的区域检查器
 		regionManager.checkRegions(
 				this.collisionRectangle == null ? tempRect.set(getX(), getY(), 0, 0) : this.collisionRectangle,
 				regionCheckerImpl.reset(this, regionManager));
+		// 遍历之前的包含区域集合
 		for (final CRegion region : this.priorContainingRegions) {
+			// 如果当前包含区域集合不包含该区域，则单位离开了该区域
 			if (!this.containingRegions.contains(region)) {
+				// 调用区域管理器的onUnitLeaveRegion方法处理单位离开区域的事件
 				regionManager.onUnitLeaveRegion(this, region);
 			}
 		}
 	}
 
+	/**
+	 * 获取当前对象的所有分类。
+	 *
+	 * @return 当前对象的分类集合
+	 */
 	public EnumSet<CUnitClassification> getClassifications() {
 		return this.classifications;
 	}
 
+	/**
+	 * 向当前对象的分类集合中添加一个新的分类。
+	 *
+	 * @param unitClassification 要添加的分类
+	 */
 	public void addClassification(final CUnitClassification unitClassification) {
 		this.classifications.add(unitClassification);
 	}
+
 
 	public float getDefense() {
 		return this.currentDefense;
@@ -2821,15 +3316,22 @@ public class CUnit extends CWidget {
 			// iteration order
 			this.abilities.get(i).onDeath(simulation, this);
 		}
+		// 为当前玩家添加死亡视觉雾效果
 		simulation.getPlayer(this.playerIndex).addFogModifer(simulation, new CUnitDeathVisionFogModifier(this));
+
+		// 如果source不为空，则为source玩家也添加死亡视觉雾效果
 		if (source != null) {
-			simulation.getPlayer(source.getPlayerIndex()).addFogModifer(simulation,
-					new CUnitDeathVisionFogModifier(this));
+			simulation.getPlayer(source.getPlayerIndex()).addFogModifer(simulation, new CUnitDeathVisionFogModifier(this));
 		}
+
+		// 如果攻击雾效果的玩家索引与当前玩家索引不同
 		if (this.attackFogMod.getPlayerIndex() != this.playerIndex) {
+			// 获取攻击雾效果对应的玩家对象，并移除其雾效果
 			simulation.getPlayer(this.attackFogMod.getPlayerIndex()).removeFogModifer(simulation, this.attackFogMod);
+			// 将攻击雾效果的玩家索引设置为当前玩家索引
 			this.attackFogMod.setPlayerIndex(this.playerIndex);
 		}
+
 
 		if (result.isReincarnating()) {
 			return;
@@ -3097,146 +3599,151 @@ public class CUnit extends CWidget {
 	@Override
 	public boolean canBeTargetedBy(final CSimulation simulation, final CUnit source,
 			final EnumSet<CTargetType> targetsAllowed, final AbilityTargetCheckReceiver<CWidget> receiver) {
+		// 检查是否尝试对自己使用技能，如果目标不允许是自己且当前对象与来源相同，则目标检查失败
 		if ((this == source) && targetsAllowed.contains(CTargetType.NOTSELF)
-				&& !targetsAllowed.contains(CTargetType.SELF)) {
-			receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_SELF);
-			return false;
+			  && !targetsAllowed.contains(CTargetType.SELF)) {
+		  receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_SELF); // 报告错误：无法对自己使用技能
+		  return false; // 返回false，表示目标检查未通过
 		}
+		// 检查是否尝试对非自己控制的单位使用技能，如果目标允许的是玩家单位且来源的玩家索引与当前对象不同，则目标检查失败
 		if (targetsAllowed.contains(CTargetType.PLAYERUNITS) && (source.getPlayerIndex() != getPlayerIndex())) {
-			receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_ONE_OF_YOUR_OWN_UNITS);
-			return false;
+		  receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_ONE_OF_YOUR_OWN_UNITS); // 报告错误：必须对您自己的单位使用技能
+		  return false; // 返回false，表示目标检查未通过
 		}
+		// 检查是否尝试对魔法免疫的单位使用魔法，如果目标允许的是非魔法免疫单位且当前对象是魔法免疫的，则目标检查失败
 		if (targetsAllowed.contains(CTargetType.NON_MAGIC_IMMUNE) && isMagicImmune()) {
-			receiver.targetCheckFailed(CommandStringErrorKeys.THAT_UNIT_IS_IMMUNE_TO_MAGIC);
-			return false;
+		  receiver.targetCheckFailed(CommandStringErrorKeys.THAT_UNIT_IS_IMMUNE_TO_MAGIC); // 报告错误：该单位对魔法免疫
+		  return false; // 返回false，表示目标检查未通过
 		}
-		if (targetsAllowed.containsAll(this.unitType.getTargetedAs()) || (!targetsAllowed.contains(CTargetType.GROUND)
-				&& !targetsAllowed.contains(CTargetType.STRUCTURE) && !targetsAllowed.contains(CTargetType.AIR))) {
-			final int sourcePlayerIndex = source.getPlayerIndex();
-			final CPlayer sourcePlayer = simulation.getPlayer(sourcePlayerIndex);
-			if (!targetsAllowed.contains(CTargetType.ENEMIES)
-					|| !sourcePlayer.hasAlliance(this.playerIndex, CAllianceType.PASSIVE)
-					|| targetsAllowed.contains(CTargetType.FRIEND)) {
-				if (!targetsAllowed.contains(CTargetType.FRIEND)
-						|| sourcePlayer.hasAlliance(this.playerIndex, CAllianceType.PASSIVE)
-						|| targetsAllowed.contains(CTargetType.ENEMIES)) {
-					if (!targetsAllowed.contains(CTargetType.MECHANICAL)
-							|| this.unitType.getClassifications().contains(CUnitClassification.MECHANICAL)) {
-						if (!targetsAllowed.contains(CTargetType.ORGANIC)
-								|| !this.unitType.getClassifications().contains(CUnitClassification.MECHANICAL)) {
-							if (!targetsAllowed.contains(CTargetType.ANCIENT)
-									|| this.unitType.getClassifications().contains(CUnitClassification.ANCIENT)) {
-								if (!targetsAllowed.contains(CTargetType.NONANCIENT)
-										|| !this.unitType.getClassifications().contains(CUnitClassification.ANCIENT)) {
-									final boolean invulnerable = isInvulnerable();
-									if ((!invulnerable && (targetsAllowed.contains(CTargetType.VULNERABLE)
-											|| !targetsAllowed.contains(CTargetType.INVULNERABLE)))
-											|| (invulnerable && targetsAllowed.contains(CTargetType.INVULNERABLE))) {
-										if (!targetsAllowed.contains(CTargetType.HERO) || (getHeroData() != null)) {
-											if (!targetsAllowed.contains(CTargetType.NONHERO)
-													|| (getHeroData() == null)) {
-												if (isDead()) {
-													if (isRaisable() && isDecays() && isBoneCorpse()) {
-														if (targetsAllowed.contains(CTargetType.DEAD)) {
-															return true;
-														}
-														else {
-															receiver.targetCheckFailed(
-																	CommandStringErrorKeys.TARGET_MUST_BE_LIVING);
-														}
-													}
-													else {
-														receiver.targetCheckFailed(
-																CommandStringErrorKeys.MUST_TARGET_A_UNIT_WITH_THIS_ACTION);
-													}
-												}
-												else {
-													if (!targetsAllowed.contains(CTargetType.DEAD)
-															|| targetsAllowed.contains(CTargetType.ALIVE)) {
-														return true;
-													}
-													else {
-														receiver.targetCheckFailed(
-																CommandStringErrorKeys.MUST_TARGET_A_CORPSE);
-													}
-												}
-											}
-											else {
-												receiver.targetCheckFailed(
-														CommandStringErrorKeys.UNABLE_TO_TARGET_HEROES);
-											}
-										}
-										else {
-											receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_A_HERO);
-										}
-									}
-									else {
-										if (invulnerable) {
-											receiver.targetCheckFailed(
-													CommandStringErrorKeys.THAT_TARGET_IS_INVULNERABLE);
-										}
-										else {
-											receiver.targetCheckFailed(
-													CommandStringErrorKeys.UNABLE_TO_TARGET_THIS_UNIT);
-										}
-									}
-								}
-								else {
-									receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_ANCIENTS);
-								}
-							}
-							else {
-								receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_AN_ANCIENT);
-							}
-						}
-						else {
-							receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_ORGANIC_UNITS);
-						}
-					}
-					else {
-						receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_ORGANIC_UNITS);
-					}
-				}
-				else {
-					receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_A_FRIENDLY_UNIT);
-				}
-			}
-			else {
-				receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_AN_ENEMY_UNIT);
-			}
+		// 检查目标是否合法
+		if (targetsAllowed.containsAll(this.unitType.getTargetedAs()) // 目标类型包含所有允许的目标类型
+			  || (!targetsAllowed.contains(CTargetType.GROUND) // 或者目标类型不包含地面、建筑和空中目标
+					  && !targetsAllowed.contains(CTargetType.STRUCTURE)
+					  && !targetsAllowed.contains(CTargetType.AIR))) {
+		  final int sourcePlayerIndex = source.getPlayerIndex(); // 获取源玩家索引
+		  final CPlayer sourcePlayer = simulation.getPlayer(sourcePlayerIndex); // 获取源玩家对象
+		  // 检查目标是否为敌人或盟友
+		  if (!targetsAllowed.contains(CTargetType.ENEMIES)
+				  || !sourcePlayer.hasAlliance(this.playerIndex, CAllianceType.PASSIVE) // 如果目标不是敌人，或者源玩家与当前玩家不是被动联盟
+				  || targetsAllowed.contains(CTargetType.FRIEND)) {
+			  // 检查目标是否为友军或敌人
+			  if (!targetsAllowed.contains(CTargetType.FRIEND)
+					  || sourcePlayer.hasAlliance(this.playerIndex, CAllianceType.PASSIVE) // 如果目标不是友军，或者源玩家与当前玩家是被动联盟
+					  || targetsAllowed.contains(CTargetType.ENEMIES)) {
+				  // 检查目标是否为机械或有机
+				  if (!targetsAllowed.contains(CTargetType.MECHANICAL)
+						  || this.unitType.getClassifications().contains(CUnitClassification.MECHANICAL)) {
+					  // 检查目标是否为有机或非机械
+					  if (!targetsAllowed.contains(CTargetType.ORGANIC)
+							  || !this.unitType.getClassifications().contains(CUnitClassification.MECHANICAL)) {
+						  // 检查目标是否为古代或非古代
+						  if (!targetsAllowed.contains(CTargetType.ANCIENT)
+								  || this.unitType.getClassifications().contains(CUnitClassification.ANCIENT)) {
+							  // 检查目标是否为非古代或古代
+							  if (!targetsAllowed.contains(CTargetType.NONANCIENT)
+									  || !this.unitType.getClassifications().contains(CUnitClassification.ANCIENT)) {
+								  final boolean invulnerable = isInvulnerable(); // 检查单位是否无敌
+								  // 检查目标是否为脆弱或无敌
+								  if ((!invulnerable && (targetsAllowed.contains(CTargetType.VULNERABLE)
+										  || !targetsAllowed.contains(CTargetType.INVULNERABLE)))
+										  || (invulnerable && targetsAllowed.contains(CTargetType.INVULNERABLE))) {
+									  // 检查目标是否为英雄或非英雄
+									  if (!targetsAllowed.contains(CTargetType.HERO) || (getHeroData() != null)) {
+										  if (!targetsAllowed.contains(CTargetType.NONHERO)
+												  || (getHeroData() == null)) {
+											  // 检查单位是否死亡
+											  if (isDead()) {
+												  // 检查单位是否可复活、是否腐烂、是否为骨骸尸体
+												  if (isRaisable() && isDecays() && isBoneCorpse()) {
+													  if (targetsAllowed.contains(CTargetType.DEAD)) {
+														  return true; // 目标合法
+													  } else {
+														  receiver.targetCheckFailed(
+																  CommandStringErrorKeys.TARGET_MUST_BE_LIVING); // 目标必须是活的
+													  }
+												  } else {
+													  receiver.targetCheckFailed(
+															  CommandStringErrorKeys.MUST_TARGET_A_UNIT_WITH_THIS_ACTION); // 必须目标此动作的单位
+												  }
+											  } else {
+												  if (!targetsAllowed.contains(CTargetType.DEAD)
+														  || targetsAllowed.contains(CTargetType.ALIVE)) {
+													  return true; // 目标合法
+												  } else {
+													  receiver.targetCheckFailed(
+															  CommandStringErrorKeys.MUST_TARGET_A_CORPSE); // 必须目标尸体
+												  }
+											  }
+										  } else {
+											  receiver.targetCheckFailed(
+													  CommandStringErrorKeys.UNABLE_TO_TARGET_HEROES); // 无法目标英雄
+										  }
+									  } else {
+										  receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_A_HERO); // 必须目标英雄
+									  }
+								  } else {
+									  if (invulnerable) {
+										  receiver.targetCheckFailed(
+												  CommandStringErrorKeys.THAT_TARGET_IS_INVULNERABLE); // 目标是无敌的
+									  } else {
+										  receiver.targetCheckFailed(
+												  CommandStringErrorKeys.UNABLE_TO_TARGET_THIS_UNIT); // 无法目标此单位
+									  }
+								  }
+							  } else {
+								  receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_ANCIENTS); // 无法目标古代单位
+							  }
+						  } else {
+							  receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_AN_ANCIENT); // 必须目标古代单位
+						  }
+					  } else {
+						  receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_ORGANIC_UNITS); // 必须目标有机单位
+					  }
+				  } else {
+					  receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_ORGANIC_UNITS); // 无法目标有机单位
+				  }
+			  } else {
+				  receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_A_FRIENDLY_UNIT); // 必须目标友军单位
+			  }
+		  } else {
+			  receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_AN_ENEMY_UNIT); // 必须目标敌军单位
+		  }
 		}
 		else {
-			if (this.unitType.getTargetedAs().contains(CTargetType.GROUND)
-					&& !targetsAllowed.contains(CTargetType.GROUND)) {
-				receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_GROUND_UNITS);
+			// 检查目标单位类型是否符合要求
+			if (this.unitType.getTargetedAs().contains(CTargetType.GROUND) // 如果单位类型包含地面目标
+				&& !targetsAllowed.contains(CTargetType.GROUND)) { // 但不允许攻击地面目标
+					receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_GROUND_UNITS); // 目标检查失败，无法攻击地面单位
 			}
-			else if (this.unitType.getTargetedAs().contains(CTargetType.STRUCTURE)
-					&& !targetsAllowed.contains(CTargetType.STRUCTURE)) {
-				receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_BUILDINGS);
+			else if (this.unitType.getTargetedAs().contains(CTargetType.STRUCTURE) // 如果单位类型包含建筑目标
+				&& !targetsAllowed.contains(CTargetType.STRUCTURE)) { // 但不允许攻击建筑
+					receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_BUILDINGS); // 目标检查失败，无法攻击建筑
 			}
-			else if (this.unitType.getTargetedAs().contains(CTargetType.AIR)
-					&& !targetsAllowed.contains(CTargetType.AIR)) {
-				receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_AIR_UNITS);
+			else if (this.unitType.getTargetedAs().contains(CTargetType.AIR) // 如果单位类型包含空中目标
+				&& !targetsAllowed.contains(CTargetType.AIR)) { // 但不允许攻击空中目标
+					receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_AIR_UNITS); // 目标检查失败，无法攻击空中单位
 			}
-			else if (this.unitType.getTargetedAs().contains(CTargetType.WARD)
-					&& !targetsAllowed.contains(CTargetType.WARD)) {
-				receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_WARDS);
+			else if (this.unitType.getTargetedAs().contains(CTargetType.WARD) // 如果单位类型包含守卫目标
+				&& !targetsAllowed.contains(CTargetType.WARD)) { // 但不允许攻击守卫
+					receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_WARDS); // 目标检查失败，无法攻击守卫
 			}
-			else if (targetsAllowed.contains(CTargetType.GROUND)) {
-				receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_A_GROUND_UNIT);
+			// 检查是否必须攻击特定类型的单位
+			else if (targetsAllowed.contains(CTargetType.GROUND)) { // 如果必须攻击地面单位
+				receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_A_GROUND_UNIT); // 目标检查失败，必须攻击一个地面单位
 			}
-			else if (targetsAllowed.contains(CTargetType.STRUCTURE)) {
-				receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_A_BUILDING);
+			else if (targetsAllowed.contains(CTargetType.STRUCTURE)) { // 如果必须攻击建筑
+				receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_A_BUILDING); // 目标检查失败，必须攻击一个建筑
 			}
-			else if (targetsAllowed.contains(CTargetType.AIR)) {
-				receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_AN_AIR_UNIT);
+			else if (targetsAllowed.contains(CTargetType.AIR)) { // 如果必须攻击空中单位
+				receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_AN_AIR_UNIT); // 目标检查失败，必须攻击一个空中单位
 			}
-			else if (targetsAllowed.contains(CTargetType.WARD)) {
-				receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_A_WARD);
+			else if (targetsAllowed.contains(CTargetType.WARD)) { // 如果必须攻击守卫
+				receiver.targetCheckFailed(CommandStringErrorKeys.MUST_TARGET_A_WARD); // 目标检查失败，必须攻击一个守卫
 			}
-			else {
-				receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_THIS_UNIT);
+			else { // 如果没有符合条件的目标类型
+				receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_THIS_UNIT); // 目标检查失败，无法攻击这个单位
 			}
+
 		}
 		return false;
 	}
@@ -3248,11 +3755,12 @@ public class CUnit extends CWidget {
 		// building. Will it be a problem that I changed it?
 		// I was trying to fix attack move on stationary units which was crashing
 	}
-
+	// 判断在水上移动是否被允许
 	public boolean isMovementOnWaterAllowed() {
 		return !isMovementDisabled() && getMovementType().isPathable((short) ~PathingFlags.UNSWIMABLE);
 	}
 
+	// 获取单位的移动类型
 	public MovementType getMovementType() {
 		if (isMovementDisabled()) {
 			return MovementType.DISABLED;
@@ -3261,51 +3769,76 @@ public class CUnit extends CWidget {
 												// wrapper exists to later mod
 	}
 
+	// 获取单位的获取范围
 	public float getAcquisitionRange() {
 		return this.acquisitionRange;
 	}
 
+	// 设置单位的获取范围
 	public void setAcquisitionRange(final float acquisitionRange) {
 		this.acquisitionRange = acquisitionRange;
 	}
 
+	// 设置单位的当前生命值
 	public void setCurrentHp(final CSimulation game, final float hpValue) {
 		setLife(game, Math.min(hpValue, getMaximumLife()));
 	}
 
+	// 恢复单位的生命值
 	public void heal(final CSimulation game, final float lifeToRegain) {
 		setLife(game, Math.min(getLife() + lifeToRegain, getMaximumLife()));
 	}
 
+	// 恢复单位的法力值
 	public void restoreMana(final CSimulation game, final float manaToRegain) {
 		setMana(Math.min(getMana() + manaToRegain, getMaximumMana()));
 	}
 
+	// 复活单位
 	public void resurrect(final CSimulation simulation) {
+		// 移除当前单位从世界碰撞检测中
 		simulation.getWorldCollision().removeUnit(this);
+
+		// 重置当前单位为非尸体状态
 		this.corpse = false;
+		// 重置当前单位为非骨骼尸体状态
 		this.boneCorpse = false;
+		// 重置死亡回合数
 		this.deathTurnTick = 0;
+		// 重置死亡时不爆炸
 		this.explodesOnDeath = false;
+		// 重置死亡爆炸增益ID为空
 		this.explodesOnDeathBuffId = null;
+
+		// 设置当前单位生命值为最大生命值
 		setLife(simulation, getMaximumLife());
+
+		// 将当前单位重新添加到世界碰撞检测中
 		simulation.getWorldCollision().addUnit(this);
-		simulation.unitUpdatedType(this, this.typeId); // clear out some state
+
+		// 更新单位状态，清除一些旧状态
+		simulation.unitUpdatedType(this, this.typeId);
+
+		// 播放站立动画
 		this.unitAnimationListener.playAnimation(true, PrimaryTag.STAND, SequenceUtils.EMPTY, 0.0f, true);
+
 	}
 
+	// 自动施法目标查找器枚举类：检测目标是否是技能能攻击的单位
 	private static final class AutocastTargetFinderEnum implements CUnitEnumFunction {
+		// 目标检查接收器实例
 		private final static BooleanAbilityTargetCheckReceiver<CWidget> targetCheckReceiver = BooleanAbilityTargetCheckReceiver
 				.<CWidget>getInstance();
-		private CSimulation game;
-		private CUnit source;
-		private CAutocastAbility ability;
-		private boolean disableMove;
-		private AutocastType type;
+		private CSimulation game; // 游戏实例
+		private CUnit source; // 来源单位
+		private CAutocastAbility ability; // 自动施法能力
+		private boolean disableMove; // 禁用移动标志
+		private AutocastType type; // 自动施法类型
 
-		private CUnit currentUnitTarget;
-		private double comparisonValue;
+		private CUnit currentUnitTarget; // 当前单位目标
+		private double comparisonValue; // 比较值
 
+		// 重置方法，初始化相关参数
 		private AutocastTargetFinderEnum reset(final CSimulation game, final CUnit source,
 				final CAutocastAbility ability, final boolean disableMove) {
 			this.game = game;
@@ -3319,33 +3852,45 @@ public class CUnit extends CWidget {
 			return this;
 		}
 
+		// 调用接口方法，执行目标查找逻辑
 		@Override
 		public boolean call(final CUnit unit) {
+			// 自动类型不为无
 			if (this.type != AutocastType.NONE) {
 				switch (this.type) {
-				case ATTACKINGALLY:
-				case ATTACKINGENEMY:
+				case ATTACKINGALLY: // 攻击友方单位的情况
+				case ATTACKINGENEMY: // 攻击敌方单位的情况
+					// 目标单位有当前行为，且行为为远程行为
 					if ((unit.getCurrentBehavior() != null) && (unit.getCurrentBehavior() instanceof CRangedBehavior)) {
+						// 获取目标远程行为
 						final CRangedBehavior rbeh = (CRangedBehavior) unit.getCurrentBehavior();
+						// 目标行为是攻击行为
 						if (rbeh.getHighlightOrderId() == OrderIds.attack) {
+							// 获取目标单位正在攻击的目标
 							final AbilityTarget target = rbeh.getTarget();
+							// 获取目标攻击的单位
 							final CUnit targetUnit = target.visit(AbilityTargetVisitor.UNIT);
+							// 目标正在攻击的单位不为空
 							if (targetUnit != null) {
-								if (((this.type == AutocastType.ATTACKINGALLY)
+								if (((this.type == AutocastType.ATTACKINGALLY) // 攻击友方单位的情况
 										&& this.game.getPlayer(this.source.getPlayerIndex())
-												.hasAlliance(targetUnit.getPlayerIndex(), CAllianceType.PASSIVE))
-										|| ((this.type == AutocastType.ATTACKINGENEMY)
+												.hasAlliance(targetUnit.getPlayerIndex(), CAllianceType.PASSIVE)) // 目标正在攻击友方单位
+										|| ((this.type == AutocastType.ATTACKINGENEMY) // 在攻击敌方单位
 												&& !this.game.getPlayer(this.source.getPlayerIndex()).hasAlliance(
-														targetUnit.getPlayerIndex(), CAllianceType.PASSIVE))) {
+														targetUnit.getPlayerIndex(), CAllianceType.PASSIVE))) { // 目标正在攻击不是敌方单位
 									targetCheckReceiver.reset();
+									// 检查单位是否可以自动瞄准目标
 									this.ability.checkCanAutoTarget(this.game, this.source,
 											this.ability.getBaseOrderId(), unit, targetCheckReceiver);
+									// 目标可以自动瞄准
 									if (targetCheckReceiver.isTargetable()) {
+										// 当前单位目标为空, 设置当前目标为该单位，并设置与目标的距离作为和下一个目标比较
 										if (this.currentUnitTarget == null) {
 											this.currentUnitTarget = unit;
 											this.comparisonValue = this.source.distance(unit);
 										}
 										else {
+											// 否则 与之前的最近目标距离作比较，如果距离更近，则设置为当前目标
 											final double dist = this.source.distance(unit);
 											if (dist < this.comparisonValue) {
 												this.currentUnitTarget = unit;
@@ -3358,24 +3903,31 @@ public class CUnit extends CWidget {
 						}
 					}
 					break;
-				case ATTACKTARGETING:
+				case ATTACKTARGETING: // 正在攻击目标的情况
+					// 目标单位不是盟友，且不是死亡状态，且不是无敌状态，且不是休眠状态
 					if (!this.game.getPlayer(this.source.getPlayerIndex()).hasAlliance(unit.getPlayerIndex(),
 							CAllianceType.PASSIVE) && !unit.isDead() && !unit.isInvulnerable()
 							&& !unit.isUnitType(CUnitTypeJass.SLEEPING)) {
+						// 遍历自己的攻击列表
 						for (final CUnitAttack attack : this.source.getCurrentAttacks()) {
+							// 能够到达攻击目标范围， 目标单位能作为目标， 且攻击目标距离大于等于最小攻击距离
 							if (this.source.canReach(unit, this.source.acquisitionRange)
 									&& unit.canBeTargetedBy(this.game, this.source, attack.getTargetsAllowed())
 									&& (this.source.distance(unit) >= this.source.getUnitType()
 											.getMinimumAttackRange())) {
 								targetCheckReceiver.reset();
+								// 检查单位是否可以自动瞄准目标
 								this.ability.checkCanAutoTarget(this.game, this.source, this.ability.getBaseOrderId(),
 										unit, targetCheckReceiver);
+								// 目标可以自动瞄准
 								if (targetCheckReceiver.isTargetable()) {
+									// 当前单位目标为空, 设置当前目标为该单位，并设置与目标的距离作为和下一个目标比较
 									if (this.currentUnitTarget == null) {
 										this.currentUnitTarget = unit;
 										this.comparisonValue = this.source.distance(unit);
 									}
 									else {
+										// 否则 与之前的最近目标距离作比较，如果距离更近，则设置为当前目标
 										final double dist = this.source.distance(unit);
 										if (dist < this.comparisonValue) {
 											this.currentUnitTarget = unit;
@@ -3388,16 +3940,20 @@ public class CUnit extends CWidget {
 					}
 
 					break;
-				case HIGESTHP:
+				case HIGESTHP: // 最高生命值目标
 					targetCheckReceiver.reset();
+					// 检查单位是否可以自动瞄准目标
 					this.ability.checkCanAutoTarget(this.game, this.source, this.ability.getBaseOrderId(), unit,
 							targetCheckReceiver);
+					// 目标可以自动瞄准
 					if (targetCheckReceiver.isTargetable()) {
+						// 当前单位目标为空, 设置当前目标为该单位，并设置目标的血条比例值作为和下一个目标比较
 						if (this.currentUnitTarget == null) {
 							this.currentUnitTarget = unit;
 							this.comparisonValue = unit.getLife() / unit.getMaximumLife();
 						}
 						else {
+							// 否则 与之前的最大血统值做比较，如果比之前的更高，则设置为当前目标
 							final double ratio = unit.getLife() / unit.getMaximumLife();
 							if (ratio > this.comparisonValue) {
 								this.currentUnitTarget = unit;
@@ -3406,17 +3962,21 @@ public class CUnit extends CWidget {
 						}
 					}
 					break;
-				case LOWESTHP:
+				case LOWESTHP: // 最低生命值目标
 					targetCheckReceiver.reset();
+					// 检查单位是否可以自动瞄准目标
 					this.ability.checkCanAutoTarget(this.game, this.source, this.ability.getBaseOrderId(), unit,
 							targetCheckReceiver);
+					// 目标可以自动瞄准
 					if (targetCheckReceiver.isTargetable()) {
 						if (unit.getLife() < unit.getMaximumLife()) {
+							// 当前单位目标为空, 设置当前目标为该单位，并设置目标的血条比例值作为和下一个目标比较
 							if (this.currentUnitTarget == null) {
 								this.currentUnitTarget = unit;
 								this.comparisonValue = unit.getLife() / unit.getMaximumLife();
 							}
 							else {
+								// 否则 与之前的最小血统值做比较，如果比之前的更低，则设置为当前目标
 								final double ratio = unit.getLife() / unit.getMaximumLife();
 								if (ratio < this.comparisonValue) {
 									this.currentUnitTarget = unit;
@@ -3426,16 +3986,20 @@ public class CUnit extends CWidget {
 						}
 					}
 					break;
-				case NEARESTVALID:
+				case NEARESTVALID: // 最近的有效目标
 					targetCheckReceiver.reset();
+					// 检查单位是否可以自动瞄准目标
 					this.ability.checkCanAutoTarget(this.game, this.source, this.ability.getBaseOrderId(), unit,
 							targetCheckReceiver);
+					// 目标可以自动瞄准
 					if (targetCheckReceiver.isTargetable()) {
+						// 当前单位目标为空, 设置当前目标为该单位，并设置与目标的距离作为和下一个目标比较
 						if (this.currentUnitTarget == null) {
 							this.currentUnitTarget = unit;
 							this.comparisonValue = this.source.distance(unit);
 						}
 						else {
+							// 否则 与之前的最近目标距离作比较，如果距离更近，则设置为当前目标
 							final double dist = this.source.distance(unit);
 							if (dist < this.comparisonValue) {
 								this.currentUnitTarget = unit;
@@ -3444,17 +4008,21 @@ public class CUnit extends CWidget {
 						}
 					}
 					break;
-				case NEARESTENEMY:
+				case NEARESTENEMY: // 最近的敌方目标
 					targetCheckReceiver.reset();
+					// 检查单位是否可以自动瞄准目标
 					this.ability.checkCanAutoTarget(this.game, this.source, this.ability.getBaseOrderId(), unit,
 							targetCheckReceiver);
+					// 目标可以自动瞄准，且目标不是友方
 					if (targetCheckReceiver.isTargetable() && !this.game.getPlayer(this.source.getPlayerIndex())
 							.hasAlliance(unit.getPlayerIndex(), CAllianceType.PASSIVE)) {
+						// 当前单位目标为空, 设置当前目标为该单位，并设置与目标的距离作为和下一个目标比较
 						if (this.currentUnitTarget == null) {
 							this.currentUnitTarget = unit;
 							this.comparisonValue = this.source.distance(unit);
 						}
 						else {
+							// 否则 与之前的最近目标距离作比较，如果距离更近，则设置为当前目标
 							final double dist = this.source.distance(unit);
 							if (dist < this.comparisonValue) {
 								this.currentUnitTarget = unit;
@@ -3463,18 +4031,19 @@ public class CUnit extends CWidget {
 						}
 					}
 					break;
-				case NONE:
-				case NOTARGET:
+				case NONE: // 无目标
+				case NOTARGET: // 没有目标
 				default:
 					break;
 
 				}
 			}
 
-			return false;
+			return false; // 最终返回 false
 		}
 	}
-	// 类 AutoAttackTargetFinderEnum 实现了 CUnitEnumFunction 接口，负责自动攻击目标的查找逻辑
+
+	// 查找可攻击的目标，并将目标设置给攻击行为，启动攻击行为
 	private static final class AutoAttackTargetFinderEnum implements CUnitEnumFunction {
 		private CSimulation game;
 		private CUnit source;
@@ -3494,30 +4063,39 @@ public class CUnit extends CWidget {
 		@Override
 		// 调用函数，判断单位是否可作为攻击目标并执行攻击行为
 		public boolean call(final CUnit unit) {
+			// 攻击行为存在， 并且攻击类型的技能可用
 			if ((this.source.getAttackBehavior() != null)
 					&& !this.source.getFirstAbilityOfType(CAbilityAttack.class).isDisabled()) {
 				// TODO this "attack behavior null" check was added for some weird Root edge
 				// case with NE, maybe
 				// refactor it later
+				// 目标不是同盟，目标没有死亡， 目标不是无敌
 				if (!this.game.getPlayer(this.source.getPlayerIndex()).hasAlliance(unit.getPlayerIndex(),
 						CAllianceType.PASSIVE) && !unit.isDead() && !unit.isInvulnerable()
 						&& !unit.isUnitType(CUnitTypeJass.SLEEPING)) {
+					// 遍历攻击列表
 					for (final CUnitAttack attack : this.source.getCurrentAttacks()) {
+						// 能够到达目标范围， 目标可以被攻击， 攻击距离大于最小攻击距离
 						if (this.source.canReach(unit, this.source.acquisitionRange)
 								&& unit.canBeTargetedBy(this.game, this.source, attack.getTargetsAllowed())
 								&& (this.source.distance(unit) >= this.source.getUnitType().getMinimumAttackRange())) {
-							if (!(unit.isUnitType(CUnitTypeJass.ETHEREAL)
-									&& (attack.getAttackType() != CAttackType.MAGIC)
-									&& (attack.getAttackType() != CAttackType.SPELLS))
-									&& !(this.game.getGameplayConstants().isMagicImmuneResistsDamage()
-											&& unit.isUnitType(CUnitTypeJass.MAGIC_IMMUNE)
-											&& (attack.getAttackType() == CAttackType.MAGIC))) {
+							// 目标不是虚无单位，目标不是魔法攻击， 目标不是法术攻击， 目标不是魔法免疫单位， 目标不是魔法免疫单位的魔法攻击， 目标不是魔法免疫单位的法术攻击， 目标不是魔法免疫单位的物理攻击， 目标不是物理免疫单位， 目标不是物理免疫单位的物理攻击， 目标不是物理免疫单位的魔法攻击， 目标不是物理免疫单位的法术攻击， 目标不是物理免疫单位的物理攻击， 目标不是物理免疫单位的物理攻击， 目标不是物理免疫单位的物理攻击， 目标不是物理免疫单位的物理攻击， 目标不是物理免疫单位的物理攻击，
+							if (!(unit.isUnitType(CUnitTypeJass.ETHEREAL) // 目标不是虚无单位
+									&& (attack.getAttackType() != CAttackType.MAGIC) // 攻击不是魔法攻击
+									&& (attack.getAttackType() != CAttackType.SPELLS)) // 攻击不是法术攻击
+									&& !(this.game.getGameplayConstants().isMagicImmuneResistsDamage() // 魔法免疫单位的魔法攻击
+											&& unit.isUnitType(CUnitTypeJass.MAGIC_IMMUNE)  // 目标是魔法免疫状态
+											&& (attack.getAttackType() == CAttackType.MAGIC))) { // 攻击魔法攻击
+								// 结束当前行为
 								if (this.source.currentBehavior != null) {
 									this.source.currentBehavior.end(this.game, false);
 								}
+								// 重置攻击行为 目标
 								this.source.currentBehavior = this.source.getAttackBehavior().reset(OrderIds.attack,
 										attack, unit, this.disableMove, CBehaviorAttackListener.DO_NOTHING);
+								// 开始攻击行为
 								this.source.currentBehavior.begin(this.game);
+								// 标记找到攻击目标
 								this.foundAnyTarget = true;
 								return true;
 							}
@@ -3590,7 +4168,7 @@ public class CUnit extends CWidget {
 		return this.boardTransportBehavior;
 	}
 
-	// 处理下一个指令行为
+	// 处理下一个指令行为 或者 默认行为
 	public CBehavior pollNextOrderBehavior(final CSimulation game) {
 		// 如果默认行为与停止行为不相同，则返回当前的默认行为。
 		if (this.defaultBehavior != this.stopBehavior) {
@@ -3610,11 +4188,18 @@ public class CUnit extends CWidget {
 		return nextOrderBehavior;
 	}
 
-
+	/**
+	 * 判断单位是否正在移动。
+	 * @return 如果当前行为是移动，则返回true，否则返回false。
+	 */
 	public boolean isMoving() {
 		return getCurrentBehavior() instanceof CBehaviorMove;
 	}
 
+	/**
+	 * 设置单位是否正在建造中。
+	 * @param constructing 如果单位正在建造中，则为true，否则为false。
+	 */
 	public void setConstructing(final boolean constructing) {
 		this.constructing = constructing;
 		if (constructing) {
@@ -3622,80 +4207,151 @@ public class CUnit extends CWidget {
 		}
 	}
 
+	/**
+	 * 设置单位建造是否暂停。
+	 * @param constructingPaused 如果建造暂停，则为true，否则为false。
+	 */
 	public void setConstructingPaused(final boolean constructingPaused) {
 		this.constructingPaused = constructingPaused;
 	}
 
+	/**
+	 * 设置建造进度。
+	 * @param constructionProgress 建造进度值。
+	 */
 	public void setConstructionProgress(final float constructionProgress) {
 		this.constructionProgress = constructionProgress;
 	}
 
+	/**
+	 * 判断单位是否正在建造中。
+	 * @return 如果单位正在建造中且没有升级类型，则返回true，否则返回false。
+	 */
 	public boolean isConstructing() {
 		return this.constructing && (this.upgradeIdType == null);
 	}
 
+	/**
+	 * 判断单位建造是否暂停。
+	 * @return 如果建造暂停，则返回true，否则返回false。
+	 */
 	public boolean isConstructingPaused() {
 		return this.constructingPaused;
 	}
 
+	/**
+	 * 判断单位是否正在升级。
+	 * @return 如果单位正在建造中且有升级类型，则返回true，否则返回false。
+	 */
 	public boolean isUpgrading() {
 		return this.constructing && (this.upgradeIdType != null);
 	}
 
+	/**
+	 * 获取单位的升级类型ID。
+	 * @return 单位的升级类型ID。
+	 */
 	public War3ID getUpgradeIdType() {
 		return this.upgradeIdType;
 	}
 
+	/**
+	 * 判断单位是否正在建造或升级中。
+	 * @return 如果单位正在建造中，则返回true，否则返回false。
+	 */
 	public boolean isConstructingOrUpgrading() {
 		return this.constructing;
 	}
 
+	/**
+	 * 获取建造进度。
+	 * @return 建造进度值。
+	 */
 	public float getConstructionProgress() {
 		return this.constructionProgress;
 	}
 
+	/**
+	 * 设置单位是否隐藏。
+	 * @param hidden 如果单位隐藏，则为true，否则为false。
+	 */
 	public void setHidden(final boolean hidden) {
 		this.hidden = hidden;
 		this.stateNotifier.hideStateChanged();
 	}
 
+	/**
+	 * 设置单位是否暂停。
+	 * @param paused 如果单位暂停，则为true，否则为false。
+	 */
 	public void setPaused(final boolean paused) {
 		this.paused = paused;
 	}
 
+	/**
+	 * 判断单位是否暂停。
+	 * @return 如果单位暂停，则返回true，否则返回false。
+	 */
 	public boolean isPaused() {
 		return this.paused;
 	}
 
+	/**
+	 * 设置单位是否接受命令。
+	 * @param acceptingOrders 如果单位接受命令，则为true，否则为false。
+	 */
 	public void setAcceptingOrders(final boolean acceptingOrders) {
 		this.acceptingOrders = acceptingOrders;
 	}
 
+	/**
+	 * 判断单位是否隐藏。
+	 * @return 如果单位隐藏，则返回true，否则返回false。
+	 */
 	public boolean isHidden() {
 		return this.hidden;
 	}
 
+	/**
+	 * 设置单位是否无敌。
+	 * @param invulnerable 如果单位无敌，则为true，否则为false。
+	 */
 	public void setInvulnerable(final boolean invulnerable) {
 		this.invulnerable = invulnerable;
 	}
 
+	/**
+	 * 判断单位是否无敌。
+	 * @return 如果单位无敌，则返回true，否则返回false。
+	 */
 	@Override
 	public boolean isInvulnerable() {
 		return this.invulnerable;
 	}
 
+	/**
+	 * 设置当前单元内的工作人员。
+	 *
+	 * @param unit 要设置的工作人员所在的CUnit对象
+	 */
 	public void setWorkerInside(final CUnit unit) {
 		this.workerInside = unit;
 	}
 
+	/**
+	 * 获取当前单元内的工作人员。
+	 *
+	 * @return 当前单元内的CUnit对象，如果没有工作人员则返回null
+	 */
 	public CUnit getWorkerInside() {
 		return this.workerInside;
 	}
-
+	// 此方法用于调整结构的位置，以避免卡住
 	private void nudgeAround(final CSimulation simulation, final CUnit structure) {
 		setPointAndCheckUnstuck(structure.getX(), structure.getY(), simulation);
 	}
 
+	// 此方法重写用于设置生命值并处理死亡状态
 	@Override
 	public void setLife(final CSimulation simulation, final float life) {
 		final boolean wasDead = isDead();
@@ -3705,7 +4361,16 @@ public class CUnit extends CWidget {
 		}
 		this.stateNotifier.lifeChanged();
 	}
-
+	/**
+	 * 将一个建筑或研究项目添加到建造队列中。
+	 * 如果队列中有空位，则设置队列项并返回true。
+	 * 如果添加的是单位、研究或牺牲项目，则还会更新玩家的技术树。
+	 *
+	 * @param game         当前游戏实例
+	 * @param rawcode      要添加的项目的原始代码
+	 * @param queueItemType 要添加的项目的队列类型
+	 * @return 如果成功添加到队列则返回true，否则返回false
+	 */
 	private boolean queue(final CSimulation game, final War3ID rawcode, final QueueItemType queueItemType) {
 		for (int i = 0; i < this.buildQueue.length; i++) {
 			if (this.buildQueue[i] == null) {
@@ -3721,43 +4386,77 @@ public class CUnit extends CWidget {
 		return false;
 	}
 
+	/**
+	 * 获取当前的建造队列。
+	 *
+	 * @return 当前建造队列的数组
+	 */
 	public War3ID[] getBuildQueue() {
 		return this.buildQueue;
 	}
 
+	/**
+	 * 获取当前建造队列中各项的类型。
+	 *
+	 * @return 当前建造队列类型的数组
+	 */
 	public QueueItemType[] getBuildQueueTypes() {
 		return this.buildQueueTypes;
 	}
 
+	/**
+	 * 检查建造队列是否处于激活状态。
+	 *
+	 * @return 如果建造队列的第一个位置不为空，则返回true，表示队列激活
+	 */
 	public boolean isBuildQueueActive() {
 		return this.buildQueueTypes[0] != null;
 	}
 
+
+	/**
+	 * 获取建造队列剩余时间。
+	 *
+	 * @param simulation 模拟环境对象，用于获取相关数据。
+	 * @return 建造队列剩余时间，如果建造队列不活跃则返回0。
+	 */
 	public float getBuildQueueTimeRemaining(final CSimulation simulation) {
+		// 如果建造队列不活跃，直接返回0
 		if (!isBuildQueueActive()) {
 			return 0;
 		}
+		// 根据建造队列的第一个元素类型进行处理
 		switch (this.buildQueueTypes[0]) {
-		case RESEARCH: {
-			final War3ID rawcode = this.buildQueue[0];
-			final CUpgradeType trainedUnitType = simulation.getUpgradeData().getType(rawcode);
-			return trainedUnitType.getBuildTime(simulation.getPlayer(this.playerIndex).getTechtreeUnlocked(rawcode));
-		}
-		case SACRIFICE:
-		case UNIT: {
-			final CUnitType trainedUnitType = simulation.getUnitData().getUnitType(this.buildQueue[0]);
-			return trainedUnitType.getBuildTime();
-		}
-		case HERO_REVIVE: {
-			final CUnit hero = simulation.getUnit(this.buildQueue[0].getValue());
-			final CUnitType trainedUnitType = hero.getUnitType();
-			return simulation.getGameplayConstants().getHeroReviveTime(trainedUnitType.getBuildTime(),
-					hero.getHeroData().getHeroLevel());
-		}
-		default:
-			return 0;
+			case RESEARCH: {
+				// 获取研究项目的原始代码
+				final War3ID rawcode = this.buildQueue[0];
+				// 获取升级类型
+				final CUpgradeType trainedUnitType = simulation.getUpgradeData().getType(rawcode);
+				// 返回研究项目的剩余建造时间
+				return trainedUnitType.getBuildTime(simulation.getPlayer(this.playerIndex).getTechtreeUnlocked(rawcode));
+			}
+			case SACRIFICE:
+			case UNIT: {
+				// 获取单位类型
+				final CUnitType trainedUnitType = simulation.getUnitData().getUnitType(this.buildQueue[0]);
+				// 返回单位的建造时间
+				return trainedUnitType.getBuildTime();
+			}
+			case HERO_REVIVE: {
+				// 获取英雄单位
+				final CUnit hero = simulation.getUnit(this.buildQueue[0].getValue());
+				// 获取英雄的单位类型
+				final CUnitType trainedUnitType = hero.getUnitType();
+				// 返回英雄复活的剩余时间
+				return simulation.getGameplayConstants().getHeroReviveTime(trainedUnitType.getBuildTime(),
+						hero.getHeroData().getHeroLevel());
+			}
+			default:
+				// 默认情况下返回0
+				return 0;
 		}
 	}
+
 
 	public void cancelBuildQueueItem(final CSimulation game, final int cancelIndex) {
 		if ((cancelIndex >= 0) && (cancelIndex < this.buildQueueTypes.length)) {
@@ -3872,38 +4571,58 @@ public class CUnit extends CWidget {
 			}
 		}
 	}
-
+	// 队列训练单位
 	public void queueTrainingUnit(final CSimulation game, final War3ID rawcode) {
+		// 如果队列中存在游戏单位，则执行以下操作
 		if (queue(game, rawcode, QueueItemType.UNIT)) {
-			final CPlayer player = game.getPlayer(this.playerIndex);
-			final CUnitType unitType = game.getUnitData().getUnitType(rawcode);
-			final boolean isHeroType = unitType.isHero();
-			if (isHeroType && (player.getHeroTokens() > 0)) {
-				player.setHeroTokens(player.getHeroTokens() - 1);
-			}
-			else {
-				player.chargeFor(unitType);
-			}
+			  // 获取当前玩家对象
+			  final CPlayer player = game.getPlayer(this.playerIndex);
+			  // 根据原始代码获取单位类型
+			  final CUnitType unitType = game.getUnitData().getUnitType(rawcode);
+			  // 判断单位类型是否为英雄类型
+			  final boolean isHeroType = unitType.isHero();
+			  // 如果是英雄类型并且玩家拥有英雄令牌
+			  if (isHeroType && (player.getHeroTokens() > 0)) {
+				  // 玩家使用一个英雄令牌
+				  player.setHeroTokens(player.getHeroTokens() - 1);
+			  }
+			  // 如果不是英雄类型或者玩家没有英雄令牌
+			  else {
+				  // 玩家为单位类型充值
+				  player.chargeFor(unitType);
+			  }
 		}
+
 	}
 
+	// 队列牺牲单位
 	public void queueSacrificingUnit(final CSimulation game, final War3ID rawcode, final CUnit sacrifice) {
+		// 如果队列中存在游戏、原始代码和队列项类型为SACRIFICE的情况，则执行以下操作
 		if (queue(game, rawcode, QueueItemType.SACRIFICE)) {
+			// 将sacrifice设置为隐藏
 			sacrifice.setHidden(true);
+			// 将工人设置在sacrifice内部
 			setWorkerInside(sacrifice);
 
+			// 获取当前玩家对象
 			final CPlayer player = game.getPlayer(this.playerIndex);
+			// 根据原始代码获取单位类型
 			final CUnitType unitType = game.getUnitData().getUnitType(rawcode);
+			// 判断单位类型是否为英雄类型
 			final boolean isHeroType = unitType.isHero();
+			// 如果是英雄类型且玩家拥有英雄令牌，则减少一个英雄令牌
 			if (isHeroType && (player.getHeroTokens() > 0)) {
 				player.setHeroTokens(player.getHeroTokens() - 1);
 			}
+			// 否则，玩家为单位类型充值
 			else {
 				player.chargeFor(unitType);
 			}
 		}
+
 	}
 
+	// 队列复活英雄
 	public void queueRevivingHero(final CSimulation game, final CUnit hero) {
 		if (queue(game, new War3ID(hero.getHandleId()), QueueItemType.HERO_REVIVE)) {
 			hero.getHeroData().setReviving(true);
@@ -3916,6 +4635,7 @@ public class CUnit extends CWidget {
 		}
 	}
 
+	// 队列研究技术
 	public void queueResearch(final CSimulation game, final War3ID rawcode) {
 		if (queue(game, rawcode, QueueItemType.RESEARCH)) {
 			final CPlayer player = game.getPlayer(this.playerIndex);
@@ -3924,6 +4644,7 @@ public class CUnit extends CWidget {
 		}
 	}
 
+	// 队列项类型枚举
 	public static enum QueueItemType {
 		UNIT, // 单位
 		RESEARCH, // 研究一个技术或能力。
@@ -3931,41 +4652,50 @@ public class CUnit extends CWidget {
 		SACRIFICE; // 牺牲某个单位以取得某种效果。
 	}
 
+	// 设置集结点
 	public void setRallyPoint(final AbilityTarget target) {
 		this.rallyPoint = target;
 		this.stateNotifier.rallyPointChanged();
 	}
 
+	// 内部发布英雄状态变化
 	public void internalPublishHeroStatsChanged() {
 		this.stateNotifier.heroStatsChanged();
 	}
 
+	// 获取集结点
 	public AbilityTarget getRallyPoint() {
 		return this.rallyPoint;
 	}
 
+	// 集结点提供者接口
 	private static interface RallyProvider {
 		float getX();
 
 		float getY();
 	}
 
+	// 访问者模式的实现
 	@Override
 	public <T> T visit(final AbilityTargetVisitor<T> visitor) {
 		return visitor.accept(this);
 	}
 
+	// 访问者模式的实现
 	@Override
 	public <T> T visit(final CWidgetVisitor<T> visitor) {
 		return visitor.accept(this);
 	}
 
+
+	// 根据指令和目标检测能使用的能力，如果有就执行该指令
 	private static final class UseAbilityOnTargetByIdVisitor implements AbilityTargetVisitor<Void> {
 		private static final UseAbilityOnTargetByIdVisitor INSTANCE = new UseAbilityOnTargetByIdVisitor();
 		private CSimulation game;
 		private CUnit trainedUnit; // 受训单位
-		private int rallyOrderId;
+		private int rallyOrderId; // 召集指令
 
+		// 重置访问者的状态
 		private UseAbilityOnTargetByIdVisitor reset(final CSimulation game, final CUnit trainedUnit,
 				final int rallyOrderId) {
 			this.game = game;
@@ -3974,48 +4704,67 @@ public class CUnit extends CWidget {
 			return this;
 		}
 
+		// 接受AbilityPointTarget类型的目标并执行相应能力
 		@Override
 		public Void accept(final AbilityPointTarget target) {
 			CAbility abilityToUse = null;
+			// 遍历单位所有能力
 			for (final CAbility ability : this.trainedUnit.getAbilities()) {
+				// 检测能力能否使用
 				ability.checkCanUse(this.game, this.trainedUnit, this.rallyOrderId,
 						BooleanAbilityActivationReceiver.INSTANCE);
+				// 如果能使用
 				if (BooleanAbilityActivationReceiver.INSTANCE.isOk()) {
+					// 检测能力能否使用在该目标上
 					final BooleanAbilityTargetCheckReceiver<AbilityPointTarget> targetCheckReceiver = BooleanAbilityTargetCheckReceiver
 							.<AbilityPointTarget>getInstance().reset();
 					ability.checkCanTarget(this.game, this.trainedUnit, this.rallyOrderId, target, targetCheckReceiver);
+					// 如果能使用在该目标
 					if (targetCheckReceiver.isTargetable()) {
+						// 设置能使用的技能
 						abilityToUse = ability;
 					}
 				}
 			}
+			// 如果有技能可以使用
 			if (abilityToUse != null) {
+				// 执行指令
 				this.trainedUnit.order(this.game,
 						new COrderTargetPoint(abilityToUse.getHandleId(), this.rallyOrderId, target, false), false);
 			}
 			return null;
 		}
 
+		// 接受CUnit类型的目标并执行相应能力
 		@Override
 		public Void accept(final CUnit targetUnit) {
 			return acceptWidget(this.game, this.trainedUnit, this.rallyOrderId, targetUnit);
 		}
 
+		// 接受CWidget类型的目标并执行相应能力
 		private Void acceptWidget(final CSimulation game, final CUnit trainedUnit, final int rallyOrderId,
 				final CWidget target) {
 			CAbility abilityToUse = null;
+			// 遍历单位所有能力
 			for (final CAbility ability : trainedUnit.getAbilities()) {
+				// 检测能力能否使用
 				ability.checkCanUse(game, trainedUnit, rallyOrderId, BooleanAbilityActivationReceiver.INSTANCE);
+				// 如果能使用
 				if (BooleanAbilityActivationReceiver.INSTANCE.isOk()) {
+					// 检测能力能否使用在该目标上
 					final BooleanAbilityTargetCheckReceiver<CWidget> targetCheckReceiver = BooleanAbilityTargetCheckReceiver
 							.<CWidget>getInstance().reset();
 					ability.checkCanTarget(game, trainedUnit, rallyOrderId, target, targetCheckReceiver);
+					// 如果能使用在该目标
 					if (targetCheckReceiver.isTargetable()) {
+						// 设置能使用的技能
 						abilityToUse = ability;
 					}
 				}
 			}
+			// 如果有技能可以使用
 			if (abilityToUse != null) {
+				// 执行指令
 				trainedUnit.order(game,
 						new COrderTargetWidget(abilityToUse.getHandleId(), rallyOrderId, target.getHandleId(), false),
 						false);
@@ -4023,41 +4772,51 @@ public class CUnit extends CWidget {
 			return null;
 		}
 
+		// 接受CDestructable类型的目标并执行相应能力
 		@Override
 		public Void accept(final CDestructable target) {
 			return acceptWidget(this.game, this.trainedUnit, this.rallyOrderId, target);
 		}
 
+		// 接受CItem类型的目标并执行相应能力
 		@Override
 		public Void accept(final CItem target) {
 			return acceptWidget(this.game, this.trainedUnit, this.rallyOrderId, target);
 		}
 	}
-
+	// 获取已制作的食物数量
 	public int getFoodMade() {
 		return this.foodMade;
 	}
 
+	// 获取已使用的食物数量
 	public int getFoodUsed() {
 		return this.foodUsed;
 	}
 
+	// 设置已制作的食物数量，并返回制作数量的变化
 	public int setFoodMade(final int foodMade) {
 		final int delta = foodMade - this.foodMade;
 		this.foodMade = foodMade;
 		return delta;
 	}
 
+	// 设置已使用的食物数量，并返回使用数量的变化
 	public int setFoodUsed(final int foodUsed) {
-		final int delta = foodUsed - this.foodUsed;
-		this.foodUsed = foodUsed;
-		return delta;
+		// 计算并返回食物使用量的变化量
+		// foodUsed: 当前的食物使用量
+		final int delta = foodUsed - this.foodUsed; // 计算变化量
+		this.foodUsed = foodUsed; // 更新当前的食物使用量
+		return delta; // 返回变化量
+
 	}
 
+	// 设置默认行为
 	public void setDefaultBehavior(final CBehavior defaultBehavior) {
 		this.defaultBehavior = defaultBehavior;
 	}
 
+	// 获取金矿技能数据
 	public CAbilityGoldMinable getGoldMineData() {
 		for (final CAbility ability : this.abilities) {
 			if (ability instanceof CAbilityGoldMinable) {
@@ -4067,6 +4826,7 @@ public class CUnit extends CWidget {
 		return null;
 	}
 
+	// 获取叠加金矿技能数据
 	public CAbilityOverlayedMine getOverlayedGoldMineData() {
 		for (final CAbility ability : this.abilities) {
 			if (ability instanceof CAbilityOverlayedMine) {
@@ -4076,18 +4836,28 @@ public class CUnit extends CWidget {
 		return null;
 	}
 
+	// 获取金钱数量
 	public int getGold() {
+		// 遍历当前对象的所有能力
 		for (final CAbility ability : this.abilities) {
+			// 如果能力是可开采黄金的能力
 			if (ability instanceof CAbilityGoldMinable) {
+				// 返回这种能力可以开采的黄金数量
 				return ((CAbilityGoldMinable) ability).getGold();
 			}
+
+			// 如果能力是覆盖型矿场的能力
 			if (ability instanceof CAbilityOverlayedMine) {
+				// 返回这种能力可以开采的黄金数量
 				return ((CAbilityOverlayedMine) ability).getGold();
 			}
 		}
+		// 如果没有任何能力可以开采黄金，则返回0
 		return 0;
+
 	}
 
+	// 设置金钱数量
 	public void setGold(final int goldAmount) {
 		for (final CAbility ability : this.abilities) {
 			if (ability instanceof CAbilityGoldMinable) {
@@ -4099,14 +4869,17 @@ public class CUnit extends CWidget {
 		}
 	}
 
+	// 获取订单队列
 	public Queue<COrder> getOrderQueue() {
 		return this.orderQueue;
 	}
 
+	// 获取当前订单
 	public COrder getCurrentOrder() {
 		return this.lastStartedOrder;
 	}
 
+	// 获取英雄技能数据
 	public CAbilityHero getHeroData() {
 		for (final CAbility ability : this.abilities) {
 			if (ability instanceof CAbilityHero) {
@@ -4116,6 +4889,7 @@ public class CUnit extends CWidget {
 		return null;
 	}
 
+	// 获取根技能数据
 	public CAbilityRoot getRootData() {
 		for (final CAbility ability : this.abilities) {
 			if (ability instanceof CAbilityRoot) {
@@ -4125,6 +4899,7 @@ public class CUnit extends CWidget {
 		return null;
 	}
 
+	// 获取背包技能数据
 	public CAbilityInventory getInventoryData() {
 		for (final CAbility ability : this.abilities) {
 			if (ability instanceof CAbilityInventory) {
@@ -4134,6 +4909,7 @@ public class CUnit extends CWidget {
 		return null;
 	}
 
+	// 获取中立建筑技能数据
 	public CAbilityNeutralBuilding getNeutralBuildingData() {
 		for (final CAbility ability : this.abilities) {
 			if (ability instanceof CAbilityNeutralBuilding) {
@@ -4143,6 +4919,7 @@ public class CUnit extends CWidget {
 		return null;
 	}
 
+	// 获取货仓技能
 	public CAbilityCargoHold getCargoData() {
 		for (final CAbility ability : this.abilities) {
 			if (ability instanceof CAbilityCargoHold) {
@@ -4152,19 +4929,23 @@ public class CUnit extends CWidget {
 		return null;
 	}
 
+	// 设置所有普攻列表
 	public void setUnitSpecificAttacks(final List<CUnitAttack> unitSpecificAttacks) {
 		this.unitSpecificAttacks = unitSpecificAttacks;
 	}
 
+	// 设置能用的普攻列表
 	public void setUnitSpecificCurrentAttacks(final List<CUnitAttack> unitSpecificCurrentAttacks) {
 		this.unitSpecificCurrentAttacks = unitSpecificCurrentAttacks;
 		computeDerivedFields(NonStackingStatBuffType.ATKSPD);
 	}
 
+	// 获取所有普攻列表
 	public List<CUnitAttack> getUnitSpecificAttacks() {
 		return this.unitSpecificAttacks;
 	}
 
+	// 获取能用的普攻列表
 	public List<CUnitAttack> getCurrentAttacks() {
 		if (this.disableAttacks) {
 			return Collections.emptyList();
@@ -4175,15 +4956,18 @@ public class CUnit extends CWidget {
 		return Collections.emptyList();
 	}
 
+	// 设置是否禁用普攻
 	public void setDisableAttacks(final boolean disableAttacks) {
 		this.disableAttacks = disableAttacks;
 		this.stateNotifier.attacksChanged();
 	}
 
+	// 检查是否禁用普攻
 	public boolean isDisableAttacks() {
 		return this.disableAttacks;
 	}
 
+	// 拾取物品时的处理
 	public void onPickUpItem(final CSimulation game, final CItem item, final boolean playUserUISounds) {
 		this.stateNotifier.inventoryChanged();
 		if (playUserUISounds) {
@@ -4192,6 +4976,7 @@ public class CUnit extends CWidget {
 		firePickUpItemEvents(game, item);
 	}
 
+	// 投放物品时的处理
 	public void onDropItem(final CSimulation game, final CItem droppedItem, final boolean playUserUISounds) {
 		this.stateNotifier.inventoryChanged();
 		if (playUserUISounds) {
@@ -4199,19 +4984,23 @@ public class CUnit extends CWidget {
 		}
 	}
 
+	// 检查单位是否在指定区域内
 	public boolean isInRegion(final CRegion region) {
 		return this.containingRegions.contains(region);
 	}
 
 	@Override
+	// 获取最大生命值
 	public float getMaxLife() {
 		return this.maximumLife;
 	}
 
+	// 单位进入区域检测回调
 	private static final class RegionCheckerImpl implements CRegionEnumFunction {
 		private CUnit unit;
 		private CRegionManager regionManager;
 
+		// 重置区域检查器
 		public RegionCheckerImpl reset(final CUnit unit, final CRegionManager regionManager) {
 			this.unit = unit;
 			this.regionManager = regionManager;
@@ -4219,6 +5008,7 @@ public class CUnit extends CWidget {
 		}
 
 		@Override
+		// 调用检查函数
 		public boolean call(final CRegion region) {
 			if (this.unit.containingRegions.add(region)) {
 				if (!this.unit.priorContainingRegions.contains(region)) {
@@ -4230,14 +5020,17 @@ public class CUnit extends CWidget {
 
 	}
 
+	// 检查单位是否为建筑
 	public boolean isBuilding() {
 		return this.structure;
 	}
 
+	// 设置单位是否为建筑
 	public void setStructure(final boolean flag) {
 		this.structure = flag;
 	}
 
+	// 单位移除时的处理
 	public void onRemove(final CSimulation simulation) {
 		final CPlayer player = simulation.getPlayer(this.playerIndex);
 		if (WarsmashConstants.FIRE_DEATH_EVENTS_ON_REMOVEUNIT) {
@@ -4270,20 +5063,24 @@ public class CUnit extends CWidget {
 		private final CUnitStateListener listener;
 		private final StateListenerUpdateType updateType;
 
+		// 状态监听器更新
 		public StateListenerUpdate(final CUnitStateListener listener, final StateListenerUpdateType updateType) {
 			this.listener = listener;
 			this.updateType = updateType;
 		}
 
+		// 获取状态监听器
 		public CUnitStateListener getListener() {
 			return this.listener;
 		}
 
+		// 获取更新类型
 		public StateListenerUpdateType getUpdateType() {
 			return this.updateType;
 		}
 	}
 
+	// 取消升级处理
 	public void cancelUpgrade(final CSimulation game) {
 		final CPlayer player = game.getPlayer(this.playerIndex);
 		player.setUnitFoodUsed(this, this.unitType.getFoodUsed());
@@ -4318,6 +5115,7 @@ public class CUnit extends CWidget {
 		this.constructionProgress = 0;
 		this.unitAnimationListener.playAnimation(true, PrimaryTag.STAND, SequenceUtils.EMPTY, 0.0f, true);
 	}
+
 
 	public void beginUpgrade(final CSimulation game, final War3ID rawcode) {
 		this.upgradeIdType = rawcode;
@@ -4509,6 +5307,7 @@ public class CUnit extends CWidget {
 		return unit.getUnitType().getName();
 	}
 
+	// 冷却改变事件
 	public void fireCooldownsChangedEvent() {
 		this.stateNotifier.ordersChanged();
 	}
@@ -4523,6 +5322,7 @@ public class CUnit extends CWidget {
 		}
 	}
 
+	// 检测魔法值是否够消耗，如果够就消耗魔法值，否则返回false
 	public boolean chargeMana(final int manaCost) {
 		if (this.mana >= manaCost) {
 			setMana(this.mana - manaCost);
@@ -4620,50 +5420,74 @@ public class CUnit extends CWidget {
 		}
 		game.getPlayer(this.playerIndex).fireResearchFinishEvents(this, game, researched);
 	}
-
+	/**
+	 * 判断当前单位是否为英雄。
+	 * @return 如果当前单位是英雄，则返回true；否则返回false。
+	 */
 	public boolean isHero() {
-		return getHeroData() != null; // in future maybe do this with better performance
+		// 检查获取英雄数据的方法返回值是否不为null，以确定当前单位是否为英雄
+		return getHeroData() != null; // 未来可能需要用更好的性能来实现这个方法
 	}
 
+	/**
+	 * 判断当前单位是否为指定玩家的盟友。
+	 * @param whichPlayer 需要检查的玩家对象。
+	 * @return 如果当前单位是指定玩家的盟友，则返回true；否则返回false。
+	 */
 	public boolean isUnitAlly(final CPlayer whichPlayer) {
+		// 检查指定玩家是否与当前玩家存在被动同盟关系
 		return whichPlayer.hasAlliance(getPlayerIndex(), CAllianceType.PASSIVE);
 	}
-
+	/**
+	 * 如果可能，检查这是否是一个工人并派遣它去工作。
+	 *
+	 * @param game 当前游戏实例
+	 * @param defaultResourceType 默认资源类型，如果没有携带资源则使用此类型
+	 * @return 工人工作的资源类型，如果没有工人可以工作则返回null
+	 */
 	public ResourceType backToWork(final CSimulation game, final ResourceType defaultResourceType) {
-		// if possible, check if this is a worker and send it to work
+		// 遍历所有能力，检查是否有采集能力
 		for (final CAbility ability : this.abilities) {
 			if (ability instanceof CAbilityHarvest) {
 				final CAbilityHarvest abilityHarvest = (CAbilityHarvest) ability;
 				final int carriedResourceAmount = abilityHarvest.getCarriedResourceAmount();
 				final ResourceType carriedResourceType = abilityHarvest.getCarriedResourceType();
+
+				// 如果携带了资源
 				if (carriedResourceAmount != 0) {
 					switch (carriedResourceType) {
-					case GOLD:
-						if (carriedResourceAmount >= abilityHarvest.getGoldCapacity()) {
-							abilityHarvest.getBehaviorReturnResources().reset(game);
-							this.order(game, OrderIds.returnresources,
-									abilityHarvest.getBehaviorReturnResources().findNearestDropoffPoint(game));
-						}
-						else {
-							this.order(game, OrderIds.harvest, CBehaviorReturnResources.findNearestMine(this, game));
-						}
-						return ResourceType.GOLD;
-					case LUMBER:
-						if (carriedResourceAmount >= abilityHarvest.getLumberCapacity()) {
-							abilityHarvest.getBehaviorReturnResources().reset(game);
-							this.order(game, OrderIds.returnresources,
-									abilityHarvest.getBehaviorReturnResources().findNearestDropoffPoint(game));
-						}
-						else {
-							this.order(game, OrderIds.harvest, CBehaviorReturnResources.findNearestTree(this,
-									abilityHarvest, game, abilityHarvest.getLastHarvestTarget()));
-						}
-						return ResourceType.LUMBER;
-					default:
-						throw new IllegalStateException(
-								"Worker was carrying a resource of unsupported type: " + carriedResourceType);
+						case GOLD:
+							// 如果携带的金子数量达到容量上限，返回基地
+							if (carriedResourceAmount >= abilityHarvest.getGoldCapacity()) {
+								abilityHarvest.getBehaviorReturnResources().reset(game);
+								this.order(game, OrderIds.returnresources,
+										abilityHarvest.getBehaviorReturnResources().findNearestDropoffPoint(game));
+							}
+							// 否则继续采集金子
+							else {
+								this.order(game, OrderIds.harvest, CBehaviorReturnResources.findNearestMine(this, game));
+							}
+							return ResourceType.GOLD;
+						case LUMBER:
+							// 如果携带的木材数量达到容量上限，返回基地
+							if (carriedResourceAmount >= abilityHarvest.getLumberCapacity()) {
+								abilityHarvest.getBehaviorReturnResources().reset(game);
+								this.order(game, OrderIds.returnresources,
+										abilityHarvest.getBehaviorReturnResources().findNearestDropoffPoint(game));
+							}
+							// 否则继续采集木材
+							else {
+								this.order(game, OrderIds.harvest, CBehaviorReturnResources.findNearestTree(this,
+										abilityHarvest, game, abilityHarvest.getLastHarvestTarget()));
+							}
+							return ResourceType.LUMBER;
+						default:
+							// 抛出异常，不支持的资源类型
+							throw new IllegalStateException(
+									"Worker was carrying a resource of unsupported type: " + carriedResourceType);
 					}
 				}
+				// 如果没有携带资源但之前有资源类型
 				else if (carriedResourceType != null) {
 					if (carriedResourceType == ResourceType.GOLD) {
 						this.order(game, OrderIds.harvest, CBehaviorReturnResources.findNearestMine(this, game));
@@ -4675,6 +5499,7 @@ public class CUnit extends CWidget {
 						return ResourceType.LUMBER;
 					}
 				}
+				// 如果没有携带资源且没有之前的资源类型，使用默认资源类型
 				else if (defaultResourceType != null) {
 					if (((defaultResourceType == ResourceType.GOLD) || (abilityHarvest.getLumberCapacity() == 0))
 							&& (abilityHarvest.getGoldCapacity() > 0)) {
@@ -4690,8 +5515,10 @@ public class CUnit extends CWidget {
 			}
 		}
 
+		// 如果没有工人可以工作，返回null
 		return null;
 	}
+
 
 	public void notifyAttacksChanged() {
 		this.stateNotifier.attacksChanged();
@@ -4718,45 +5545,63 @@ public class CUnit extends CWidget {
 	}
 
 	public void updateFogOfWar(final CSimulation game) {
+		// 如果单位没有死亡且没有被隐藏
 		if (!isDead() && !this.hidden) {
+			// 根据当前是白天还是夜晚，获取单位的视野半径
 			final float sightRadius = game.isDay() ? this.unitType.getSightRadiusDay()
 					: this.unitType.getSightRadiusNight();
+			// 如果视野半径大于0
 			if (sightRadius > 0) {
+				// 计算视野半径的平方除以网格步长的平方，用于后续的距离判断
 				final float radSq = (sightRadius * sightRadius)
 						/ (CPlayerFogOfWar.GRID_STEP * CPlayerFogOfWar.GRID_STEP);
+				// 获取玩家的战争迷雾对象
 				final CPlayerFogOfWar fogOfWar = game.getPlayer(this.playerIndex).getFogOfWar();
+				// 判断单位是否为飞行单位
 				final boolean flying = getUnitType().getMovementType() == MovementType.FLY;
+				// 获取单位的坐标和高度信息
 				final float myX = getX();
 				final float myY = getY();
 				final int myZ = flying ? Integer.MAX_VALUE : game.getTerrainHeight(myX, myY);
+				// 获取寻路网格对象
 				final PathingGrid pathingGrid = game.getPathingGrid();
+				// 设置当前位置的战争迷雾状态为可见
 				fogOfWar.setState(pathingGrid.getFogOfWarIndexX(myX), pathingGrid.getFogOfWarIndexY(myY), (byte) 0);
 
+				// 计算视野范围内的网格坐标
 				final int myXi = pathingGrid.getFogOfWarIndexX(myX);
 				final int myYi = pathingGrid.getFogOfWarIndexY(myY);
 				final int maxXi = pathingGrid.getFogOfWarIndexX(myX + sightRadius);
 				final int maxYi = pathingGrid.getFogOfWarIndexY(myY + sightRadius);
+				// 遍历视野范围内的网格，更新战争迷雾状态
 				for (int a = 1; a <= Math.max(maxYi - myYi, maxXi - myXi); a++) {
+					// 计算当前方格到中心点的平方距离
 					final int distance = a * a;
 
-					if ((distance <= radSq)
-							&& (flying || !pathingGrid.isBlockVision(myX, myY - ((a - 1) * CPlayerFogOfWar.GRID_STEP)))
-							&& (fogOfWar.getState(myXi, (myYi - a) + 1) == 0)
-							&& (flying || game.isTerrainWater(myX, myY - (a * CPlayerFogOfWar.GRID_STEP))
-									|| (myZ > game.getTerrainHeight(myX, myY - (a * CPlayerFogOfWar.GRID_STEP)))
-									|| (!game.isTerrainRomp(myX, myY - (a * CPlayerFogOfWar.GRID_STEP)) && (myZ == game
-											.getTerrainHeight(myX, myY - (a * CPlayerFogOfWar.GRID_STEP)))))) {
+					// 检测上方： 检查是否在视野范围内且不是障碍物，并更新迷雾状态
+					if ((distance <= radSq) // 如果距离小于等于半径的平方
+							&& (flying || !pathingGrid.isBlockVision(myX, myY - ((a - 1) * CPlayerFogOfWar.GRID_STEP))) // 如果飞行或者下方没有障碍物阻挡视野
+							&& (fogOfWar.getState(myXi, (myYi - a) + 1) == 0) // 如果目标位置的迷雾状态为0（即可见）
+							&& (flying || game.isTerrainWater(myX, myY - (a * CPlayerFogOfWar.GRID_STEP)) // 如果飞行或者下方是水域
+										|| (myZ > game.getTerrainHeight(myX, myY - (a * CPlayerFogOfWar.GRID_STEP)))  // 或者高度高于地形
+										|| (!game.isTerrainRomp(myX, myY - (a * CPlayerFogOfWar.GRID_STEP)) && (myZ == game.getTerrainHeight(myX, myY - (a * CPlayerFogOfWar.GRID_STEP)))))) // 不是崎岖的地形，且高度相同
+					{
+						// 更新迷雾状态为可见
 						fogOfWar.setState(myXi, myYi - a, (byte) 0);
 					}
+
+					// 检测下方
 					if ((distance <= radSq)
-							&& (flying || !pathingGrid.isBlockVision(myX, myY + ((a - 1) * CPlayerFogOfWar.GRID_STEP)))
-							&& (fogOfWar.getState(myXi, (myYi + a) - 1) == 0)
-							&& (flying || game.isTerrainWater(myX, myY + (a * CPlayerFogOfWar.GRID_STEP))
-									|| (myZ > game.getTerrainHeight(myX, myY + (a * CPlayerFogOfWar.GRID_STEP)))
+							&& (flying || !pathingGrid.isBlockVision(myX, myY + ((a - 1) * CPlayerFogOfWar.GRID_STEP))) // 如果飞行或者下方没有障碍物阻挡视野
+							&& (fogOfWar.getState(myXi, (myYi + a) - 1) == 0) // 如果目标位置的迷雾状态为0（即可见）
+							&& (flying || game.isTerrainWater(myX, myY + (a * CPlayerFogOfWar.GRID_STEP))  // 如果飞行或者下方是水域
+									|| (myZ > game.getTerrainHeight(myX, myY + (a * CPlayerFogOfWar.GRID_STEP))) // 或者高度高于地形
 									|| (!game.isTerrainRomp(myX, myY + (a * CPlayerFogOfWar.GRID_STEP)) && (myZ == game
 											.getTerrainHeight(myX, myY + (a * CPlayerFogOfWar.GRID_STEP)))))) {
 						fogOfWar.setState(myXi, myYi + a, (byte) 0);
 					}
+
+					// 检测左方
 					if ((distance <= radSq)
 							&& (flying || !pathingGrid.isBlockVision(myX - ((a - 1) * CPlayerFogOfWar.GRID_STEP), myY))
 							&& (fogOfWar.getState((myXi - a) + 1, myYi) == 0)
@@ -4766,6 +5611,8 @@ public class CUnit extends CWidget {
 											.getTerrainHeight(myX - (a * CPlayerFogOfWar.GRID_STEP), myY))))) {
 						fogOfWar.setState(myXi - a, myYi, (byte) 0);
 					}
+
+					// 检测右方
 					if ((distance <= radSq)
 							&& (flying || !pathingGrid.isBlockVision(myX + ((a - 1) * CPlayerFogOfWar.GRID_STEP), myY))
 							&& (fogOfWar.getState((myXi + a) - 1, myYi) == 0)
@@ -4784,6 +5631,7 @@ public class CUnit extends CWidget {
 							final int xf = x * CPlayerFogOfWar.GRID_STEP;
 							final int yf = y * CPlayerFogOfWar.GRID_STEP;
 
+							// 左上方
 							if ((flying || game.isTerrainWater(myX - xf, myY - yf)
 									|| (myZ > game.getTerrainHeight(myX - xf, myY - yf))
 									|| (!game.isTerrainRomp(myX - xf, myY - yf)
@@ -4800,6 +5648,7 @@ public class CUnit extends CWidget {
 															(myY - yf) + CPlayerFogOfWar.GRID_STEP))))) {
 								fogOfWar.setState(myXi - x, myYi - y, (byte) 0);
 							}
+							// 左下方
 							if ((flying || game.isTerrainWater(myX - xf, myY + yf)
 									|| (myZ > game.getTerrainHeight(myX - xf, myY + yf))
 									|| (!game.isTerrainRomp(myX - xf, myY + yf)
@@ -4816,6 +5665,7 @@ public class CUnit extends CWidget {
 															(myY + yf) - CPlayerFogOfWar.GRID_STEP))))) {
 								fogOfWar.setState(myXi - x, myYi + y, (byte) 0);
 							}
+							// 右上方
 							if ((flying || game.isTerrainWater(myX + xf, myY - yf)
 									|| (myZ > game.getTerrainHeight(myX + xf, myY - yf))
 									|| (!game.isTerrainRomp(myX + xf, myY - yf)
@@ -4832,6 +5682,7 @@ public class CUnit extends CWidget {
 															(myY - yf) + CPlayerFogOfWar.GRID_STEP))))) {
 								fogOfWar.setState(myXi + x, myYi - y, (byte) 0);
 							}
+							// 右下方
 							if ((flying || game.isTerrainWater(myX + xf, myY + yf)
 									|| (myZ > game.getTerrainHeight(myX + xf, myY + yf))
 									|| (!game.isTerrainRomp(myX + xf, myY + yf)
@@ -4962,23 +5813,30 @@ public class CUnit extends CWidget {
 		this.evasionListeners.remove(listener);
 	}
 
+	// 开始冷却
 	public void beginCooldown(final CSimulation game, final War3ID abilityId, final float cooldownDuration) {
+		// 获取游戏当前帧数
 		final int gameTurnTick = game.getGameTurnTick();
+		// 设置技能冷却到期时间帧
 		this.rawcodeToCooldownExpireTime.put(abilityId.getValue(),
 				gameTurnTick + (int) StrictMath.ceil(cooldownDuration / WarsmashConstants.SIMULATION_STEP_TIME));
+		// 设置技能冷却开始时间
 		this.rawcodeToCooldownStartTime.put(abilityId.getValue(), gameTurnTick);
+		// 触发技能冷却变化事件
 		fireCooldownsChangedEvent();
 	}
-
+	// 获取冷却剩余的时间（以游戏的滴答数为单位）
 	public int getCooldownRemainingTicks(final CSimulation game, final War3ID abilityId) {
-		final int expireTime = this.rawcodeToCooldownExpireTime.get(abilityId.getValue(), -1);
-		final int gameTurnTick = game.getGameTurnTick();
-		if ((expireTime == -1) || (expireTime <= gameTurnTick)) {
-			return 0;
+		final int expireTime = this.rawcodeToCooldownExpireTime.get(abilityId.getValue(), -1); // 获取能力ID对应的冷却结束时间，如果不存在则返回-1
+		final int gameTurnTick = game.getGameTurnTick(); // 获取当前游戏回合数
+		if ((expireTime == -1) || (expireTime <= gameTurnTick)) { // 如果冷却结束时间为-1或者已经过了冷却时间
+			return 0; // 返回0表示技能已经准备好，可以立即使用
 		}
-		return expireTime - gameTurnTick;
+		return expireTime - gameTurnTick; // 返回剩余的冷却时间
+
 	}
 
+	// 获取冷却时间长度（以游戏的滴答数为单位）
 	public int getCooldownLengthDisplayTicks(final CSimulation game, final War3ID abilityId) {
 		final int startTime = this.rawcodeToCooldownStartTime.get(abilityId.getValue(), -1);
 		final int expireTime = this.rawcodeToCooldownExpireTime.get(abilityId.getValue(), -1);
@@ -4988,38 +5846,47 @@ public class CUnit extends CWidget {
 		return expireTime - startTime;
 	}
 
+	// 检查对象是否可提升
 	public boolean isRaisable() {
 		return this.raisable;
 	}
 
+	// 检查对象是否会衰减
 	public boolean isDecays() {
 		return this.decays;
 	}
 
+	// 设置对象是否可提升
 	public void setRaisable(final boolean raisable) {
 		this.raisable = raisable;
 	}
 
+	// 设置对象是否会衰减
 	public void setDecays(final boolean decays) {
 		this.decays = decays;
 	}
 
+	// 设置对象是否免疫魔法
 	public void setMagicImmune(final boolean magicImmune) {
 		this.magicImmune = magicImmune;
 	}
 
+	// 检查对象是否免疫魔法
 	public boolean isMagicImmune() {
 		return this.magicImmune;
 	}
 
+	// 检查对象是否处于假死状态
 	public boolean isFalseDeath() {
 		return this.falseDeath;
 	}
 
+	// 设置对象的假死状态
 	public void setFalseDeath(final boolean falseDeath) {
 		this.falseDeath = falseDeath;
 	}
 
+	// 设置对象的自动施法能力
 	public void setAutocastAbility(final CAutocastAbility autocastAbility) {
 		if (this.autocastAbility != null) {
 			this.autocastAbility.setAutoCastOff();
@@ -5027,16 +5894,22 @@ public class CUnit extends CWidget {
 		this.autocastAbility = autocastAbility;
 	}
 
+	// 检查对象是否对指定玩家可见
 	public boolean isVisible(final CSimulation simulation, final int toPlayerIndex) {
-		if ((toPlayerIndex == this.playerIndex) && ((simulation.isDay() ? this.unitType.getSightRadiusDay()
-				: this.unitType.getSightRadiusNight()) > 0)) {
-			return true;
+		// 检查当前单位是否能看到目标玩家
+		if ((toPlayerIndex == this.playerIndex) && // 如果目标玩家是当前玩家自己
+				((simulation.isDay() ? this.unitType.getSightRadiusDay() // 并且是白天，获取白天的视野半径
+						: this.unitType.getSightRadiusNight()) > 0)) { // 或者是夜晚，获取夜晚的视野半径，并检查是否大于0
+			return true; // 如果视野半径大于0，表示能看到，返回true
 		}
-		final CPlayer toPlayer = simulation.getPlayer(toPlayerIndex);
-		final byte fogState = toPlayer.getFogOfWar().getState(simulation.getPathingGrid(), getX(), getY());
-		if (fogState == 0) {
-			return true;
+
+		final CPlayer toPlayer = simulation.getPlayer(toPlayerIndex); // 获取目标玩家对象
+		final byte fogState = toPlayer.getFogOfWar().getState(simulation.getPathingGrid(), getX(), getY()); // 获取目标玩家战争迷雾状态
+		if (fogState == 0) { // 如果战争迷雾状态为0，表示没有迷雾遮挡
+			return true; // 表示能看到，返回true
 		}
-		return false;
+		return false; // 其他情况表示看不到，返回false
+
 	}
+
 }

@@ -8,6 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeDrop;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypeDropLevelData;
+// 卸载  (地精飞艇) 在指定区域卸载全部单位。
 
 public class CAbilityTypeDefinitionDrop extends AbstractCAbilityTypeDefinition<CAbilityTypeDropLevelData>
 		implements CAbilityTypeDefinition {

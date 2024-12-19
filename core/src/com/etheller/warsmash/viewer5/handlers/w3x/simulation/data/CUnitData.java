@@ -63,164 +63,194 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.players.CPlayer;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.SimulationRenderController;
 
 public class CUnitData {
+	// 初始魔法值
 	private static final String MANA_INITIAL_AMOUNT = "mana0"; // replaced from 'umpi'
+	// 最大魔法值
 	private static final String MANA_MAXIMUM = "manaN"; // replaced from 'umpm'
+	// 魔法恢复速度
 	private static final String MANA_REGEN = "regenMana"; // replaced from 'umpr'
+	// 初始生命值
 	private static final String HIT_POINT_MAXIMUM = "HP"; // replaced from 'uhpm'
+	// 生命恢复速度
 	private static final String HIT_POINT_REGEN = "regenHP"; // replaced from 'uhpr'
+	// 生命回复类型
 	private static final String HIT_POINT_REGEN_TYPE = "regenType"; // replaced from 'uhrt'
+	// 基础移动速度
 	private static final String MOVEMENT_SPEED_BASE = "spd"; // replaced from 'umvs'
+	// 推进窗口
 	private static final String PROPULSION_WINDOW = "propWin"; // replaced from 'uprw'
+	// 转向速度
 	private static final String TURN_RATE = "turnRate"; // replaced from 'umvr'
+	// 是否是建筑
 	private static final String IS_BLDG = "isbldg"; // replaced from 'ubdg'
+	// 名称
 	private static final String NAME = "Name"; // replaced from 'unam'
+	// 名称列表
 	private static final String PROPER_NAMES = "Propernames"; // replaced from 'upro'
+	// 名称数量
 	private static final String PROPER_NAMES_COUNT = "nameCount"; // replaced from 'upru'
+	// 投射物 起始位置偏移 X
 	private static final String PROJECTILE_LAUNCH_X = "launchX"; // replaced from 'ulpx'
+	// 投射物 起始位置偏移 Y
 	private static final String PROJECTILE_LAUNCH_Y = "launchY"; // replaced from 'ulpy'
+	// 投射物 起始位置偏移 Z
 	private static final String PROJECTILE_LAUNCH_Z = "launchZ"; // replaced from 'ulpz'
+	// 是否可以普攻
 	private static final String ATTACKS_ENABLED = "weapsOn"; // replaced from 'uaen'
+	// 普攻1 后摇时间点
 	private static final String ATTACK1_BACKSWING_POINT = "backSw1"; // replaced from 'ubs1'
+	// 普攻1 伤害效果时间点
 	private static final String ATTACK1_DAMAGE_POINT = "dmgpt1"; // replaced from 'udp1'
-	private static final String ATTACK1_AREA_OF_EFFECT_FULL_DMG = "Farea1"; // replaced from 'ua1f'
-	private static final String ATTACK1_AREA_OF_EFFECT_HALF_DMG = "Harea1"; // replaced from 'ua1h'
-	private static final String ATTACK1_AREA_OF_EFFECT_QUARTER_DMG = "Qarea1"; // replaced from 'ua1q'
-	private static final String ATTACK1_AREA_OF_EFFECT_TARGETS = "splashTargs1"; // replaced from 'ua1p'
-	private static final String ATTACK1_ATTACK_TYPE = "atkType1"; // replaced from 'ua1t'
-	private static final String ATTACK1_COOLDOWN = "cool1"; // replaced from 'ua1c'
-	private static final String ATTACK1_DMG_BASE = "dmgplus1"; // replaced from 'ua1b'
-	private static final String ATTACK1_DAMAGE_FACTOR_HALF = "Hfact1"; // replaced from 'uhd1'
-	private static final String ATTACK1_DAMAGE_FACTOR_QUARTER = "Qfact1"; // replaced from 'uqd1'
-	private static final String ATTACK1_DAMAGE_LOSS_FACTOR = "damageLoss1"; // replaced from 'udl1'
-	private static final String ATTACK1_DMG_DICE = "dice1"; // replaced from 'ua1d'
-	private static final String ATTACK1_DMG_SIDES_PER_DIE = "sides1"; // replaced from 'ua1s'
-	private static final String ATTACK1_DMG_SPILL_DIST = "spillDist1"; // replaced from 'usd1'
-	private static final String ATTACK1_DMG_SPILL_RADIUS = "spillRadius1"; // replaced from 'usr1'
-	private static final String ATTACK1_DMG_UPGRADE_AMT = "dmgUp1"; // replaced from 'udu1'
-	private static final String ATTACK1_TARGET_COUNT = "targCount1"; // replaced from 'utc1'
-	private static final String ATTACK1_PROJECTILE_ARC = "Missilearc"; // replaced from 'uma1'
-	private static final String ATTACK1_MISSILE_ART = "Missileart"; // replaced from 'ua1m'
-	private static final String ATTACK1_PROJECTILE_HOMING_ENABLED = "MissileHoming"; // replaced from 'umh1'
-	private static final String ATTACK1_PROJECTILE_SPEED = "Missilespeed"; // replaced from 'ua1z'
-	private static final String ATTACK1_RANGE = "rangeN1"; // replaced from 'ua1r'
-	private static final String ATTACK1_RANGE_MOTION_BUFFER = "RngBuff1"; // replaced from 'urb1'
-	private static final String ATTACK1_SHOW_UI = "showUI1"; // replaced from 'uwu1'
-	private static final String ATTACK1_TARGETS_ALLOWED = "targs1"; // replaced from 'ua1g'
-	private static final String ATTACK1_WEAPON_SOUND = "weapType1"; // replaced from 'ucs1'
-	private static final String ATTACK1_WEAPON_TYPE = "weapTp1"; // replaced from 'ua1w'
 
-	private static final String ATTACK2_BACKSWING_POINT = "backSw2"; // replaced from 'ubs2'
-	private static final String ATTACK2_DAMAGE_POINT = "dmgpt2"; // replaced from 'udp2'
-	private static final String ATTACK2_AREA_OF_EFFECT_FULL_DMG = "Farea2"; // replaced from 'ua2f'
-	private static final String ATTACK2_AREA_OF_EFFECT_HALF_DMG = "Harea2"; // replaced from 'ua2h'
-	private static final String ATTACK2_AREA_OF_EFFECT_QUARTER_DMG = "Qarea2"; // replaced from 'ua2q'
-	private static final String ATTACK2_AREA_OF_EFFECT_TARGETS = "splashTargs2"; // replaced from 'ua2p'
-	private static final String ATTACK2_ATTACK_TYPE = "atkType2"; // replaced from 'ua2t'
-	private static final String ATTACK2_COOLDOWN = "cool2"; // replaced from 'ua2c'
-	private static final String ATTACK2_DMG_BASE = "dmgplus2"; // replaced from 'ua2b'
-	private static final String ATTACK2_DAMAGE_FACTOR_HALF = "Hfact2"; // replaced from 'uhd2'
-	private static final String ATTACK2_DAMAGE_FACTOR_QUARTER = "Qfact2"; // replaced from 'uqd2'
-	private static final String ATTACK2_DAMAGE_LOSS_FACTOR = "damageLoss2"; // replaced from 'udl2'
-	private static final String ATTACK2_DMG_DICE = "dice2"; // replaced from 'ua2d'
-	private static final String ATTACK2_DMG_SIDES_PER_DIE = "sides2"; // replaced from 'ua2s'
-	private static final String ATTACK2_DMG_SPILL_DIST = "spillDist2"; // replaced from 'usd2'
-	private static final String ATTACK2_DMG_SPILL_RADIUS = "spillRadius2"; // replaced from 'usr2'
-	private static final String ATTACK2_DMG_UPGRADE_AMT = "dmgUp2"; // replaced from 'udu2'
-	private static final String ATTACK2_TARGET_COUNT = "targCount2"; // replaced from 'utc2'
-	private static final String ATTACK2_PROJECTILE_ARC = "Missilearc"; // replaced from 'uma2'
-	private static final String ATTACK2_MISSILE_ART = "Missileart"; // replaced from 'ua2m'
-	private static final String ATTACK2_PROJECTILE_HOMING_ENABLED = "MissileHoming"; // replaced from 'umh2'
-	private static final String ATTACK2_PROJECTILE_SPEED = "Missilespeed"; // replaced from 'ua2z'
-	private static final String ATTACK2_RANGE = "rangeN2"; // replaced from 'ua2r'
-	private static final String ATTACK2_RANGE_MOTION_BUFFER = "RngBuff2"; // replaced from 'urb2'
-	private static final String ATTACK2_SHOW_UI = "showUI2"; // replaced from 'uwu2'
-	private static final String ATTACK2_TARGETS_ALLOWED = "targs2"; // replaced from 'ua2g'
-	private static final String ATTACK2_WEAPON_SOUND = "weapType2"; // replaced from 'ucs2'
-	private static final String ATTACK2_WEAPON_TYPE = "weapTp2"; // replaced from 'ua2w'
+	private static final String ATTACK1_AREA_OF_EFFECT_FULL_DMG = "Farea1"; // 全伤害范围
+	private static final String ATTACK1_AREA_OF_EFFECT_HALF_DMG = "Harea1"; // 半伤害范围
+	private static final String ATTACK1_AREA_OF_EFFECT_QUARTER_DMG = "Qarea1"; // 四分之一伤害范围
+	private static final String ATTACK1_AREA_OF_EFFECT_TARGETS = "splashTargs1"; // 波及目标
+	private static final String ATTACK1_ATTACK_TYPE = "atkType1"; // 攻击类型
+	private static final String ATTACK1_COOLDOWN = "cool1"; // 冷却时间
+	private static final String ATTACK1_DMG_BASE = "dmgplus1"; // 基础伤害
+	private static final String ATTACK1_DAMAGE_FACTOR_HALF = "Hfact1"; // 半伤害因子
+	private static final String ATTACK1_DAMAGE_FACTOR_QUARTER = "Qfact1"; // 四分之一伤害因子
+	private static final String ATTACK1_DAMAGE_LOSS_FACTOR = "damageLoss1"; // 伤害损失因子
+	private static final String ATTACK1_DMG_DICE = "dice1"; // 伤害骰子
+	private static final String ATTACK1_DMG_SIDES_PER_DIE = "sides1"; // 每个骰子的面数
+	private static final String ATTACK1_DMG_SPILL_DIST = "spillDist1"; // 伤害溢出距离
+	private static final String ATTACK1_DMG_SPILL_RADIUS = "spillRadius1"; // 伤害溢出半径
+	private static final String ATTACK1_DMG_UPGRADE_AMT = "dmgUp1"; // 伤害升级量
+	private static final String ATTACK1_TARGET_COUNT = "targCount1"; // 目标数量
+	private static final String ATTACK1_PROJECTILE_ARC = "Missilearc"; // 弹道弧度
+	private static final String ATTACK1_MISSILE_ART = "Missileart"; // 弹道模型
+	private static final String ATTACK1_PROJECTILE_HOMING_ENABLED = "MissileHoming"; // 弹道是否追踪
+	private static final String ATTACK1_PROJECTILE_SPEED = "Missilespeed"; // 弹道速度
+	private static final String ATTACK1_RANGE = "rangeN1"; // 攻击范围
+	private static final String ATTACK1_RANGE_MOTION_BUFFER = "RngBuff1"; // 范围运动缓冲
+	private static final String ATTACK1_SHOW_UI = "showUI1"; // 是否显示UI
+	private static final String ATTACK1_TARGETS_ALLOWED = "targs1"; // 允许的目标类型
+	private static final String ATTACK1_WEAPON_SOUND = "weapType1"; // 武器声音
+	private static final String ATTACK1_WEAPON_TYPE = "weapTp1"; // 武器类型
 
-	private static final String CAST_BACKSWING_POINT = "castbsw"; // replaced from 'ucbs'
-	private static final String CAST_POINT = "castpt"; // replaced from 'ucpt'
+	// 定义了攻击2的各个属性常量
+	private static final String ATTACK2_BACKSWING_POINT = "backSw2"; // 攻击2的后摇点
+	private static final String ATTACK2_DAMAGE_POINT = "dmgpt2"; // 攻击2的伤害点
+	private static final String ATTACK2_AREA_OF_EFFECT_FULL_DMG = "Farea2"; // 攻击2的全伤害范围效果
+	private static final String ATTACK2_AREA_OF_EFFECT_HALF_DMG = "Harea2"; // 攻击2的半伤害范围效果
+	private static final String ATTACK2_AREA_OF_EFFECT_QUARTER_DMG = "Qarea2"; // 攻击2的四分之一伤害范围效果
+	private static final String ATTACK2_AREA_OF_EFFECT_TARGETS = "splashTargs2"; // 攻击2的范围效果目标
+	private static final String ATTACK2_ATTACK_TYPE = "atkType2"; // 攻击2的攻击类型
+	private static final String ATTACK2_COOLDOWN = "cool2"; // 攻击2的冷却时间
+	private static final String ATTACK2_DMG_BASE = "dmgplus2"; // 攻击2的基础伤害
+	private static final String ATTACK2_DAMAGE_FACTOR_HALF = "Hfact2"; // 攻击2的半伤害因子
+	private static final String ATTACK2_DAMAGE_FACTOR_QUARTER = "Qfact2"; // 攻击2的四分之一伤害因子
+	private static final String ATTACK2_DAMAGE_LOSS_FACTOR = "damageLoss2"; // 攻击2的伤害损失因子
+	private static final String ATTACK2_DMG_DICE = "dice2"; // 攻击2的伤害骰子
+	private static final String ATTACK2_DMG_SIDES_PER_DIE = "sides2"; // 攻击2的每个骰子的面数
+	private static final String ATTACK2_DMG_SPILL_DIST = "spillDist2"; // 攻击2的伤害溢出距离
+	private static final String ATTACK2_DMG_SPILL_RADIUS = "spillRadius2"; // 攻击2的伤害溢出半径
+	private static final String ATTACK2_DMG_UPGRADE_AMT = "dmgUp2"; // 攻击2的伤害升级量
+	private static final String ATTACK2_TARGET_COUNT = "targCount2"; // 攻击2的目标数量
+	private static final String ATTACK2_PROJECTILE_ARC = "Missilearc"; // 攻击2的弹道弧度
+	private static final String ATTACK2_MISSILE_ART = "Missileart"; // 攻击2的弹道模型
+	private static final String ATTACK2_PROJECTILE_HOMING_ENABLED = "MissileHoming"; // 攻击2的弹道是否启用追踪
+	private static final String ATTACK2_PROJECTILE_SPEED = "Missilespeed"; // 攻击2的弹道速度
+	private static final String ATTACK2_RANGE = "rangeN2"; // 攻击2的范围
+	private static final String ATTACK2_RANGE_MOTION_BUFFER = "RngBuff2"; // 攻击2的范围运动缓冲
+	private static final String ATTACK2_SHOW_UI = "showUI2"; // 攻击2是否显示UI
+	private static final String ATTACK2_TARGETS_ALLOWED = "targs2"; // 攻击2允许的目标类型
+	private static final String ATTACK2_WEAPON_SOUND = "weapType2"; // 攻击2的武器声音
+	private static final String ATTACK2_WEAPON_TYPE = "weapTp2"; // 攻击2的武器类型
 
-	private static final String ACQUISITION_RANGE = "acquire"; // replaced from 'uacq'
-	private static final String MINIMUM_ATTACK_RANGE = "minRange"; // replaced from 'uamn'
+	// 定义了一系列常量，用于表示游戏中的各种属性和类型
+	// 这些常量用于替换之前的简写代码，以提高代码的可读性和可维护性
 
-	private static final String PROJECTILE_IMPACT_Z = "impactZ"; // replaced from 'uimz'
+	private static final String CAST_BACKSWING_POINT = "castbsw"; // 替换之前的'ucbs'，表示后摆击点
+	private static final String CAST_POINT = "castpt"; // 替换之前的'ucpt'，表示投射点
 
-	private static final String DEATH_TYPE = "deathType"; // replaced from 'udea'
-	private static final String ARMOR_TYPE = "armor"; // replaced from 'uarm'
+	private static final String ACQUISITION_RANGE = "acquire"; // 替换之前的'uacq'，表示获取范围
+	private static final String MINIMUM_ATTACK_RANGE = "minRange"; // 替换之前的'uamn'，表示最小攻击范围
 
-	private static final String DEFENSE = "def"; // replaced from 'udef'
-	private static final String DEFENSE_TYPE = "defType"; // replaced from 'udty'
-	private static final String DEFENSE_UPGRADE_BONUS = "defUp"; // replaced from 'udup'
-	private static final String MOVE_HEIGHT = "moveHeight"; // replaced from 'umvh'
-	private static final String MOVE_TYPE = "movetp"; // replaced from 'umvt'
-	private static final String COLLISION_SIZE = "collision"; // replaced from 'ucol'
-	private static final String CLASSIFICATION = "type"; // replaced from 'utyp'
-	private static final String DEATH_TIME = "death"; // replaced from 'udtm'
-	private static final String TARGETED_AS = "targType"; // replaced from 'utar'
+	private static final String PROJECTILE_IMPACT_Z = "impactZ"; // 替换之前的'uimz'，表示弹丸撞击Z坐标
 
-	private static final String ABILITIES_DEFAULT_AUTO = "auto"; // replaced from 'uabi'
-	private static final String ABILITIES_NORMAL = "abilList"; // replaced from 'uabi'
-	private static final String ABILITIES_HERO = "heroAbilList"; // replaced from 'uhab'
+	private static final String DEATH_TYPE = "deathType"; // 替换之前的'udea'，表示死亡类型
+	private static final String ARMOR_TYPE = "armor"; // 替换之前的'uarm'，表示护甲类型
 
-	private static final String STRUCTURES_BUILT = "Builds"; // replaced from 'ubui'
-	private static final String UNITS_TRAINED = "Trains"; // replaced from 'utra'
-	private static final String RESEARCHES_AVAILABLE = "Researches"; // replaced from 'ures'
-	private static final String UPGRADES_USED = "upgrades"; // replaced from 'upgr'
-	private static final String UPGRADES_TO = "Upgrade"; // replaced from 'uupt'
-	private static final String ITEMS_SOLD = "Sellitems"; // replaced from 'usei'
-	private static final String ITEMS_MADE = "Makeitems"; // replaced from 'umki'
-	private static final String REVIVES_HEROES = "Revive"; // replaced from 'urev'
-	private static final String UNIT_RACE = "race"; // replaced from 'urac'
+	private static final String DEFENSE = "def"; // 替换之前的'udef'，表示防御
+	private static final String DEFENSE_TYPE = "defType"; // 替换之前的'udty'，表示防御类型
+	private static final String DEFENSE_UPGRADE_BONUS = "defUp"; // 替换之前的'udup'，表示防御升级加成
+	private static final String MOVE_HEIGHT = "moveHeight"; // 替换之前的'umvh'，表示移动高度
+	private static final String MOVE_TYPE = "movetp"; // 替换之前的'umvt'，表示移动类型
+	private static final String COLLISION_SIZE = "collision"; // 替换之前的'ucol'，表示碰撞大小
+	private static final String CLASSIFICATION = "type"; // 替换之前的'utyp'，表示分类
+	private static final String DEATH_TIME = "death"; // 替换之前的'udtm'，表示死亡时间
+	private static final String TARGETED_AS = "targType"; // 替换之前的'utar'，表示被定位为
 
-	private static final String REQUIRES = "Requires"; // replaced from 'ureq'
-	private static final String REQUIRES_AMOUNT = "Requiresamount"; // replaced from 'urqa'
-	private static final String REQUIRES_TIER_COUNT = "Requirescount"; // replaced from 'urqc'
-	private static final String[] REQUIRES_TIER_X = { "Requires1", "Requires2", // replaced from 'urq1'
-			"Requires3", "Requires4", "Requires5", "Requires6", // replaced from 'urq3'
-			"Requires7", "Requires8", "Requires9" }; // replaced from 'urq7'
+	private static final String ABILITIES_DEFAULT_AUTO = "auto"; // 替换之前的'uabi'，表示默认自动能力
+	private static final String ABILITIES_NORMAL = "abilList"; // 替换之前的'uabi'，表示普通能力列表
+	private static final String ABILITIES_HERO = "heroAbilList"; // 替换之前的'uhab'，表示英雄能力列表
 
-	private static final String GOLD_COST = "goldcost"; // replaced from 'ugol'
-	private static final String LUMBER_COST = "lumbercost"; // replaced from 'ulum'
-	private static final String BUILD_TIME = "bldtm"; // replaced from 'ubld'
-	private static final String FOOD_USED = "fused"; // replaced from 'ufoo'
-	private static final String FOOD_MADE = "fmade"; // replaced from 'ufma'
+	private static final String STRUCTURES_BUILT = "Builds"; // 替换之前的'ubui'，表示建造的结构
+	private static final String UNITS_TRAINED = "Trains"; // 替换之前的'utra'，表示训练的单位
+	private static final String RESEARCHES_AVAILABLE = "Researches"; // 替换之前的'ures'，表示可用的研究
+	private static final String UPGRADES_USED = "upgrades"; // 替换之前的'upgr'，表示已使用的升级
+	private static final String UPGRADES_TO = "Upgrade"; // 替换之前的'uupt'，表示升级到
+	private static final String ITEMS_SOLD = "Sellitems"; // 替换之前的'usei'，表示出售的物品
+	private static final String ITEMS_MADE = "Makeitems"; // 替换之前的'umki'，表示制作的物品
+	private static final String REVIVES_HEROES = "Revive"; // 替换之前的'urev'，表示复活英雄
+	private static final String UNIT_RACE = "race"; // 替换之前的'urac'，表示单位种族
 
-	private static final String REQUIRE_PLACE = "requirePlace"; // replaced from 'upar'
-	private static final String PREVENT_PLACE = "preventPlace"; // replaced from 'upap'
+	private static final String REQUIRES = "Requires"; // 表示单位建造所需的资源
+	private static final String REQUIRES_AMOUNT = "Requiresamount"; // 表示所需资源的数量
+	private static final String REQUIRES_TIER_COUNT = "Requirescount"; // 表示所需资源的等级数量
+	private static final String[] REQUIRES_TIER_X = { "Requires1", "Requires2", // 表示不同等级的所需资源
+			"Requires3", "Requires4", "Requires5", "Requires6",
+			"Requires7", "Requires8", "Requires9" };
 
-	private static final String UNIT_LEVEL = "level"; // replaced from 'ulev'
+	private static final String GOLD_COST = "goldcost"; // 表示单位建造所需的金币成本
+	private static final String LUMBER_COST = "lumbercost"; // 表示单位建造所需的木材成本
+	private static final String BUILD_TIME = "bldtm"; // 表示单位建造所需的时间
+	private static final String FOOD_USED = "fused"; // 表示建造单位所消耗的食物
+	private static final String FOOD_MADE = "fmade"; // 表示单位能生产的食物
 
-	private static final String STR = "STR"; // replaced from 'ustr'
-	private static final String STR_PLUS = "STRplus"; // replaced from 'ustp'
-	private static final String AGI = "AGI"; // replaced from 'uagi'
-	private static final String AGI_PLUS = "AGIplus"; // replaced from 'uagp'
-	private static final String INT = "INT"; // replaced from 'uint'
-	private static final String INT_PLUS = "INTplus"; // replaced from 'uinp'
-	private static final String PRIMARY_ATTRIBUTE = "Primary"; // replaced from 'upra'
+	private static final String REQUIRE_PLACE = "requirePlace"; // 表示单位建造所需的地点
+	private static final String PREVENT_PLACE = "preventPlace"; // 表示单位不能建造的地点
 
-	private static final String CAN_FLEE = "canFlee"; // replaced from 'ufle'
-	private static final String PRIORITY = "prio"; // replaced from 'upri'
+	private static final String UNIT_LEVEL = "level"; // 表示单位的等级
 
-	private static final String POINT_VALUE = "points"; // replaced from 'upoi'
+	// 表示单位的基础属性
+	private static final String STR = "STR"; // 力量
+	private static final String STR_PLUS = "STRplus"; // 力量加成
+	private static final String AGI = "AGI"; // 敏捷
+	private static final String AGI_PLUS = "AGIplus"; // 敏捷加成
+	private static final String INT = "INT"; // 智力
+	private static final String INT_PLUS = "INTplus"; // 智力加成
+	private static final String PRIMARY_ATTRIBUTE = "Primary"; // 主属性
 
-	private static final String CAN_BE_BUILT_ON_THEM = "isBuildOn"; // replaced from 'uibo'
-	private static final String CAN_BUILD_ON_ME = "canBuildOn"; // replaced from 'ucbo'
+	private static final String CAN_FLEE = "canFlee"; // 表示单位是否能逃跑
+	private static final String PRIORITY = "prio"; // 表示单位的优先级
 
-	private static final String SIGHT_RADIUS_DAY = "sight"; // replaced from 'usid'
-	private static final String SIGHT_RADIUS_NIGHT = "nsight"; // replaced from 'usin'
-	private static final String EXTENDED_LOS = "fatLOS"; // replaced from 'ulos'
+	private static final String POINT_VALUE = "points"; // 表示单位的点数价值
 
-	private static final String GOLD_BOUNTY_AWARDED_BASE = "bountyplus"; // replaced from 'ubba'
-	private static final String GOLD_BOUNTY_AWARDED_DICE = "bountydice"; // replaced from 'ubdi'
-	private static final String GOLD_BOUNTY_AWARDED_SIDES = "bountysides"; // replaced from 'ubsi'
+	// 表示单位之间的建造关系
+	private static final String CAN_BE_BUILT_ON_THEM = "isBuildOn"; // 表示其他单位能否在此单位上建造
+	private static final String CAN_BUILD_ON_ME = "canBuildOn"; // 表示此单位能否在其他单位上建造
 
-	private static final String LUMBER_BOUNTY_AWARDED_BASE = "lumberbountyplus"; // replaced from 'ulba'
-	private static final String LUMBER_BOUNTY_AWARDED_DICE = "lumberbountydice"; // replaced from 'ulbd'
-	private static final String LUMBER_BOUNTY_AWARDED_SIDES = "lumberbountysides"; // replaced from 'ulbs'
+	private static final String SIGHT_RADIUS_DAY = "sight"; // 表示单位白天的视野范围
+	private static final String SIGHT_RADIUS_NIGHT = "nsight"; // 表示单位夜晚的视野范围
+	private static final String EXTENDED_LOS = "fatLOS"; // 表示单位的扩展视线范围
 
+	// 定义了与金币赏金相关的常量，这些常量用于表示基础值、骰子数和面数
+	private static final String GOLD_BOUNTY_AWARDED_BASE = "bountyplus"; // 替换自 'ubba'
+	private static final String GOLD_BOUNTY_AWARDED_DICE = "bountydice"; // 替换自 'ubdi'
+	private static final String GOLD_BOUNTY_AWARDED_SIDES = "bountysides"; // 替换自 'ubsi'
+
+	// 定义了与木材赏金相关的常量，这些常量用于表示基础值、骰子数和面数
+	private static final String LUMBER_BOUNTY_AWARDED_BASE = "lumberbountyplus"; // 替换自 'ulba'
+	private static final String LUMBER_BOUNTY_AWARDED_DICE = "lumberbountydice"; // 替换自 'ulbd'
+	private static final String LUMBER_BOUNTY_AWARDED_SIDES = "lumberbountysides"; // 替换自 'ulbs'
+
+	// 定义了显示中立建筑图标的常量
 	private static final String NEUTRAL_BUILDING_SHOW_ICON = "nbmmIcon";
 
+	// 实例变量，包括游戏玩法常量、单位数据、单位ID到单位类型的映射等
 	private final CGameplayConstants gameplayConstants;
 	private final ObjectData unitData;
 	private final Map<War3ID, CUnitType> unitIdToUnitType = new HashMap<>();
@@ -228,6 +258,7 @@ public class CUnitData {
 	private final CAbilityData abilityData;
 	private final CUpgradeData upgradeData;
 	private final SimulationRenderController simulationRenderController;
+
 
 	public CUnitData(final CGameplayConstants gameplayConstants, final ObjectData unitData,
 			final CAbilityData abilityData, final CUpgradeData upgradeData,
@@ -238,162 +269,294 @@ public class CUnitData {
 		this.upgradeData = upgradeData;
 		this.simulationRenderController = simulationRenderController;
 	}
-
+	/**
+	 * 创建一个新的单位（CUnit 对象）。
+	 *
+	 * @param simulation 游戏模拟对象。
+	 * @param playerIndex 玩家索引。
+	 * @param typeId 单位类型 ID。
+	 * @param x 单位在地图上的 X 坐标。
+	 * @param y 单位在地图上的 Y 坐标。
+	 * @param facing 单位的朝向。
+	 * @param buildingPathingPixelMap 建筑路径像素图。
+	 * @param handleIdAllocator 句柄 ID 分配器。
+	 * @return 新创建的单位对象。
+	 */
 	public CUnit create(final CSimulation simulation, final int playerIndex, final War3ID typeId, final float x,
 			final float y, final float facing, final BufferedImage buildingPathingPixelMap,
 			final HandleIdAllocator handleIdAllocator) {
+		// 从 unitData 中获取单位类型的 GameObject
 		final GameObject unitType = this.unitData.get(typeId.asStringValue());
+		// 分配一个新的句柄 ID
 		final int handleId = handleIdAllocator.createId();
 
+		// 获取单位类型实例，可能会使用建筑路径像素图和 GameObject
 		final CUnitType unitTypeInstance = getUnitTypeInstance(typeId, buildingPathingPixelMap, unitType);
+		// 获取单位的最大生命值
 		final int life = unitTypeInstance.getMaxLife();
+		// 获取单位的生命回复速度
 		final float lifeRegen = unitTypeInstance.getLifeRegen();
+		// 获取单位的初始法力值
 		final int manaInitial = unitTypeInstance.getManaInitial();
+		// 获取单位的最大法力值
 		final int manaMaximum = unitTypeInstance.getManaMaximum();
+		// 获取单位的移动速度
 		final int speed = unitTypeInstance.getSpeed();
 
+		// 创建一个新的 CUnit 对象，使用分配的句柄 ID、玩家索引、位置、朝向、属性和单位类型实例
 		final CUnit unit = new CUnit(handleId, playerIndex, x, y, life, typeId, facing, manaInitial, life, lifeRegen,
 				manaMaximum, speed, unitTypeInstance);
+		// 返回新创建的单位对象
 		return unit;
 	}
-
+	/**
+	 * 将玩家的升级应用到指定的单位上
+	 *
+	 * @param simulation 游戏模拟对象
+	 * @param playerIndex 玩家索引
+	 * @param unitTypeInstance 单位类型实例
+	 * @param unit 要应用升级的单位
+	 */
 	public void applyPlayerUpgradesToUnit(final CSimulation simulation, final int playerIndex,
 			final CUnitType unitTypeInstance, final CUnit unit) {
+		// 获取指定玩家
 		final CPlayer player = simulation.getPlayer(playerIndex);
+		// 遍历单位类型实例使用的升级列表
 		for (final War3ID upgradeId : unitTypeInstance.getUpgradesUsed()) {
+			// 获取玩家对该升级的解锁状态
 			final int techtreeUnlocked = player.getTechtreeUnlocked(upgradeId);
+			// 如果升级已解锁
 			if (techtreeUnlocked > 0) {
+				// 从升级数据中获取升级类型
 				final CUpgradeType upgradeType = this.upgradeData.getType(upgradeId);
+				// 如果升级类型存在
 				if (upgradeType != null) {
+					// 将升级应用到单位上
 					upgradeType.apply(simulation, unit, techtreeUnlocked);
 				}
 			}
 		}
 	}
 
+	/**
+	 * 从指定单位上移除玩家的升级效果
+	 *
+	 * @param simulation 游戏模拟对象
+	 * @param playerIndex 玩家索引
+	 * @param unitTypeInstance 单位类型实例
+	 * @param unit 要移除升级效果的单位
+	 */
 	public void unapplyPlayerUpgradesToUnit(final CSimulation simulation, final int playerIndex,
 			final CUnitType unitTypeInstance, final CUnit unit) {
+		// 获取指定玩家
 		final CPlayer player = simulation.getPlayer(playerIndex);
+		// 遍历单位类型实例使用的升级列表
 		for (final War3ID upgradeId : unitTypeInstance.getUpgradesUsed()) {
+			// 获取玩家对该升级的解锁状态
 			final int techtreeUnlocked = player.getTechtreeUnlocked(upgradeId);
+			// 如果升级已解锁
 			if (techtreeUnlocked > 0) {
+				// 从升级数据中获取升级类型
 				final CUpgradeType upgradeType = this.upgradeData.getType(upgradeId);
+				// 如果升级类型存在
 				if (upgradeType != null) {
+					// 将升级从单位上移除
 					upgradeType.unapply(simulation, unit, techtreeUnlocked);
 				}
 			}
 		}
 	}
 
+
+	// 添加默认能力到单位
 	public void addDefaultAbilitiesToUnit(final CSimulation simulation, final HandleIdAllocator handleIdAllocator,
 			final CUnitType unitTypeInstance, final boolean resetMana, final int manaInitial, final int speed,
 			final CUnit unit) {
+		// 移动速度大于0，添加移动能力
 		if (speed > 0) {
 			unit.add(simulation, new CAbilityMove(handleIdAllocator.createId()));
 		}
+		// 获取普攻列表
 		final List<CUnitAttack> unitSpecificAttacks = new ArrayList<>();
 		for (final CUnitAttack attack : unitTypeInstance.getAttacks()) {
 			unitSpecificAttacks.add(attack.copy());
 		}
+		// 设置普攻列表
 		unit.setUnitSpecificAttacks(unitSpecificAttacks);
+		// 设置能用的普攻列表
 		unit.setUnitSpecificCurrentAttacks(
 				getEnabledAttacks(unitSpecificAttacks, unitTypeInstance.getAttacksEnabled()));
+		// 普攻列表不为空，添加普攻能力
 		if (!unit.getCurrentAttacks().isEmpty()) {
 			unit.add(simulation, new CAbilityAttack(handleIdAllocator.createId()));
 		}
+		// 获取单位类型实例可以建造的建筑列表
 		final List<War3ID> structuresBuilt = unitTypeInstance.getStructuresBuilt();
+		// 如果建筑列表不为空
 		if (!structuresBuilt.isEmpty()) {
+			// 根据单位类型实例的种族，添加相应的建造能力
 			switch (unitTypeInstance.getRace()) {
-			case ORC:
-				unit.add(simulation, new CAbilityOrcBuild(handleIdAllocator.createId(), structuresBuilt));
-				break;
-			case HUMAN:
-				unit.add(simulation, new CAbilityHumanBuild(handleIdAllocator.createId(), structuresBuilt));
-				break;
-			case UNDEAD:
-				unit.add(simulation, new CAbilityUndeadBuild(handleIdAllocator.createId(), structuresBuilt));
-				break;
-			case NIGHTELF:
-				unit.add(simulation, new CAbilityNightElfBuild(handleIdAllocator.createId(), structuresBuilt));
-				break;
-			case NAGA:
-				unit.add(simulation, new CAbilityNagaBuild(handleIdAllocator.createId(), structuresBuilt));
-				break;
-			case CREEPS:
-			case CRITTERS:
-			case DEMON:
-			case OTHER:
-				unit.add(simulation, new CAbilityOrcBuild(handleIdAllocator.createId(), structuresBuilt));
-				break;
+				// 如果是兽族
+				case ORC:
+					// 添加兽族建造能力
+					unit.add(simulation, new CAbilityOrcBuild(handleIdAllocator.createId(), structuresBuilt));
+					break;
+				// 如果是人类
+				case HUMAN:
+					// 添加人类建造能力
+					unit.add(simulation, new CAbilityHumanBuild(handleIdAllocator.createId(), structuresBuilt));
+					break;
+				// 如果是不死族
+				case UNDEAD:
+					// 添加不死族建造能力
+					unit.add(simulation, new CAbilityUndeadBuild(handleIdAllocator.createId(), structuresBuilt));
+					break;
+				// 如果是暗夜精灵
+				case NIGHTELF:
+					// 添加暗夜精灵建造能力
+					unit.add(simulation, new CAbilityNightElfBuild(handleIdAllocator.createId(), structuresBuilt));
+					break;
+				// 如果是娜迦族
+				case NAGA:
+					// 添加娜迦族建造能力
+					unit.add(simulation, new CAbilityNagaBuild(handleIdAllocator.createId(), structuresBuilt));
+					break;
+				// 如果是其他种族
+				case CREEPS:
+				case CRITTERS:
+				case DEMON:
+				case OTHER:
+					// 添加兽族建造能力
+					unit.add(simulation, new CAbilityOrcBuild(handleIdAllocator.createId(), structuresBuilt));
+					break;
 			}
 		}
+
+		// 获取单位类型实例可以训练的单位列表
 		final List<War3ID> unitsTrained = unitTypeInstance.getUnitsTrained();
+		// 获取单位类型实例可以研究的科技列表
 		final List<War3ID> researchesAvailable = unitTypeInstance.getResearchesAvailable();
+		// 获取单位类型实例可以升级的列表
 		final List<War3ID> upgradesTo = unitTypeInstance.getUpgradesTo();
+		// 获取单位类型实例可以出售的物品列表
 		final List<War3ID> itemsSold = unitTypeInstance.getItemsSold();
+		// 获取单位类型实例可以制造的物品列表
 		final List<War3ID> itemsMade = unitTypeInstance.getItemsMade();
+
+		// 如果单位类型实例可以训练单位或研究科技
 		if (!unitsTrained.isEmpty() || !researchesAvailable.isEmpty()) {
+			// 添加训练和研究队列能力
 			unit.add(simulation, new CAbilityQueue(handleIdAllocator.createId(), unitsTrained, researchesAvailable));
 		}
+
+		// 如果单位类型实例可以升级
 		if (!upgradesTo.isEmpty()) {
+			// 添加升级能力
 			unit.add(simulation, new CAbilityUpgrade(handleIdAllocator.createId(), upgradesTo));
 		}
+
+		// 如果单位类型实例可以出售物品
 		if (!itemsSold.isEmpty()) {
+			// 添加出售物品能力
 			unit.add(simulation, new CAbilitySellItems(handleIdAllocator.createId(), itemsSold));
 		}
+
+		// 如果单位类型实例可以制造物品
 		if (!itemsMade.isEmpty()) {
+			// 添加制造物品能力
 			unit.add(simulation, new CAbilitySellItems(handleIdAllocator.createId(), itemsMade));
 		}
+
+		// 如果单位类型实例可以复活英雄
 		if (unitTypeInstance.isRevivesHeroes()) {
+			// 添加复活英雄能力
 			unit.add(simulation, new CAbilityReviveHero(handleIdAllocator.createId()));
 		}
+
+		// 如果单位类型实例可以训练单位或复活英雄
 		if (!unitsTrained.isEmpty() || unitTypeInstance.isRevivesHeroes()) {
+			// 添加集结点能力
 			unit.add(simulation, new CAbilityRally(handleIdAllocator.createId()));
 		}
+
+
+		// 如果是英雄，添加英雄能力, 设置初始魔法值
 		if (unitTypeInstance.isHero()) {
 			final List<War3ID> heroAbilityList = unitTypeInstance.getHeroAbilityList();
+			// 添加英雄能力
 			unit.add(simulation, new CAbilityHero(handleIdAllocator.createId(), heroAbilityList));
 			// reset initial mana after the value is adjusted for hero data
+			// 在英雄数据调整值后重置初始法力值
 			unit.setMana(manaInitial);
 		}
+
+		// 遍历单位类型实例的能力列表
 		for (final War3ID ability : unitTypeInstance.getAbilityList()) {
+			// 通过原始代码获取单位的现有能力
 			final CLevelingAbility existingAbility = unit
 					.getAbility(GetAbilityByRawcodeVisitor.getInstance().reset(ability));
+			// 如果现有能力不存在或不是永久的
 			if ((existingAbility == null) || !existingAbility.isPermanent()) {
+				// 创建一个新的能力
 				final CAbility createAbility = this.abilityData.createAbility(ability, handleIdAllocator.createId());
+				// 如果创建的能力不为空
 				if (createAbility != null) {
+					// 将新能力添加到单位中
 					unit.add(simulation, createAbility);
 				}
+				// 如果该能力是单位类型实例的默认自动施放能力，并且新创建的能力是一个自动施放能力
 				if (ability.equals(unitTypeInstance.getDefaultAutocastAbility())
 						&& (createAbility instanceof CAutocastAbility)) {
+					// 设置自动施放能力为开启状态
 					((CAutocastAbility) createAbility).setAutoCastOn(unit, true);
 				}
 			}
+			// 如果现有能力存在且是永久的
 			else {
+				// 如果该能力是单位类型实例的默认自动施放能力，并且现有能力是一个自动施放能力
 				if (ability.equals(unitTypeInstance.getDefaultAutocastAbility())
 						&& (existingAbility instanceof CAutocastAbility)) {
+					// 设置自动施放能力为开启状态
 					((CAutocastAbility) existingAbility).setAutoCastOn(unit, true);
 				}
 			}
 		}
 
+		// 检查单位是否为英雄，并且当前游戏是否为混乱之治（Reign of Chaos）版本
 		if (unitTypeInstance.isHero() && simulation.isMapReignOfChaos()
+				// 检查单位是否没有物品栏能力
 				&& (unit.getFirstAbilityOfType(CAbilityInventory.class) == null)) {
+			// 为单位添加物品栏能力，能力 ID 为 "AInv"
 			unit.add(simulation,
 					simulation.getAbilityData().createAbility(War3ID.fromString("AInv"), handleIdAllocator.createId()));
 		}
-	}
 
+	}
+	/**
+	 * 为单位添加缺失的默认能力。
+	 *
+	 * @param simulation 模拟对象
+	 * @param handleIdAllocator 句柄ID分配器
+	 * @param unitTypeInstance 单位类型实例
+	 * @param resetMana 是否重置法力值
+	 * @param manaInitial 初始法力值
+	 * @param speed 单位移动速度
+	 * @param unit 单位对象
+	 */
 	public void addMissingDefaultAbilitiesToUnit(final CSimulation simulation,
 			final HandleIdAllocator handleIdAllocator, final CUnitType unitTypeInstance, final boolean resetMana,
 			final int manaInitial, final int speed, final CUnit unit) {
+		// 获取移动能力
 		final CAbilityMove preMove = unit.getFirstAbilityOfType(CAbilityMove.class);
+		// 如果之前没有移动能力，限制移动速度大于0，添加移动能力
 		if ((speed > 0) && (preMove == null)) {
 			unit.add(simulation, new CAbilityMove(handleIdAllocator.createId()));
 		}
+		// 如果之前有移动能力，现在移动速度小于0, 移除移动能力
 		if ((speed <= 0) && (preMove != null)) {
 			unit.remove(simulation, preMove);
 		}
+		// 重新设置普攻列表
 		final List<CUnitAttack> unitSpecificAttacks = new ArrayList<>();
 		for (final CUnitAttack attack : unitTypeInstance.getAttacks()) {
 			unitSpecificAttacks.add(attack.copy());
@@ -404,6 +567,8 @@ public class CUnitData {
 		if (!unit.getCurrentAttacks().isEmpty()) {
 			unit.add(simulation, new CAbilityAttack(handleIdAllocator.createId()));
 		}
+
+		// 获取单位类型实例可以建造的建筑列表
 		final List<War3ID> structuresBuilt = unitTypeInstance.getStructuresBuilt();
 		if (!structuresBuilt.isEmpty()) {
 			switch (unitTypeInstance.getRace()) {
@@ -430,56 +595,78 @@ public class CUnitData {
 				break;
 			}
 		}
+		// 获取单位类型实例可以训练的单位列表
 		final List<War3ID> unitsTrained = unitTypeInstance.getUnitsTrained();
+		// 获取单位类型实例可以研究的科技列表
 		final List<War3ID> researchesAvailable = unitTypeInstance.getResearchesAvailable();
+		// 获取单位类型实例可以升级到的单位列表
 		final List<War3ID> upgradesTo = unitTypeInstance.getUpgradesTo();
+		// 获取单位类型实例可以出售的物品列表
 		final List<War3ID> itemsSold = unitTypeInstance.getItemsSold();
+		// 获取单位类型实例可以制造的物品列表
 		final List<War3ID> itemsMade = unitTypeInstance.getItemsMade();
+		// 如果单位可以训练单位或研究科技，则添加相应的能力
 		if (!unitsTrained.isEmpty() || !researchesAvailable.isEmpty()) {
 			unit.add(simulation, new CAbilityQueue(handleIdAllocator.createId(), unitsTrained, researchesAvailable));
 		}
+		// 如果单位可以升级，则添加升级能力
 		if (!upgradesTo.isEmpty()) {
 			unit.add(simulation, new CAbilityUpgrade(handleIdAllocator.createId(), upgradesTo));
 		}
+		// 如果单位可以出售物品，则添加出售物品能力
 		if (!itemsSold.isEmpty()) {
 			unit.add(simulation, new CAbilitySellItems(handleIdAllocator.createId(), itemsSold));
 		}
+		// 如果单位可以制造物品，则添加制造物品能力
 		if (!itemsMade.isEmpty()) {
 			unit.add(simulation, new CAbilitySellItems(handleIdAllocator.createId(), itemsMade));
 		}
+		// 如果单位可以复活英雄，则添加复活英雄能力
 		if (unitTypeInstance.isRevivesHeroes()) {
 			unit.add(simulation, new CAbilityReviveHero(handleIdAllocator.createId()));
 		}
+		// 如果单位可以训练单位或复活英雄，则添加集结点能力
 		if (!unitsTrained.isEmpty() || unitTypeInstance.isRevivesHeroes()) {
 			unit.add(simulation, new CAbilityRally(handleIdAllocator.createId()));
 		}
+
+		// 如果是英雄
 		if (unitTypeInstance.isHero()) {
 			final List<War3ID> heroAbilityList = unitTypeInstance.getHeroAbilityList();
+			/// 如果已经有英雄能力
 			if (unit.getFirstAbilityOfType(CAbilityHero.class) != null) {
+				// 重新设置英雄可用技能列表
 				final CAbilityHero abil = unit.getFirstAbilityOfType(CAbilityHero.class);
 				abil.setSkillsAvailable(heroAbilityList);
 				abil.recalculateAllStats(simulation, unit);
 			}
 			else {
+				// 否则 添加英雄能力
 				unit.add(simulation, new CAbilityHero(handleIdAllocator.createId(), heroAbilityList));
 				// reset initial mana after the value is adjusted for hero data
 				unit.setMana(manaInitial);
 			}
 		}
+		// 遍历单位类型实例的能力列表，处理能力添加和自动施法的逻辑
 		for (final War3ID ability : unitTypeInstance.getAbilityList()) {
+			// 获取之前是否已经添加了能力
 			final CLevelingAbility existingAbility = unit
 					.getAbility(GetAbilityByRawcodeVisitor.getInstance().reset(ability));
+			// 之前没有添加该能力
 			if ((existingAbility == null)) {
+				// 创建新能力
 				final CAbility createAbility = this.abilityData.createAbility(ability, handleIdAllocator.createId());
 				if (createAbility != null) {
 					unit.add(simulation, createAbility);
 				}
+				// 如果是默认自动施法能力，且创建的能力是一个自动施法能力
 				if (ability.equals(unitTypeInstance.getDefaultAutocastAbility())
 						&& (createAbility instanceof CAutocastAbility)) {
 					((CAutocastAbility) createAbility).setAutoCastOn(unit, true);
 				}
 			}
 			else {
+				// 如果是默认自动施法能力，且之前的能力是一个自动施法能力
 				if (ability.equals(unitTypeInstance.getDefaultAutocastAbility())
 						&& (existingAbility instanceof CAutocastAbility)) {
 					((CAutocastAbility) existingAbility).setAutoCastOn(unit, true);
@@ -487,12 +674,15 @@ public class CUnitData {
 			}
 		}
 
+
+		// 如果是英雄，添加物品栏能力
 		if (unitTypeInstance.isHero() && simulation.isMapReignOfChaos()
 				&& (unit.getFirstAbilityOfType(CAbilityInventory.class) == null)) {
 			unit.add(simulation,
 					simulation.getAbilityData().createAbility(War3ID.fromString("AInv"), handleIdAllocator.createId()));
 		}
 	}
+
 
 	private CUnitType getUnitTypeInstance(final War3ID typeId, final BufferedImage buildingPathingPixelMap,
 			final GameObject unitType) {
@@ -790,13 +980,16 @@ public class CUnitData {
 		return unitTypeInstance;
 	}
 
+	// 获取能用的普攻列表
 	public static List<CUnitAttack> getEnabledAttacks(final List<CUnitAttack> attacks, final int attacksEnabled) {
 		final List<CUnitAttack> enabledAttacks = new ArrayList<>();
+		// 检测普攻1是否可用
 		if ((attacksEnabled & 0x1) != 0) {
 			if (attacks.size() > 0) {
 				enabledAttacks.add(attacks.get(0));
 			}
 		}
+		// 检测普攻2是否可用
 		if ((attacksEnabled & 0x2) != 0) {
 			if (attacks.size() > 1) {
 				enabledAttacks.add(attacks.get(1));
@@ -804,7 +997,7 @@ public class CUnitData {
 		}
 		return enabledAttacks;
 	}
-
+	// 解析建筑物ID列表
 	public static List<War3ID> parseIDList(final List<String> structuresBuiltString) {
 		final List<War3ID> structuresBuilt = new ArrayList<>();
 		for (final String structuresBuiltStringItem : structuresBuiltString) {
@@ -815,6 +1008,7 @@ public class CUnitData {
 		return structuresBuilt;
 	}
 
+	// 解析建筑物ID集合
 	public static Set<War3ID> parseIDSet(final List<String> structuresBuiltString) {
 		final Set<War3ID> structuresBuilt = new HashSet<>();
 		for (final String structuresBuiltStringItem : structuresBuiltString) {
@@ -825,53 +1019,51 @@ public class CUnitData {
 		return structuresBuilt;
 	}
 
+	// 解析单位类型需求
 	public static List<CUnitTypeRequirement> parseRequirements(final List<String> requirementsString,
 			final List<String> requirementsLevelsString) {
-		final List<CUnitTypeRequirement> requirements = new ArrayList<>();
-		for (int i = 0; i < requirementsString.size(); i++) {
-			final String item = requirementsString.get(i);
-			if (!item.isEmpty() && (item.length() == 4)) {
-				int level;
-				if (i < requirementsLevelsString.size()) {
-					if (requirementsLevelsString.get(i).isEmpty()) {
-						level = 1;
-					}
-					else {
-						try {
-							level = Integer.parseInt(requirementsLevelsString.get(i));
-						}
-						catch (final NumberFormatException exc) {
-							level = 1;
-						}
-					}
-				}
-				else if (requirementsLevelsString.size() > 0) {
-					final String requirementLevel = requirementsLevelsString.get(requirementsLevelsString.size() - 1);
-					if (requirementLevel.isEmpty()) {
-						level = 1;
-					}
-					else {
-						try {
-							level = Integer.parseInt(requirementLevel);
-						}
-						catch (final NumberFormatException exc) {
-							level = 1;
-						}
-					}
-				}
-				else {
-					level = 1;
-				}
-				requirements.add(new CUnitTypeRequirement(War3ID.fromString(item), level));
-			}
+		final List<CUnitTypeRequirement> requirements = new ArrayList<>(); // 初始化要求列表
+		for (int i = 0; i < requirementsString.size(); i++) { // 遍历要求字符串列表
+		  final String item = requirementsString.get(i); // 获取当前项
+		  if (!item.isEmpty() && (item.length() == 4)) { // 检查项是否非空且长度为4
+			  int level; // 初始化等级变量
+			  if (i < requirementsLevelsString.size()) { // 检查等级字符串列表是否有对应的项
+				  if (requirementsLevelsString.get(i).isEmpty()) { // 如果等级字符串为空，则等级默认为1
+					  level = 1;
+				  } else {
+					  try { // 尝试解析等级字符串为整数
+						  level = Integer.parseInt(requirementsLevelsString.get(i));
+					  } catch (final NumberFormatException exc) { // 如果解析失败，则等级默认为1
+						  level = 1;
+					  }
+				  }
+			  } else if (requirementsLevelsString.size() > 0) { // 如果等级字符串列表非空但当前索引超出范围
+				  final String requirementLevel = requirementsLevelsString.get(requirementsLevelsString.size() - 1); // 获取最后一个等级字符串
+				  if (requirementLevel.isEmpty()) { // 如果最后一个等级字符串为空，则等级默认为1
+					  level = 1;
+				  } else {
+					  try { // 尝试解析最后一个等级字符串为整数
+						  level = Integer.parseInt(requirementLevel);
+					  } catch (final NumberFormatException exc) { // 如果解析失败，则等级默认为1
+						  level = 1;
+					  }
+				  }
+			  } else { // 如果等级字符串列表为空
+				  level = 1; // 等级默认为1
+			  }
+			  requirements.add(new CUnitTypeRequirement(War3ID.fromString(item), level)); // 创建新的要求对象并添加到列表中
+		  }
 		}
-		return requirements;
+		return requirements; // 返回要求列表
+
 	}
 
+	// 获取单位类型的遗留名称
 	private String getLegacyName(final GameObject unitType) {
 		return unitType.getLegacyName();
 	}
 
+	// 填充英雄属性表
 	private static int[] populateHeroStatTable(final int maxHeroLevel, final float statPerLevel) {
 		final int[] table = new int[maxHeroLevel];
 		float sumBonusAtLevel = 0f;
@@ -888,6 +1080,7 @@ public class CUnitData {
 		return table;
 	}
 
+	// 创建攻击类型
 	private CUnitAttack createAttack(final float animationBackswingPoint, final float animationDamagePoint,
 			final int areaOfEffectFullDamage, final int areaOfEffectMediumDamage, final int areaOfEffectSmallDamage,
 			final EnumSet<CTargetType> areaOfEffectTargets, final CAttackType attackType, final float cooldownTime,
@@ -943,92 +1136,113 @@ public class CUnitData {
 		return attack;
 	}
 
+	// 获取单位推进窗口
 	public float getPropulsionWindow(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsFloat(PROPULSION_WINDOW, 0);
 	}
 
+	// 获取单位转向速率
 	public float getTurnRate(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsFloat(TURN_RATE, 0);
 	}
 
+	// 判断单位是否是建筑
 	public boolean isBuilding(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsBoolean(IS_BLDG, 0);
 	}
 
+	// 获取单位名称
 	public String getName(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getName();
 	}
 
+	// 获取单位的最小攻击1伤害
 	public int getA1MinDamage(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsInteger(ATTACK1_DMG_BASE, 0)
 				+ this.unitData.get(unitTypeId.asStringValue()).getFieldAsInteger(ATTACK1_DMG_DICE, 0);
 	}
 
+	// 获取单位的最大攻击1伤害
 	public int getA1MaxDamage(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsInteger(ATTACK1_DMG_BASE, 0)
 				+ (this.unitData.get(unitTypeId.asStringValue()).getFieldAsInteger(ATTACK1_DMG_DICE, 0) * this.unitData
 						.get(unitTypeId.asStringValue()).getFieldAsInteger(ATTACK1_DMG_SIDES_PER_DIE, 0));
 	}
 
+	// 获取单位的最小攻击2伤害
 	public int getA2MinDamage(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsInteger(ATTACK2_DMG_BASE, 0)
 				+ this.unitData.get(unitTypeId.asStringValue()).getFieldAsInteger(ATTACK2_DMG_DICE, 0);
 	}
 
+	// 获取单位的最大攻击2伤害
 	public int getA2MaxDamage(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsInteger(ATTACK2_DMG_BASE, 0)
 				+ (this.unitData.get(unitTypeId.asStringValue()).getFieldAsInteger(ATTACK2_DMG_DICE, 0) * this.unitData
 						.get(unitTypeId.asStringValue()).getFieldAsInteger(ATTACK2_DMG_SIDES_PER_DIE, 0));
 	}
 
+	// 获取单位防御
 	public int getDefense(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsInteger(DEFENSE, 0);
 	}
 
+	// 获取单位攻击1的投射物速度
 	public int getA1ProjectileSpeed(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsInteger(ATTACK1_PROJECTILE_SPEED, 0);
 	}
 
+	// 获取单位攻击1的投射物弧度
 	public float getA1ProjectileArc(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsFloat(ATTACK1_PROJECTILE_ARC, 0);
 	}
 
+	// 获取单位攻击2的投射物速度
 	public int getA2ProjectileSpeed(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsInteger(ATTACK2_PROJECTILE_SPEED, 0);
 	}
 
+	// 获取单位攻击2的投射物弧度
 	public float getA2ProjectileArc(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsFloat(ATTACK2_PROJECTILE_ARC, 0);
 	}
 
+	// 获取单位攻击1的导弹艺术
 	public String getA1MissileArt(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsString(ATTACK1_MISSILE_ART, 0);
 	}
 
+	// 获取单位攻击2的导弹艺术
 	public String getA2MissileArt(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsString(ATTACK2_MISSILE_ART, 0);
 	}
 
+	// 获取单位攻击1的冷却时间
 	public float getA1Cooldown(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsFloat(ATTACK1_COOLDOWN, 0);
 	}
 
+	// 获取单位攻击2的冷却时间
 	public float getA2Cooldown(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsFloat(ATTACK2_COOLDOWN, 0);
 	}
 
+	// 获取单位投射物发射X坐标
 	public float getProjectileLaunchX(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsFloat(PROJECTILE_LAUNCH_X, 0);
 	}
 
+	// 获取单位投射物发射Y坐标
 	public float getProjectileLaunchY(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsFloat(PROJECTILE_LAUNCH_Y, 0);
 	}
 
+	// 获取单位投射物发射Z坐标
 	public float getProjectileLaunchZ(final War3ID unitTypeId) {
 		return this.unitData.get(unitTypeId.asStringValue()).getFieldAsFloat(PROJECTILE_LAUNCH_Z, 0);
 	}
 
+	// 获取单位类型
 	public CUnitType getUnitType(final War3ID rawcode) {
 		final CUnitType unitTypeInstance = this.unitIdToUnitType.get(rawcode);
 		if (unitTypeInstance != null) {
@@ -1043,6 +1257,7 @@ public class CUnitData {
 		return getUnitTypeInstance(rawcode, buildingPathingPixelMap, unitType);
 	}
 
+	// 通过Jass遗留名称获取单位类型
 	public CUnitType getUnitTypeByJassLegacyName(final String jassLegacyName) {
 		final War3ID typeId = this.jassLegacyNameToUnitId.get(jassLegacyName);
 		if (typeId == null) {
@@ -1060,4 +1275,5 @@ public class CUnitData {
 		}
 		return getUnitType(typeId);
 	}
+
 }

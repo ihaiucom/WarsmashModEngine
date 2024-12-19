@@ -9,6 +9,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.CAbility;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.generic.CLevelingAbility;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.test.CAbilityChannelTest;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAbilityType;
+// 通魔 可作为大多数主动技能的模板，可以被魔法护盾护身符抵挡
 
 public class CAbilityTypeChannelTest extends CAbilityType<CAbilityTypeChannelTestLevelData> {
 

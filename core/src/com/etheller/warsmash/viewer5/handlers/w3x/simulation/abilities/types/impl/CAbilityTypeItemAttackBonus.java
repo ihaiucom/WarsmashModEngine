@@ -10,6 +10,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.generic.C
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.item.CAbilityItemAttackBonus;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAbilityType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAbilityTypeLevelData;
+// 增加攻击力的物品 攻击之抓 +3
 
 public class CAbilityTypeItemAttackBonus extends CAbilityType<CAbilityTypeItemAttackBonusLevelData> {
 

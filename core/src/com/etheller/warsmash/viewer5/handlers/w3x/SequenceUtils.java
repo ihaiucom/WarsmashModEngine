@@ -14,18 +14,18 @@ import com.etheller.warsmash.viewer5.handlers.w3x.AnimationTokens.SecondaryTag;
 public class SequenceUtils {
 	private static final int SECONDARY_TAGS_DECLARED_COUNT = AnimationTokens.SecondaryTag.values().length;
 	public static final EnumSet<SecondaryTag> EMPTY = EnumSet.noneOf(SecondaryTag.class);
-	public static final EnumSet<SecondaryTag> READY = EnumSet.of(SecondaryTag.READY);
-	public static final EnumSet<SecondaryTag> FLESH = EnumSet.of(SecondaryTag.FLESH);
-	public static final EnumSet<SecondaryTag> TALK = EnumSet.of(SecondaryTag.TALK);
-	public static final EnumSet<SecondaryTag> BONE = EnumSet.of(SecondaryTag.BONE);
-	public static final EnumSet<SecondaryTag> HIT = EnumSet.of(SecondaryTag.HIT);
-	public static final EnumSet<SecondaryTag> SPELL = EnumSet.of(SecondaryTag.SPELL);
-	public static final EnumSet<SecondaryTag> SPELL_EATTREE = EnumSet.of(SecondaryTag.SPELL, SecondaryTag.EATTREE);
-	public static final EnumSet<SecondaryTag> SPELL_THROW = EnumSet.of(SecondaryTag.SPELL, SecondaryTag.THROW);
-	public static final EnumSet<SecondaryTag> WORK = EnumSet.of(SecondaryTag.WORK);
-	public static final EnumSet<SecondaryTag> COMPLETE = EnumSet.of(SecondaryTag.COMPLETE);
-	public static final EnumSet<SecondaryTag> FAST = EnumSet.of(SecondaryTag.FAST);
-	public static final EnumSet<SecondaryTag> ALTERNATE = EnumSet.of(SecondaryTag.ALTERNATE);
+	public static final EnumSet<SecondaryTag> READY = EnumSet.of(SecondaryTag.READY); // 准备
+	public static final EnumSet<SecondaryTag> FLESH = EnumSet.of(SecondaryTag.FLESH); // 估计是强化
+	public static final EnumSet<SecondaryTag> TALK = EnumSet.of(SecondaryTag.TALK); // 说话
+	public static final EnumSet<SecondaryTag> BONE = EnumSet.of(SecondaryTag.BONE); // 骨头
+	public static final EnumSet<SecondaryTag> HIT = EnumSet.of(SecondaryTag.HIT); // 受击
+	public static final EnumSet<SecondaryTag> SPELL = EnumSet.of(SecondaryTag.SPELL); // 法术
+	public static final EnumSet<SecondaryTag> SPELL_EATTREE = EnumSet.of(SecondaryTag.SPELL, SecondaryTag.EATTREE); // 法术， 吃树
+	public static final EnumSet<SecondaryTag> SPELL_THROW = EnumSet.of(SecondaryTag.SPELL, SecondaryTag.THROW); // 法术， 投掷
+	public static final EnumSet<SecondaryTag> WORK = EnumSet.of(SecondaryTag.WORK); // 工作
+	public static final EnumSet<SecondaryTag> COMPLETE = EnumSet.of(SecondaryTag.COMPLETE); // 完成
+	public static final EnumSet<SecondaryTag> FAST = EnumSet.of(SecondaryTag.FAST); // 快速
+	public static final EnumSet<SecondaryTag> ALTERNATE = EnumSet.of(SecondaryTag.ALTERNATE); // 交替
 
 	private static final StandSequenceComparator STAND_SEQUENCE_COMPARATOR = new StandSequenceComparator();
 	private static final SecondaryTagSequenceComparator SECONDARY_TAG_SEQUENCE_COMPARATOR = new SecondaryTagSequenceComparator(

@@ -3,18 +3,31 @@ package com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilitybuilder.par
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.unit.NonStackingStatBuffType;
 
 public enum StatBuffType {
+	// 攻击力
 	ATK,
+	// 攻击速度
 	ATKSPD,
+	// 防御力
 	DEF,
+	// 生命值生成
 	HPGEN,
+	// 最大生命值生成
 	MAXHPGEN,
+	// 魔法值生成
 	MPGEN,
+	// 最大魔法值生成
 	MAXMPGEN,
+	// 移动速度
 	MVSPD,
+	// 生命偷取
 	HPSTEAL,
+	// 荆棘
 	THORNS,
+	// 最大生命值
 	MAXHP,
+	// 最大魔法值
 	MAXMP;
+
 	
 	
 	public NonStackingStatBuffType toNonStackingStatBuffType(boolean percentage) {

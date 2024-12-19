@@ -12,6 +12,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.orders.OrderIds;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.trigger.enumtypes.CEffectType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.AbilityTargetCheckReceiver;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.CommandStringErrorKeys;
+// 闪烁 能让守望者瞬间移动一段距离，从而逃离战场或者快速加入战斗。|n|n|cffffcc00等级 1|r -<AEbl,Cool1>秒魔法施放间隔时间，消耗<AEbl,Cost1>点魔法。|n|cffffcc00等级 2|r -<AEbl,Cool2>秒魔法施放间隔时间，消耗<AEbl,Cost2>点魔法。|n|cffffcc00等级 3|r -<AEbl,Cool3>秒魔法施放间隔时间，消耗<AEbl,Cost3>点魔法。
 
 public class CAbilityBlink extends CAbilityPointTargetSpellBase {
 

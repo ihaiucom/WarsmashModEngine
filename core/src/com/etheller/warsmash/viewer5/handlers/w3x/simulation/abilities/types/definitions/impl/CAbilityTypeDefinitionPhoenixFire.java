@@ -8,7 +8,7 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.CAb
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.definitions.CAbilityTypeDefinition;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypePhoenixFire;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.types.impl.CAbilityTypePhoenixFireLevelData;
-
+// 凤凰火焰
 public class CAbilityTypeDefinitionPhoenixFire extends AbstractCAbilityTypeDefinition<CAbilityTypePhoenixFireLevelData>
 		implements CAbilityTypeDefinition {
 	protected static final War3ID DAMAGE_PER_SECOND = War3ID.fromString("pxf2");

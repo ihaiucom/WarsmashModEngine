@@ -3,7 +3,7 @@ package com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.targetin
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.CDestructable;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.CItem;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.CUnit;
-
+// 定义能力目标访问者的接口
 public interface AbilityTargetVisitor<T> {
 	T accept(AbilityPointTarget target);
 
@@ -13,7 +13,7 @@ public interface AbilityTargetVisitor<T> {
 
 	T accept(CItem target);
 
-	// simple cast
+	// 简单的转换
 	AbilityTargetVisitor<CUnit> UNIT = new AbilityTargetVisitor<CUnit>() {
 
 		@Override
