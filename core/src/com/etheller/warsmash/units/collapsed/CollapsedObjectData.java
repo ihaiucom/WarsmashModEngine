@@ -13,65 +13,119 @@ import com.etheller.warsmash.util.War3ID;
 import com.etheller.warsmash.util.WorldEditStrings;
 
 public class CollapsedObjectData {
-
+	/**
+	 * 应用一组更改到游戏对象的数据中。
+	 *
+	 * @param worldEditStrings    用于字符串转换的 WorldEditStrings 对象。
+	 * @param worldEditorDataType 编辑器数据的类型。
+	 * @param sourceSLKData       源 SLK 数据对象。
+	 * @param sourceSLKMetaData   源 SLK 元数据对象。
+	 * @param editorData          包含更改信息的 War3ObjectDataChangeset 对象。
+	 */
 	public static void apply(final WorldEditStrings worldEditStrings, final WorldEditorDataType worldEditorDataType,
-			final ObjectData sourceSLKData, final ObjectData sourceSLKMetaData,
-			final War3ObjectDataChangeset editorData) {
+							 final ObjectData sourceSLKData, final ObjectData sourceSLKMetaData,
+							 final War3ObjectDataChangeset editorData) {
+		// 如果编辑器数据类型是 ABILITIES
 		if (worldEditorDataType == WorldEditorDataType.ABILITIES) {
+			// 遍历源 SLK 数据中的每个键
 			for (final String originalKey : sourceSLKData.keySet()) {
+				// 获取原始键对应的游戏对象
 				final GameObject originalObject = sourceSLKData.get(originalKey);
+				// 获取游戏对象的 "code" 字段值
 				final String code = originalObject.getFieldAsString("code", 0);
+				// 如果 "code" 字段值不为空
 				if (code != null) {
+					// 从源 SLK 数据中获取 "code" 字段值对应的游戏对象
 					final GameObject codeObject = sourceSLKData.get(code);
+					// 如果找到了对应的游戏对象
 					if (codeObject != null) {
+						// 将原始游戏对象的属性继承自 "code" 游戏对象
 						sourceSLKData.inheritFrom(originalKey, code);
 					}
 				}
 			}
 		}
+
+		// 遍历编辑器数据中的每个自定义更改项
 		for (final Map.Entry<War3ID, ObjectDataChangeEntry> entry : editorData.getCustom()) {
+			// 获取更改项的单位 ID
 			final War3ID unitId = entry.getKey();
+			// 获取更改项的详细信息
 			final ObjectDataChangeEntry unitChanges = entry.getValue();
+			// 获取更改项的旧 ID
 			final War3ID oldId = unitChanges.getOldId();
+			// 获取更改项的新 ID
 			final War3ID newId = unitChanges.getNewId();
+			// 将新 ID 转换为字符串
 			final String unitIdString = newId.toString();
+			// 在源 SLK 数据中克隆一个单位，从旧 ID 到新 ID
 			sourceSLKData.cloneUnit(oldId.asStringValue(), newId.asStringValue());
+			// 从源 SLK 数据中获取新 ID 对应的游戏对象
 			final GameObject gameObject = sourceSLKData.get(unitIdString);
+			// 如果找到了对应的游戏对象
 			if (gameObject != null) {
+				// 遍历更改项中的每个元数据更改
 				for (final Map.Entry<War3ID, List<Change>> changeEntry : unitChanges.getChanges()) {
+					// 获取元数据更改的键
 					final War3ID metaKey = changeEntry.getKey();
+					// 获取元数据更改的列表
 					final List<Change> changes = changeEntry.getValue();
+					// 从源 SLK 元数据中获取元数据键对应的游戏对象
 					final GameObject metaDataField = sourceSLKMetaData.get(metaKey.asStringValue());
+					// 如果没有找到对应的元数据游戏对象
 					if (metaDataField == null) {
+						// 打印错误信息
 						System.err.println("UNKNOWN META DATA FIELD: " + metaKey + " on " + unitId);
+						// 继续下一个更改项
 						continue;
 					}
+					// 应用更改到游戏对象
 					applyChange(gameObject, changes, metaDataField);
 				}
 			}
 		}
+
+		// 遍历编辑器数据中的每个原始更改项
 		for (final Map.Entry<War3ID, ObjectDataChangeEntry> entry : editorData.getOriginal()) {
+			// 获取更改项的单位 ID
 			final War3ID unitId = entry.getKey();
+			// 获取更改项的详细信息
 			final ObjectDataChangeEntry unitChanges = entry.getValue();
+			// 获取更改项的旧 ID
 			final War3ID oldId = unitChanges.getOldId();
+			// 获取更改项的新 ID
 			final War3ID newId = unitChanges.getNewId();
+			// 将旧 ID 转换为字符串
 			final String unitIdString = oldId.toString();
+			// 从源 SLK 数据中获取旧 ID 对应的游戏对象
 			final GameObject gameObject = sourceSLKData.get(unitIdString);
+			// 如果找到了对应的游戏对象
 			if (gameObject != null) {
+				// 遍历更改项中的每个元数据更改
 				for (final Map.Entry<War3ID, List<Change>> changeEntry : unitChanges.getChanges()) {
+					// 获取元数据更改的键
 					final War3ID metaKey = changeEntry.getKey();
+					// 获取元数据更改的列表
 					final List<Change> changes = changeEntry.getValue();
+					// 从源 SLK 元数据中获取元数据键对应的游戏对象
 					final GameObject metaDataField = sourceSLKMetaData.get(metaKey.asStringValue());
+					// 如果没有找到对应的元数据游戏对象
 					if (metaDataField == null) {
+						// 打印错误信息
 						System.err.println("UNKNOWN META DATA FIELD: " + metaKey + " on " + unitId);
+						// 继续下一个更改项
 						continue;
 					}
+					// 应用更改到游戏对象
 					applyChange(gameObject, changes, metaDataField);
 				}
 			}
 		}
+
+		// 解析源 SLK 数据中名称字段的字符串引用
 		resolveStringReferencesInNames(worldEditStrings, sourceSLKData);
 	}
+
 
 	private static void applyChange(final GameObject gameObject, final List<Change> changes,
 			final GameObject metaDataField) {

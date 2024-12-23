@@ -10,16 +10,27 @@ import com.google.common.io.LittleEndianDataOutputStream;
  * A player.
  */
 public class Player {
+	// 玩家ID
 	private int id;
+	// 玩家类型
 	private int type;
+	// 玩家种族
 	private int race;
+	// 是否固定起始位置
 	private int isFixedStartPosition;
+	// 玩家名称
 	private String name;
+	// 玩家起始位置的坐标数组，包含两个浮点数，分别代表X和Y坐标
 	private final float[] startLocation = new float[2];
+	// 盟友低优先级标志位
 	private long allyLowPriorities;
+	// 盟友高优先级标志位
 	private long allyHighPriorities;
+	// 敌人低优先级标志位
 	private long enemyLowPrioritiesFlags;
+	// 敌人高优先级标志位
 	private long enemyHighPrioritiesFlags;
+
 
 	public void load(final LittleEndianDataInputStream stream, final int version) throws IOException {
 		this.id = (int) ParseUtils.readUInt32(stream);

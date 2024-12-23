@@ -763,26 +763,37 @@ public class Terrain {
 		System.out.println("cliff: " + this.corners[x][y].cliff);
 	}
 
+	// 更新指定区域的地形纹理
 	public void updateGroundTextures(final Rectangle area) {
+		// 创建一个新的矩形区域，向四周扩展1个单位，用于计算实际需要更新的纹理区域
 		final Rectangle adjusted = new Rectangle(area.x - 1, area.y - 1, area.width + 2, area.height + 2);
+		// 创建一个矩形对象用于存储实际需要更新的纹理区域
 		final Rectangle updateArea = new Rectangle();
+		// 计算实际需要更新的纹理区域，确保不会超出地图边界
 		Intersector.intersectRectangles(new Rectangle(0, 0, this.columns - 1, this.rows - 1), adjusted, updateArea);
 
+		// 遍历实际需要更新的纹理区域的每一个点
 		for (int j = (int) updateArea.getY(); j <= (int) ((updateArea.getY() + updateArea.getHeight()) - 1); j++) {
 			for (int i = (int) updateArea.getX(); i <= (int) ((updateArea.getX() + updateArea.getWidth()) - 1); i++) {
+				// 获取当前点的纹理变化
 				getTextureVariations(i, j, this.groundTextureList, ((j * (this.columns - 1)) + i) * 4);
 
+				// 如果当前点是悬崖或斜坡的角落
 				if (this.corners[i][j].cliff || this.corners[i][j].romp) {
+					// 如果当前点是斜坡入口，则跳过不处理
 					if (isCornerRampEntrance(i, j)) {
 						continue;
 					}
+					// 设置当前点的纹理变化，标记为悬崖或斜坡的角落
 					this.groundTextureList[(((j * (this.columns - 1)) + i) * 4) + 3] |= 0b1000000000000000;
 				}
 			}
 		}
 
+		// 上传更新后的地形纹理到GPU
 		uploadGroundTexture();
 	}
+
 
 	public void removeTerrainCell(final int i, final int j) {
 		this.groundTextureList[(((j * (this.columns - 1)) + i) * 4) + 3] |= 0b1000000000000000;
@@ -1230,76 +1241,111 @@ public class Terrain {
 		}
 	}
 
+	// 添加建筑阴影的方法
 	public BuildingShadow addShadow(final String file, final float shadowX, final float shadowY) {
+		// 如果该文件的阴影还未被添加，则进行初始化
 		if (!this.shadows.containsKey(file)) {
+			// 构建阴影纹理文件的路径
 			final String path = "ReplaceableTextures\\Shadows\\" + file + ".blp";
+			// 将文件路径和空的阴影列表存入shadows映射中
 			this.shadows.put(file, new ArrayList<>());
+			// 加载阴影纹理并存入shadowTextures映射中
 			this.shadowTextures.put(file, (Texture) this.viewer.load(path, PathSolver.DEFAULT, null));
 		}
+		// 获取该文件的阴影列表
 		final List<float[]> shadowList = this.shadows.get(file);
-		final float[] shadowPositionArray = new float[] { shadowX, shadowY };
+		// 创建一个新的阴影位置数组
+		final float[] shadowPositionArray = new float[]{shadowX, shadowY};
+		// 将新的阴影位置添加到阴影列表中
 		shadowList.add(shadowPositionArray);
+		// 如果阴影初始化已完成
 		if (this.initShadowsFinished) {
+			// 获取阴影纹理
 			final Texture texture = this.shadowTextures.get(file);
-
+			// 计算阴影贴图的列数和行数
 			final int columns = (this.columns - 1) * 4;
 			final int rows = (this.rows - 1) * 4;
+			// 将阴影数据绘制到屏幕上
 			blitShadowData(columns, rows, shadowX, shadowY, texture);
+			// 获取OpenGL 3.0的实例
 			final GL30 gl = Gdx.gl30;
+			// 绑定阴影贴图到GL_TEXTURE_2D目标
 			gl.glBindTexture(GL30.GL_TEXTURE_2D, this.shadowMap);
+			// 更新阴影贴图的数据
 			gl.glTexImage2D(GL30.GL_TEXTURE_2D, 0, GL30.GL_R8, columns, rows, 0, GL30.GL_RED, GL30.GL_UNSIGNED_BYTE,
 					RenderMathUtils.wrap(this.shadowData));
 		}
+		// 返回一个新的BuildingShadow实例，包含移除和移动阴影的方法
 		return new BuildingShadow() {
+			// 移除阴影的方法
 			@Override
 			public void remove() {
+				// 从阴影列表中移除该阴影
 				shadowList.remove(shadowPositionArray);
+				// 重新加载阴影数据到GPU
 				reloadShadowDataToGPU();
 			}
 
+			// 移动阴影的方法
 			@Override
 			public void move(final float x, final float y) {
+				// 更新阴影位置
 				shadowPositionArray[0] = x;
 				shadowPositionArray[1] = y;
+				// 重新加载阴影数据到GPU
 				reloadShadowDataToGPU();
 			}
 		};
 	}
 
+
+	// 定义一个方法 blitShadowData，用于在纹理上绘制阴影数据
 	public void blitShadowData(final int columns, final int rows, final float shadowX, final float shadowY,
-			final Texture texture) {
+							   final Texture texture) {
+		// 获取纹理的宽度和高度
 		final int width = texture.getWidth();
 		final int height = texture.getHeight();
-		final int ox = (int) Math.round(width * 0.3);
-		final int oy = (int) Math.round(height * 0.7);
+		// 计算纹理上的偏移量，ox 是横向偏移，oy 是纵向偏移
+		final int ox = (int) Math.round(width * 0.3); // 横向偏移量为宽度的 30%
+		final int oy = (int) Math.round(height * 0.7); // 纵向偏移量为高度的 70%
+		// 调用 blitShadowDataLocation 方法，传入必要的参数来实际绘制阴影数据
 		blitShadowDataLocation(columns, rows, (RawOpenGLTextureResource) texture, width, height, ox, oy,
 				this.centerOffset, shadowX, shadowY, this.shadowData);
 	}
 
-	public void initShadows() throws IOException {
-		final GL30 gl = Gdx.gl30;
-		final float[] centerOffset = this.centerOffset;
-		final int columns = (this.columns - 1) * 4;
-		final int rows = (this.rows - 1) * 4;
 
-		final int shadowSize = columns * rows;
-		this.staticShadowData = new byte[columns * rows];
-		this.shadowData = new byte[columns * rows];
+	// 初始化阴影数据
+	public void initShadows() throws IOException {
+		final GL30 gl = Gdx.gl30; // 获取OpenGL 3.0上下文
+		final float[] centerOffset = this.centerOffset; // 地图中心偏移量
+		final int columns = (this.columns - 1) * 4; // 阴影贴图的列数
+		final int rows = (this.rows - 1) * 4; // 阴影贴图的行数
+
+		final int shadowSize = columns * rows; // 阴影数据的总大小
+		this.staticShadowData = new byte[columns * rows]; // 静态阴影数据数组
+		this.shadowData = new byte[columns * rows]; // 动态阴影数据数组
+
+		// 如果地图文件中包含阴影数据
 		if (this.viewer.mapMpq.has("war3map.shd")) {
 			final byte[] buffer;
 
+			// 读取阴影数据文件
 			try (final InputStream shadowSource = this.viewer.mapMpq.getResourceAsStream("war3map.shd")) {
 				buffer = IOUtils.toByteArray(shadowSource);
 			}
 
+			// 将阴影数据转换为半亮度并存储到静态阴影数据数组中
 			for (int i = 0; i < shadowSize; i++) {
 				this.staticShadowData[i] = (byte) ((buffer[i] & 0xFF) / 2f);
 			}
 		}
 
-		final byte outsideArea = (byte) 204;
+		final byte outsideArea = (byte) 204; // 阴影贴图外部区域的值
+		// 计算地图边界外的区域
 		final int x0 = this.mapBounds[0] * 4, x1 = (this.mapSize[0] - this.mapBounds[1] - 1) * 4,
 				y0 = this.mapBounds[2] * 4, y1 = (this.mapSize[1] - this.mapBounds[3] - 1) * 4;
+
+		// 填充地图边界外的区域为outsideArea
 		for (int y = y0; y < y1; ++y) {
 			for (int x = x0; x < x1; ++x) {
 				final RenderCorner c = this.corners[x >> 2][y >> 2];
@@ -1308,14 +1354,16 @@ public class Terrain {
 				}
 			}
 		}
+		// 填充地图顶部和底部边界外的区域
 		for (int y = 0; y < rows; ++y) {
-			for (int x = 0; x < x0; ++x) {
+			for (int x = x0; x < x1; ++x) {
 				this.staticShadowData[(y * columns) + x] = outsideArea;
 			}
 			for (int x = x1; x < columns; ++x) {
 				this.staticShadowData[(y * columns) + x] = outsideArea;
 			}
 		}
+		// 填充地图左侧和右侧边界外的区域
 		for (int x = x0; x < x1; ++x) {
 			for (int y = 0; y < y0; ++y) {
 				this.staticShadowData[(y * columns) + x] = outsideArea;
@@ -1324,8 +1372,11 @@ public class Terrain {
 				this.staticShadowData[(y * columns) + x] = outsideArea;
 			}
 		}
+
+		// 重新加载阴影数据
 		reloadShadowData(centerOffset, columns, rows);
 
+		// 创建并配置阴影贴图纹理
 		this.shadowMap = gl.glGenTexture();
 		gl.glBindTexture(GL30.GL_TEXTURE_2D, this.shadowMap);
 		gl.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MAG_FILTER, GL30.GL_LINEAR);
@@ -1334,11 +1385,13 @@ public class Terrain {
 		gl.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_WRAP_T, GL30.GL_CLAMP_TO_EDGE);
 		gl.glTexImage2D(GL30.GL_TEXTURE_2D, 0, GL30.GL_R8, columns, rows, 0, GL30.GL_RED, GL30.GL_UNSIGNED_BYTE,
 				RenderMathUtils.wrap(this.shadowData));
-		this.initShadowsFinished = true;
+		this.initShadowsFinished = true; // 标记阴影初始化完成
 
+		// 创建雾战争迷雾贴图纹理
 		this.fogOfWarMap = gl.glGenTexture();
 		gl.glBindTexture(GL30.GL_TEXTURE_2D, this.fogOfWarMap);
 	}
+
 
 	private void reloadShadowData(final float[] centerOffset, final int columns, final int rows) {
 		System.arraycopy(this.staticShadowData, 0, this.shadowData, 0, this.staticShadowData.length);
@@ -1357,25 +1410,34 @@ public class Terrain {
 		}
 	}
 
+	// 该方法用于将阴影数据绘制到指定的纹理资源上
 	public void blitShadowDataLocation(final int columns, final int rows, final RawOpenGLTextureResource texture,
-			final int width, final int height, final int x01, final int y01, final float[] centerOffset, final float v,
-			final float v2, final byte[] shadowData) {
+									   final int width, final int height, final int x01, final int y01, final float[] centerOffset, final float v,
+									   final float v2, final byte[] shadowData) {
+		// 计算阴影数据在纹理中的起始X坐标
 		final int x0 = (int) Math.floor((v - centerOffset[0]) / 32.0) - x01;
+		// 计算阴影数据在纹理中的起始Y坐标
 		final int y0 = (int) Math.floor((v2 - centerOffset[1]) / 32.0) + y01;
+
+		// 遍历纹理的每个像素
 		for (int y = 0; y < height; ++y) {
+			// 如果当前像素的Y坐标超出了阴影数据的范围，则跳过这个像素
 			if (((y0 - y) < 0) || ((y0 - y) >= rows)) {
 				continue;
 			}
 			for (int x = 0; x < width; ++x) {
+				// 如果当前像素的X坐标超出了阴影数据的范围，则跳过这个像素
 				if (((x0 + x) < 0) || ((x0 + x) >= columns)) {
 					continue;
 				}
+				// 如果当前像素的alpha值不为0（即不透明），则在阴影数据中对应位置设置阴影
 				if (texture.getData().get((((y * width) + x) * 4) + 3) != 0) {
 					shadowData[((y0 - y) * columns) + x0 + x] = (byte) 128;
 				}
 			}
 		}
 	}
+
 
 //	public Vector3 groundNormal(final Vector3 out, int x, int y) {
 //		final float[] centerOffset = this.centerOffset;
@@ -1530,25 +1592,44 @@ public class Terrain {
 		return this.waterHeightOffset * 128.0f;
 	}
 
+	// 定义一个名为Splat的静态内部类
 	public static final class Splat {
+		// 存储位置信息的列表，每个位置由一个float数组表示
 		public List<float[]> locations = new ArrayList<>();
+		// 存储SplatMover消费者对象的列表，用于处理与Splat相关的移动逻辑
 		public List<Consumer<SplatMover>> unitMapping = new ArrayList<>();
+		// Splat的不透明度，范围从0（完全透明）到1（完全不透明）
 		public float opacity = 1;
+		// 标记Splat是否应该显示在水面上方
 		public boolean aboveWater = false;
 	}
 
+	// 定义一个方法用于加载地形贴图（splats）
 	public void loadSplats() throws IOException {
+		// 遍历当前对象中所有的贴图条目
 		for (final Map.Entry<String, Splat> entry : this.splats.entrySet()) {
+			// 获取贴图的路径
 			final String path = entry.getKey();
+			// 获取贴图对象
 			final Splat splat = entry.getValue();
 
-			final SplatModel splatModel = new SplatModel(Gdx.gl30,
-					(Texture) this.viewer.load(path, PathSolver.DEFAULT, null), splat.locations, this.centerOffset,
-					splat.unitMapping.isEmpty() ? null : splat.unitMapping, false, false, false, false);
+			// 创建一个新的贴图模型对象
+			// 参数包括OpenGL上下文、纹理、位置信息、中心偏移量、单位映射以及一些布尔值参数
+			final SplatModel splatModel = new SplatModel(
+					Gdx.gl30,
+					(Texture) this.viewer.load(path, PathSolver.DEFAULT, null), // 加载纹理
+					splat.locations, // 贴图的位置信息
+					this.centerOffset, // 中心偏移量
+					splat.unitMapping.isEmpty() ? null : splat.unitMapping, // 单位映射，如果没有则传入null
+					false, false, false, false // 一些布尔值参数，具体含义需参考SplatModel的构造函数
+			);
+			// 设置贴图模型的透明度
 			splatModel.color[3] = splat.opacity;
+			// 将贴图模型添加到批次模型中，以便渲染
 			addSplatBatchModel(path, splatModel);
 		}
 	}
+
 
 	public void removeSplatBatchModel(final String path) {
 		this.uberSplatModelsList.remove(this.uberSplatModels.remove(path));
@@ -1564,29 +1645,44 @@ public class Terrain {
 		return this.uberSplatModels.get(pathKey);
 	}
 
+	// 定义一个方法addUberSplat，用于在环境中添加一个超级斑点（uber splat）
 	public SplatMover addUberSplat(final String path, final float x, final float y, final float z, final float scale,
-			final boolean unshaded, final boolean noDepthTest, final boolean highPriority, final boolean aboveWater) {
+								   final boolean unshaded, final boolean noDepthTest, final boolean highPriority, final boolean aboveWater) {
+		// 尝试从现有的uberSplatModels映射中获取与给定路径对应的SplatModel对象
 		SplatModel splatModel = this.uberSplatModels.get(path);
+		// 如果找不到对应的SplatModel，则创建一个新的SplatModel
 		if (splatModel == null) {
+			// 创建SplatModel，需要指定OpenGL版本、纹理、顶点列表等参数
 			splatModel = new SplatModel(Gdx.gl30, (Texture) this.viewer.load(path, PathSolver.DEFAULT, null),
 					new ArrayList<>(), this.centerOffset, new ArrayList<>(), unshaded, noDepthTest, highPriority,
 					aboveWater);
+			// 将新创建的SplatModel添加到uberSplatModels映射中
 			addSplatBatchModel(path, splatModel);
 		}
+		// 调用SplatModel的add方法，将斑点添加到指定的位置，并返回一个SplatMover对象
 		return splatModel.add(x - scale, y - scale, x + scale, y + scale, z, this.centerOffset);
 	}
 
+
+	// 定义一个方法，用于在环境中添加单位阴影的斑点效果
 	public SplatMover addUnitShadowSplat(final String texture, final float x, final float y, final float x2,
-			final float y2, final float zDepthUpward, final float opacity, final boolean aboveWater) {
+										 final float y2, final float zDepthUpward, final float opacity, final boolean aboveWater) {
+		// 尝试获取与指定纹理相对应的斑点模型
 		SplatModel splatModel = this.uberSplatModels.get(texture);
+		// 如果没有找到对应的斑点模型，则创建一个新的斑点模型
 		if (splatModel == null) {
+			// 创建斑点模型，需要OpenGL上下文、纹理、顶点列表等信息
 			splatModel = new SplatModel(Gdx.gl30, (Texture) this.viewer.load(texture, PathSolver.DEFAULT, null),
 					new ArrayList<>(), this.centerOffset, new ArrayList<>(), false, false, false, aboveWater);
+			// 设置斑点模型的透明度
 			splatModel.color[3] = opacity;
+			// 将新创建的斑点模型添加到批次模型中
 			addSplatBatchModel(texture, splatModel);
 		}
+		// 返回添加了斑点效果的移动器，包含了斑点的位置、深度等信息
 		return splatModel.add(x, y, x2, y2, zDepthUpward, this.centerOffset);
 	}
+
 
 	public static final class SoftwareGroundMesh {
 		public final float[] vertices;
@@ -1696,14 +1792,23 @@ public class Terrain {
 		return this.entireMapRectangle;
 	}
 
+	// 定义一个方法，用于将地形阴影数据重新加载到GPU中
 	private void reloadShadowDataToGPU() {
+		// 计算纹理列数，每4个像素对应地形的一个单元格，减去1是因为不需要额外的边界
 		final int columns = (Terrain.this.columns - 1) * 4;
+		// 计算纹理行数，同理，每4个像素对应地形的一个单元格
 		final int rows = (Terrain.this.rows - 1) * 4;
+		// 调用reloadShadowData方法，传入地形中心偏移量、列数和行数
 		reloadShadowData(Terrain.this.centerOffset, columns, rows);
+
+		// 获取OpenGL 3.0的实例
 		final GL30 gl = Gdx.gl30;
+		// 绑定阴影贴图纹理到GL_TEXTURE_2D目标
 		gl.glBindTexture(GL30.GL_TEXTURE_2D, Terrain.this.shadowMap);
+		// 更新纹理图像，设置纹理格式为GL_R8，即单通道8位红色数据
 		gl.glTexImage2D(GL30.GL_TEXTURE_2D, 0, GL30.GL_R8, columns, rows, 0, GL30.GL_RED, GL30.GL_UNSIGNED_BYTE,
 				RenderMathUtils.wrap(Terrain.this.shadowData));
+		// 最后一行代码将地形的阴影数据上传到GPU中，RenderMathUtils.wrap可能是用于处理数据的工具类方法
 	}
 
 	private static char getRampLetter(final int layerHeightOffset, final boolean isRamp) {
@@ -1728,27 +1833,48 @@ public class Terrain {
 		return this.defaultCameraBounds;
 	}
 
+	// 设置战争迷雾数据的方法
 	public void setFogOfWarData(final CPlayerFogOfWar fogOfWarData) {
+		// 将传入的战争迷雾数据赋值给当前对象的fogOfWarData属性
 		this.fogOfWarData = fogOfWarData;
+
+		// 分配一个直接字节缓冲区，其容量与传入的战争迷雾数据的缓冲区容量相同
+		// 直接字节缓冲区可以直接被GPU访问，用于高效的数据传输
 		this.visualFogData = ByteBuffer.allocateDirect(fogOfWarData.getFogOfWarBuffer().capacity());
+
+		// 将战争迷雾数据重新加载到GPU中，以便在图形渲染时使用
 		reloadFogOfWarDataToGPU();
 	}
 
+
+	// 定义方法reloadFogOfWarDataToGPU，用于将战争迷雾数据重新加载到GPU中
 	public void reloadFogOfWarDataToGPU() {
+		// 获取OpenGL的GL30接口实例
 		final GL30 gl = Gdx.gl30;
+		// 获取战争迷雾数据的ByteBuffer
 		final ByteBuffer fogOfWarBuffer = this.fogOfWarData.getFogOfWarBuffer();
+		// 遍历visualFogData的容量
 		for (int i = 0; i < this.visualFogData.capacity(); i++) {
+			// 将visualFogData中的每个元素与fogOfWarBuffer中对应位置的元素进行颜色淡化处理，并放回visualFogData
 			this.visualFogData.put(i,
 					War3MapViewer.fadeLineOfSightColor(this.visualFogData.get(i), fogOfWarBuffer.get(i)));
 		}
+		// 绑定战争迷雾地图纹理到GL_TEXTURE_2D目标
 		gl.glBindTexture(GL30.GL_TEXTURE_2D, Terrain.this.fogOfWarMap);
+		// 设置纹理放大过滤方式为线性过滤
 		gl.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MAG_FILTER, GL30.GL_LINEAR);
+		// 设置纹理缩小过滤方式为线性过滤
 		gl.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MIN_FILTER, GL30.GL_LINEAR);
+		// 设置纹理S轴环绕方式为边缘夹紧
 		gl.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_WRAP_S, GL30.GL_CLAMP_TO_EDGE);
+		// 设置纹理T轴环绕方式为边缘夹紧
 		gl.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_WRAP_T, GL30.GL_CLAMP_TO_EDGE);
+		// 生成2D纹理图像，指定内部格式为GL_R8，宽度为fogOfWarData的宽度，高度为fogOfWarData的高度，
+		// 数据格式为GL_RED，数据类型为GL_UNSIGNED_BYTE，数据源为visualFogData
 		gl.glTexImage2D(GL30.GL_TEXTURE_2D, 0, GL30.GL_R8, this.fogOfWarData.getWidth(), this.fogOfWarData.getHeight(),
 				0, GL30.GL_RED, GL30.GL_UNSIGNED_BYTE, this.visualFogData);
 	}
+
 
 	public int getFogOfWarMap() {
 		return this.fogOfWarMap;

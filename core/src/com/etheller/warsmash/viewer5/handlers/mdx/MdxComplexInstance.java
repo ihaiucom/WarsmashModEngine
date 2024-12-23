@@ -748,47 +748,73 @@ public class MdxComplexInstance extends ModelInstance {
 	}
 
 	/**
-	 * Set the sequence of this instance.
+	 * 设置模型的当前序列。
+	 *
+	 * @param id 要设置的序列的ID。
+	 * @return 调用此方法的MdxComplexInstance实例。
 	 */
 	public MdxComplexInstance setSequence(final int id) {
+		// 获取模型对象
 		final MdxModel model = (MdxModel) this.model;
 
+		// 如果模型状态正常
 		if (model.ok) {
-
+			// 获取上一个序列的ID
 			final int lastSequence = this.sequence;
+			// 设置当前序列的ID
 			this.sequence = id;
 
+			// 获取模型的序列列表
 			final List<Sequence> sequences = model.sequences;
 
+			// 如果序列ID无效
 			if (id < 0 || id > sequences.size() - 1) {
+				// 将当前序列设置为无效
 				this.sequence = -1;
+				// 将当前帧设置为0
 				this.frame = 0;
+				// 将浮动帧设置为0
 				this.floatingFrame = 0;
+				// 不允许粒子生成
 				this.allowParticleSpawn = false;
 			}
+			// 如果序列ID有效
 			else {
+				// 如果混合时间大于0且上一个序列不是无效的
 				if (this.blendTime > 0 && lastSequence != -1) {
+					// 如果混合时间剩余小于等于0且计数器大于0
 					if (this.blendTimeRemaining <= 0 && this.counter > 0) {
+						// 将混合时间剩余设置为混合时间
 						this.blendTimeRemaining = this.blendTime;
+						// 遍历所有排序节点
 						for (int i = 0, l = this.sortedNodes.length; i < l; i++) {
+							// 获取当前节点
 							final SkeletalNode node = this.sortedNodes[i];
+							// 开始混合
 							node.beginBlending();
 						}
 					}
 				}
 
+				// 设置当前帧为序列的起始帧
 				this.frame = (int) sequences.get(id).getInterval()[0]; // TODO not cast
+				// 设置浮动帧为当前帧
 				this.floatingFrame = this.frame;
+				// 设置序列结束标志为false
 				this.sequenceEnded = false;
 			}
 
+			// 重置事件发射器
 			resetEventEmitters();
 
+			// 设置强制标志为true
 			this.forced = true;
 		}
 
+		// 返回调用此方法的MdxComplexInstance实例
 		return this;
 	}
+
 
 	/**
 	 * Set the seuqnece loop mode. 0 to never loop, 1 to loop based on the model,

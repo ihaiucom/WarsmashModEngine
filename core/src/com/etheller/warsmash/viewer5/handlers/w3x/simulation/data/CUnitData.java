@@ -1080,7 +1080,6 @@ public class CUnitData {
 		return table;
 	}
 
-	// 创建攻击类型
 	private CUnitAttack createAttack(final float animationBackswingPoint, final float animationDamagePoint,
 			final int areaOfEffectFullDamage, final int areaOfEffectMediumDamage, final int areaOfEffectSmallDamage,
 			final EnumSet<CTargetType> areaOfEffectTargets, final CAttackType attackType, final float cooldownTime,

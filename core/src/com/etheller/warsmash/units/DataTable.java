@@ -15,24 +15,28 @@ import java.util.Map;
 import java.util.Set;
 
 import com.etheller.warsmash.util.StringBundle;
-
+// 读取slk,txt文件，并生成数据表
 public class DataTable implements ObjectData {
 	public static boolean DEBUG = false;
 
+	// 存储数据的映射表
 	Map<StringKey, Element> dataTable = new LinkedHashMap<>();
 
 	private final StringBundle worldEditStrings;
 
+	// 构造方法，初始化数据表并加载字符串包
 	public DataTable(final StringBundle worldEditStrings) {
 		this.worldEditStrings = worldEditStrings;
 	}
 
 	@Override
+	// 获取本地化的字符串
 	public String getLocalizedString(final String key) {
 		return this.worldEditStrings.getString(key);
 	}
 
 	@Override
+	// 返回数据表中的所有键
 	public Set<String> keySet() {
 		final Set<String> outputKeySet = new HashSet<>();
 		final Set<StringKey> internalKeySet = this.dataTable.keySet();
@@ -42,37 +46,39 @@ public class DataTable implements ObjectData {
 		return outputKeySet;
 	}
 
+	// 从输入流中读取TXT文件
 	public void readTXT(final InputStream inputStream) {
 		try {
 			readTXT(inputStream, false);
-		}
-		catch (final IOException e) {
+		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
+	// 从文件读取TXT文件
 	public void readTXT(final File f) {
 		readTXT(f, false);
 	}
 
+	// 从文件读取TXT文件，并可选择是否生成
 	public void readTXT(final File f, final boolean canProduce) {
 		try {
 			readTXT(new FileInputStream(f), canProduce);
-		}
-		catch (final IOException e) {
+		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
+	// 从文件读取SLK文件
 	public void readSLK(final File f) {
 		try {
 			readSLK(new FileInputStream(f));
-		}
-		catch (final IOException e) {
+		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
+	// 从输入流读取TXT文件
 	public void readTXT(final InputStream txt, final boolean canProduce) throws IOException {
 		if (txt == null) {
 			return;
@@ -107,8 +113,7 @@ public class DataTable implements ObjectData {
 						this.dataTable.put(new StringKey(newKey), currentUnit);
 					}
 				}
-			}
-			else if (input.contains("=")) {
+			} else if (input.contains("=")) {
 				final int eIndex = input.indexOf("=");
 				final String fieldValue = input.substring(eIndex + 1);
 				final StringBuilder builder = new StringBuilder();
@@ -125,12 +130,10 @@ public class DataTable implements ObjectData {
 					}
 					if (c == '\"') {
 						withinQuotedString = !withinQuotedString;
-					}
-					else if (!withinQuotedString && (c == ',')) {
+					} else if (!withinQuotedString && (c == ',')) {
 						values.add(builder.toString().trim());
 						builder.setLength(0); // empty buffer
-					}
-					else {
+					} else {
 						builder.append(c);
 					}
 					wasSlash = isSlash;
@@ -148,6 +151,7 @@ public class DataTable implements ObjectData {
 		reader.close();
 	}
 
+	// 从输入流中读取SLK文件
 	public void readSLK(final InputStream txt) throws IOException {
 		if (txt == null) {
 			return;
@@ -172,8 +176,7 @@ public class DataTable implements ObjectData {
 		if (xIndex > yIndex) {
 			colCount = Integer.parseInt(input.substring(xIndex, input.lastIndexOf(";")));
 			rowCount = Integer.parseInt(input.substring(yIndex, xIndex - 2));
-		}
-		else {
+		} else {
 			rowCount = Integer.parseInt(input.substring(yIndex, input.lastIndexOf(";")));
 			colCount = Integer.parseInt(input.substring(xIndex, yIndex - 2));
 			flipMode = true;
@@ -195,8 +198,7 @@ public class DataTable implements ObjectData {
 			if (input.contains("X1;") || input.endsWith(";X1")) {
 				rowStartCount++;
 				col = 0;
-			}
-			else {
+			} else {
 				col++;
 			}
 			String kInput;
@@ -205,8 +207,7 @@ public class DataTable implements ObjectData {
 				if (DEBUG) {
 					System.out.println(kInput);
 				}
-			}
-			else {
+			} else {
 				kInput = input;
 			}
 			if (rowStartCount <= 1) {
@@ -224,8 +225,7 @@ public class DataTable implements ObjectData {
 							rowStartCount++;
 						}
 						fieldId = lastFieldId + 1;
-					}
-					else {
+					} else {
 						fieldId = Integer.parseInt(input.substring(subXIndex + 1, fieldIdEndIndex));
 					}
 
@@ -235,14 +235,12 @@ public class DataTable implements ObjectData {
 					}
 					if (quotationIndex == -1) {
 						dataNames[fieldId - 1] = kInput.substring(eIndex + 1);
-					}
-					else {
+					} else {
 						dataNames[fieldId - 1] = kInput.substring(quotationIndex + 1, kInput.lastIndexOf("\""));
 					}
 					lastFieldId = fieldId;
 					continue;
-				}
-				else {
+				} else {
 					int eIndex = kInput.indexOf("K");
 					if ((eIndex == -1) || (kInput.charAt(eIndex - 1) != ';')) {
 						continue;
@@ -253,8 +251,7 @@ public class DataTable implements ObjectData {
 							rowStartCount++;
 						}
 						fieldId = lastFieldId + 1;
-					}
-					else {
+					} else {
 						if (flipMode && input.contains("Y") && (input == kInput)) {
 							eIndex = Math.min(subYIndex, eIndex);
 						}
@@ -273,8 +270,7 @@ public class DataTable implements ObjectData {
 					}
 					if (quotationIndex == -1) {
 						dataNames[fieldId - 1] = kInput.substring(eIndex + 1, kInput.length());
-					}
-					else {
+					} else {
 						dataNames[fieldId - 1] = kInput.substring(quotationIndex + 1, kInput.lastIndexOf("\""));
 					}
 					lastFieldId = fieldId;
@@ -292,8 +288,7 @@ public class DataTable implements ObjectData {
 						this.dataTable.put(new StringKey(newKey), currentUnit);
 					}
 				}
-			}
-			else if (kInput.contains("K")) {
+			} else if (kInput.contains("K")) {
 				final int subXIndex = input.indexOf("X");
 				int eIndex = kInput.indexOf("K");
 				if (flipMode && kInput.contains("Y")) {
@@ -315,8 +310,7 @@ public class DataTable implements ObjectData {
 						for (int splitChunkId = 0; splitChunkId < splitLine.length; splitChunkId++) {
 							currentUnit.setField(dataNames[fieldId - 1], splitLine[splitChunkId], splitChunkId);
 						}
-					}
-					else {
+					} else {
 						currentUnit.setField(dataNames[fieldId - 1], fieldValue);
 					}
 				}
@@ -327,26 +321,37 @@ public class DataTable implements ObjectData {
 	}
 
 	@Override
+	// 根据 ID 获取元素
 	public Element get(final String id) {
 		return this.dataTable.get(new StringKey(id));
 	}
 
 	@Override
+	// 定义一个方法 cloneUnit，用于克隆一个单位的数据
 	public void cloneUnit(final String parentId, final String cloneId) {
+		// 通过 parentId 获取父单位的数据条目
 		final Element parentEntry = get(parentId);
+		// 如果父单位存在
 		if (parentEntry != null) {
+			// 创建一个新的 LMUnit 对象，作为克隆单位，使用 cloneId 作为其 ID，并将当前对象作为其数据源
 			final LMUnit cloneUnit = new LMUnit(cloneId, this);
+			// 遍历父单位的所有字段
 			for (final String key : parentEntry.keySet()) {
+				// 获取父单位当前字段的所有值列表
 				final List<String> fieldList = parentEntry.getFieldAsList(key);
+				// 遍历字段值列表
 				for (int i = 0; i < fieldList.size(); i++) {
+					// 将父单位的字段值复制到克隆单位对应的字段和索引位置
 					cloneUnit.setField(key, fieldList.get(i), i);
 				}
 			}
+			// 将克隆单位的数据条目放入当前数据源中，使用 cloneId 作为键
 			put(cloneId, cloneUnit);
 		}
 	}
 
 	@Override
+	// 从父单位继承字段到子单位
 	public void inheritFrom(String childKey, String parentKey) {
 		final Element childEntry = get(childKey);
 		final Element parentEntry = get(parentKey);
@@ -360,18 +365,19 @@ public class DataTable implements ObjectData {
 						}
 					}
 				}
-			}
-			else {
+			} else {
 				cloneUnit(parentKey, childKey);
 			}
 		}
 	}
 
 	@Override
+	// 设置SLK文件中的值
 	public void setValue(final String slk, final String id, final String field, final String value) {
 		get(id).setField(field, value);
 	}
 
+	// 将元素放入数据表中
 	public void put(final String id, final Element e) {
 		this.dataTable.put(new StringKey(id), e);
 	}

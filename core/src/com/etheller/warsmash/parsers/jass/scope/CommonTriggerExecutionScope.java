@@ -22,74 +22,142 @@ import com.etheller.warsmash.viewer5.handlers.w3x.ui.dialog.CScriptDialogButton;
  * CommonTriggerExecutionScope类用于处理触发器的执行上下文，扩展了TriggerExecutionScope。
  */
 public class CommonTriggerExecutionScope extends TriggerExecutionScope {
+	// 触发该作用域的单元
 	private CUnit triggeringUnit;
+	// 过滤用的单元
 	private CUnit filterUnit;
+	// 枚举用的单元
 	private CUnit enumUnit;
+	// 过滤用的可破坏物
 	private CDestructable filterDestructable;
+	// 枚举用的可破坏物
 	private CDestructable enumDestructable;
+	// 过滤用的物品
 	private CItem filterItem;
+	// 枚举用的物品
 	private CItem enumItem;
+	// 过滤用的玩家
 	private CPlayerJass filterPlayer;
+	// 枚举用的玩家
 	private CPlayerJass enumPlayer;
+	// 即将过期的计时器
 	private CTimerJass expiringTimer;
+	// 进入区域的单元
 	private CUnit enteringUnit;
+	// 离开区域的单元
 	private CUnit leavingUnit;
+	// 触发该作用域的区域
 	private CRegion triggeringRegion;
+	// 触发该作用域的玩家
 	private CPlayerJass triggeringPlayer;
+	// 升级的单元
 	private CUnit levelingUnit;
+	// 学习技能的单元
 	private CUnit learningUnit;
+	// 已学习的技能ID
 	private int learnedSkill;
+	// 已学习的技能等级
 	private int learnedSkillLevel;
+	// 可复活的单元
 	private CUnit revivableUnit;
+	// 正在复活的单元
 	private CUnit revivingUnit;
+	// 攻击者单元
 	private CUnit attacker;
+	// 救援者单元
 	private CUnit rescuer;
+	// 即将死亡的单元
 	private CUnit dyingUnit;
+	// 击杀者单元
 	private CUnit killingUnit;
+	// 腐烂中的单元
 	private CUnit decayingUnit;
+	// 正在建造结构的单元
 	private CUnit constructingStructure;
+	// 被取消建造的结构
 	private CUnit cancelledStructure;
+	// 已建造的结构
 	private CUnit constructedStructure;
+	// 正在研究的单元
 	private CUnit researchingUnit;
+	// 已研究的项目ID
 	private int researched;
+	// 被训练的单元类型
 	private int trainedUnitType;
+	// 被训练的单元
 	private CUnit trainedUnit;
+	// 被探测到的单元
 	private CUnit detectedUnit;
+	// 召唤中的单元
 	private CUnit summoningUnit;
+	// 被召唤的单元
 	private CUnit summonedUnit;
+	// 运输单元
 	private CUnit transportUnit;
+	// 被装载的单元
 	private CUnit loadedUnit;
+	// 正在出售的单元
 	private CUnit sellingUnit;
+	// 已出售的单元
 	private CUnit soldUnit;
+	// 正在购买的单元
 	private CUnit buyingUnit;
+	// 已出售的物品
 	private CUnit soldItem;
+	// 正在改变所有权的单元
 	private CUnit changingUnit;
+	// 改变所有权前的玩家
 	private CPlayerJass changingUnitPrevOwner;
+	// 操纵物品的单元
 	private CUnit manipulatingUnit;
+	// 被操纵的物品
 	private CItem manipulatedItem;
+	// 接受命令的单元
 	private CUnit orderedUnit;
+	// 发出的命令ID
 	private int issuedOrderId;
+	// 命令点X坐标
 	private float orderPointX;
+	// 命令点Y坐标
 	private float orderPointY;
+	// 命令目标小部件
 	private CWidget orderTarget;
+	// 命令目标可破坏物
 	private CDestructable orderTargetDestructable;
+	// 命令目标物品
 	private CItem orderTargetItem;
+	// 命令目标单元
 	private CUnit orderTargetUnit;
+	// 触发小部件
 	private CWidget triggerWidget;
+	// 被点击的对话框
 	private CScriptDialog clickedDialog;
+	// 被点击的对话框按钮
 	private CScriptDialogButton clickedButton;
+	// 施放的技能
 	private CAbility spellAbility;
+	// 施放技能的单元
 	private CUnit spellAbilityUnit;
+	// 技能目标单元
 	private CUnit spellTargetUnit;
+	// 技能目标可破坏物
 	private CDestructable spellTargetDestructable;
+	// 技能目标物品
 	private CItem spellTargetItem;
+	// 技能目标点
 	private AbilityPointTarget spellTargetPoint;
+	// 技能ID
 	private War3ID spellAbilityId;
-	private int spellAbilityOrderId; // Warsmash only
-	private JassOrderButtonType spellAbilityTargetType; // Warsmash only
-	private JassOrder spellAbilityOrderCommandCard; // Warsmash only
+	// 技能命令ID（仅限Warsmash）
+	private int spellAbilityOrderId;
+	// 技能目标类型（仅限Warsmash）
+	private JassOrderButtonType spellAbilityTargetType;
+	// 技能命令卡（仅限Warsmash）
+	private JassOrder spellAbilityOrderCommandCard;
 
+	// 触发事件ID
 	private JassGameEventsWar3 triggerEventId;
+
 
 	/**
      * 构造函数，初始化触发器执行上下文

@@ -30,7 +30,9 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.upgrade.CUpgradeEff
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.upgrade.CUpgradeEffectMovementSpeedPcnt;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.upgrade.CUpgradeEffectSpellLevel;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.upgrade.CUpgradeEffectTechMaxAllowed;
-
+/**
+ * CUpgradeData 类用于管理和处理升级数据。
+ */
 public class CUpgradeData {
 	private static final String APPLIES_TO_ALL_UNITS = "global"; // replaced from 'glob'
 	private static final String CLASS = "class"; // replaced from 'gcls'
@@ -56,11 +58,18 @@ public class CUpgradeData {
 	private static final String[] EFFECT_CODE = { "code1", "code2", // replaced from 'gco1'
 			"code3", "code4", }; // replaced from 'gco3'
 
-	private final CGameplayConstants gameplayConstants;
-	private final ObjectData upgradeData;
-	private final DataTable standardUpgradeEffectMeta;
-	private final Map<War3ID, CUpgradeType> idToType = new HashMap<>();
+	private final CGameplayConstants gameplayConstants; // 游戏常量
+	private final ObjectData upgradeData; // 升级数据
+	private final DataTable standardUpgradeEffectMeta; // 标准升级效果元数据
+	private final Map<War3ID, CUpgradeType> idToType = new HashMap<>(); // 升级类型映射表
 
+	/**
+	 * 构造函数，初始化 CUpgradeData 实例
+	 *
+	 * @param gameplayConstants         游戏常量
+	 * @param upgradeData               升级数据
+	 * @param standardUpgradeEffectMeta  标准升级效果元数据
+	 */
 	public CUpgradeData(final CGameplayConstants gameplayConstants, final ObjectData upgradeData,
 			final DataTable standardUpgradeEffectMeta) {
 		this.gameplayConstants = gameplayConstants;
@@ -68,6 +77,12 @@ public class CUpgradeData {
 		this.standardUpgradeEffectMeta = standardUpgradeEffectMeta;
 	}
 
+	/**
+	 * 根据类型 ID 获取升级类型
+	 *
+	 * @param typeId 类型 ID
+	 * @return CUpgradeType 实例
+	 */
 	public CUpgradeType getType(final War3ID typeId) {
 		final GameObject upgradeType = this.upgradeData.get(typeId);
 		if (upgradeType == null) {
@@ -76,6 +91,13 @@ public class CUpgradeData {
 		return getUpgradeTypeInstance(typeId, upgradeType);
 	}
 
+	/**
+	 * 获取升级类型实例
+	 *
+	 * @param typeId      类型 ID
+	 * @param upgradeType 升级类型对象
+	 * @return CUpgradeType 实例
+	 */
 	private CUpgradeType getUpgradeTypeInstance(final War3ID typeId, final GameObject upgradeType) {
 		CUpgradeType upgradeTypeInstance = this.idToType.get(typeId);
 		if (upgradeTypeInstance == null) {

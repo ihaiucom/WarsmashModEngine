@@ -12,47 +12,89 @@ import com.google.common.io.LittleEndianDataOutputStream;
  * war3map.w3i - the general map information file.
  */
 public class War3MapW3i {
+	// 版本号
 	private int version;
+	// 保存次数
 	private int saves;
+	// 编辑器版本号
 	private int editorVersion;
+	// 游戏主版本号
 	private int gameVersionMajor;
+	// 游戏次版本号
 	private int gameVersionMinor;
+	// 游戏补丁版本号
 	private int gameVersionPatch;
+	// 游戏构建版本号
 	private int gameVersionBuild;
+	// 地图名称
 	private String name;
+	// 地图作者
 	private String author;
+	// 地图描述
 	private String description;
+	// 推荐玩家数
 	private String recommendedPlayers;
+	// 相机边界数组，用于定义游戏中的相机移动范围
 	private final float[] cameraBounds = new float[8];
+	// 相机边界补充数组，可能与相机边界配合使用
 	private final int[] cameraBoundsComplements = new int[4];
+	// 可玩区域大小，定义地图的可玩区域尺寸
 	private final int[] playableSize = new int[2];
+	// 标志位，可能包含地图的各种属性和设置
 	private long flags;
+	// 地图使用的瓷砖集，默认为'A'
 	private char tileset = 'A';
+	// 战役背景
 	private int campaignBackground;
+	// 加载屏幕模型
 	private String loadingScreenModel;
+	// 加载屏幕文本
 	private String loadingScreenText;
+	// 加载屏幕标题
 	private String loadingScreenTitle;
+	// 加载屏幕副标题
 	private String loadingScreenSubtitle;
+	// 加载屏幕设置
 	private int loadingScreen;
+	// 序章屏幕模型
 	private String prologueScreenModel;
+	// 序章屏幕文本
 	private String prologueScreenText;
+	// 序章屏幕标题
 	private String prologueScreenTitle;
+	// 序章屏幕副标题
 	private String prologueScreenSubtitle;
+	// 是否使用地形雾效
 	private int useTerrainFog;
+	// 雾高度数组，定义雾的起始和结束高度
 	private final float[] fogHeight = new float[2];
+	// 雾密度
 	private float fogDensity;
+	// 雾颜色数组，定义雾的颜色
 	private final short[] fogColor = new short[4];
+	// 全局天气设置
 	private int globalWeather;
+	// 声音环境
 	private String soundEnvironment;
+	// 光照环境瓷砖集
 	private char lightEnvironmentTileset;
+	// 水面顶点颜色数组，定义水面的颜色
 	private final short[] waterVertexColor = new short[4];
+	// 未知属性，可能是Lua脚本相关的数据
 	private final short[] unknown2ProbablyLua = new short[4];
+	// 玩家列表
 	private final List<Player> players = new ArrayList<>();
+	// 势力列表
 	private final List<Force> forces = new ArrayList<>();
+	// 升级可用性变更列表
 	private final List<UpgradeAvailabilityChange> upgradeAvailabilityChanges = new ArrayList<>();
+	// 科技可用性变更列表
 	private final List<TechAvailabilityChange> techAvailabilityChanges = new ArrayList<>();
+	// 随机单位表列表
 	private final List<RandomUnitTable> randomUnitTables = new ArrayList<>();
+	// 随机物品表列表
 	private final List<RandomItemTable> randomItemTables = new ArrayList<>();
+
 
 	public War3MapW3i(final LittleEndianDataInputStream stream) throws IOException {
 		if (stream != null) {

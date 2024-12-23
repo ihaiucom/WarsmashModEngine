@@ -170,41 +170,55 @@ public class CDestructable extends CWidget {
 		}
 	}
 
-	// 检查对象是否可以被指定目标类型选中
+	// 重写方法，判断当前对象是否可以作为目标被攻击或使用技能
 	@Override
 	public boolean canBeTargetedBy(final CSimulation simulation, final CUnit source,
-			final EnumSet<CTargetType> targetsAllowed, AbilityTargetCheckReceiver<CWidget> receiver) {
+								   final EnumSet<CTargetType> targetsAllowed, AbilityTargetCheckReceiver<CWidget> receiver) {
+		// 检查目标类型是否全部包含在允许的目标类型中
 		if (targetsAllowed.containsAll(this.destType.getTargetedAs())) {
+			// 如果当前对象已死亡
 			if (isDead()) {
+				// 如果允许的目标类型中包含死亡单位
 				if (targetsAllowed.contains(CTargetType.DEAD)) {
-					return true;
+					return true; // 可以作为目标
 				}
+				// 否则，目标检查失败，返回错误信息
 				receiver.targetCheckFailed(CommandStringErrorKeys.TARGET_MUST_BE_LIVING);
 			} else {
+				// 如果当前对象未死亡，检查是否允许攻击活着的目标
 				if (!targetsAllowed.contains(CTargetType.DEAD) || targetsAllowed.contains(CTargetType.ALIVE)) {
-					return true;
+					return true; // 可以作为目标
 				}
+				// 否则，目标检查失败，返回错误信息
 				receiver.targetCheckFailed(CommandStringErrorKeys.SOMETHING_IS_BLOCKING_THAT_TREE_STUMP);
 			}
 		} else {
+			// 如果目标类型与允许的目标类型不匹配，检查具体是哪种类型不被允许
+			// 树木
 			if (this.destType.getTargetedAs().contains(CTargetType.TREE)
 					&& !targetsAllowed.contains(CTargetType.TREE)) {
 				receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_TREES);
+			// 碎片
 			} else if (this.destType.getTargetedAs().contains(CTargetType.DEBRIS)
 					&& !targetsAllowed.contains(CTargetType.DEBRIS)) {
 				receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_DEBRIS);
+			// 墙
 			} else if (this.destType.getTargetedAs().contains(CTargetType.WALL)
 					&& !targetsAllowed.contains(CTargetType.WALL)) {
 				receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_WALLS);
+			// 桥
 			} else if (this.destType.getTargetedAs().contains(CTargetType.BRIDGE)
 					&& !targetsAllowed.contains(CTargetType.BRIDGE)) {
 				receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_BRIDGES);
 			} else {
+				// 如果都不匹配，返回无法作为目标的错误信息
 				receiver.targetCheckFailed(CommandStringErrorKeys.UNABLE_TO_TARGET_THIS_UNIT);
 			}
 		}
+		// 默认返回false，表示不能作为目标
 		return false;
 	}
+
 
 	// 接受AbilityTargetVisitor的访问
 	@Override

@@ -15,7 +15,9 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.CSimulation;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.HandleIdAllocator;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.combat.CTargetType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.util.SimulationRenderController;
-
+/**
+ * 表示可破坏数据的类
+ */
 public class CDestructableData {
 	private static final String NAME = "Name"; // replaced from 'bnam'
 	private static final String HIT_POINT_MAXIMUM = "HP"; // replaced from 'bhps'
@@ -29,15 +31,31 @@ public class CDestructableData {
 
 	private static final String OCCLUSION_HEIGHT = "occH";
 
-	private final ObjectData unitData;
-	private final Map<War3ID, CDestructableType> unitIdToUnitType = new HashMap<>();
-	private final SimulationRenderController simulationRenderController;
+	private final ObjectData unitData; // 对象数据
+	private final Map<War3ID, CDestructableType> unitIdToUnitType = new HashMap<>(); // 单位ID到单位类型的映射
+	private final SimulationRenderController simulationRenderController; // 模拟渲染控制器
 
+	/**
+	 * CDestructableData构造函数
+	 * @param unitData 对象数据
+	 * @param simulationRenderController 模拟渲染控制器
+	 */
 	public CDestructableData(final ObjectData unitData, final SimulationRenderController simulationRenderController) {
 		this.unitData = unitData;
 		this.simulationRenderController = simulationRenderController;
 	}
 
+	/**
+	 * 创建可破坏对象
+	 * @param simulation 模拟
+	 * @param typeId 单位类型ID
+	 * @param x x坐标
+	 * @param y y坐标
+	 * @param handleIdAllocator 句柄ID分配器
+	 * @param pathingInstance 路径映射实例
+	 * @param pathingInstanceDeath 死亡路径映射实例
+	 * @return 创建的可破坏对象
+	 */
 	public CDestructable create(final CSimulation simulation, final War3ID typeId, final float x, final float y,
 			final HandleIdAllocator handleIdAllocator, final RemovablePathingMapInstance pathingInstance,
 			final RemovablePathingMapInstance pathingInstanceDeath) {
@@ -53,6 +71,12 @@ public class CDestructableData {
 		return destructable;
 	}
 
+	/**
+	 * 获取单位类型实例
+	 * @param typeId 单位类型ID
+	 * @param unitType 单位类型对象
+	 * @return 单位类型实例
+	 */
 	private CDestructableType getUnitTypeInstance(final War3ID typeId, final GameObject unitType) {
 		CDestructableType unitTypeInstance = this.unitIdToUnitType.get(typeId);
 		if (unitTypeInstance == null) {
@@ -75,6 +99,11 @@ public class CDestructableData {
 		return unitTypeInstance;
 	}
 
+	/**
+	 * 获取单位类型
+	 * @param rawcode 原始代码
+	 * @return 单位类型实例或null
+	 */
 	public CDestructableType getUnitType(final War3ID rawcode) {
 		final CDestructableType unitTypeInstance = this.unitIdToUnitType.get(rawcode);
 		if (unitTypeInstance != null) {

@@ -32,52 +32,96 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.abilities.generic.C
 
 public class RenderUnit implements RenderWidget {
 	// 单位 虚无 半透明 顶点颜色
+	// 定义一个半透明的青色常量
 	public static final Color ETHEREAL = new Color(0.75f, 1, 0.5f, 0.5f);
+	// 定义一个不透明的白色常量
 	public static final Color DEFAULT = new Color(1, 1, 1, 1);
+	// 定义一个四元数常量，用于临时存储旋转数据
 	public static final Quaternion tempQuat = new Quaternion();
-	private static final String RED = "red"; // replaced from 'uclr'
-	private static final String GREEN = "green"; // replaced from 'uclg'
-	private static final String BLUE = "blue"; // replaced from 'uclb'
-	private static final String MOVE_HEIGHT = "moveHeight"; // replaced from 'umvh'
-	private static final String ORIENTATION_INTERPOLATION = "orientInterp"; // replaced from 'uori'
-	public static final String ANIM_PROPS = "animProps"; // replaced from 'uani'
-	public static final String ATTACHMENT_ANIM_PROPS = "Attachmentanimprops"; // replaced from 'uaap'
-	private static final String BLEND_TIME = "blend"; // replaced from 'uble'
-	private static final String BUILD_SOUND_LABEL = "BuildingSoundLabel"; // replaced from 'ubsl'
-	private static final String UNIT_SELECT_HEIGHT = "selZ"; // replaced from 'uslz'
+
+	// 定义颜色常量的字符串表示，用于配置文件中的替换
+	private static final String RED = "red"; // 替换自 'uclr'
+	private static final String GREEN = "green"; // 替换自 'uclg'
+	private static final String BLUE = "blue"; // 替换自 'uclb'
+	// 定义移动高度的字符串表示，用于配置文件中的替换
+	private static final String MOVE_HEIGHT = "moveHeight"; // 替换自 'umvh'
+	// 定义方向插值的字符串表示，用于配置文件中的替换
+	private static final String ORIENTATION_INTERPOLATION = "orientInterp"; // 替换自 'uori'
+	// 定义动画属性的字符串表示，用于配置文件中的替换
+	public static final String ANIM_PROPS = "animProps"; // 替换自 'uani'
+	// 定义附件动画属性的字符串表示，用于配置文件中的替换
+	public static final String ATTACHMENT_ANIM_PROPS = "Attachmentanimprops"; // 替换自 'uaap'
+	// 定义混合时间的字符串表示，用于配置文件中的替换
+	private static final String BLEND_TIME = "blend"; // 替换自 'uble'
+	// 定义建筑声音标签的字符串表示，用于配置文件中的替换
+	private static final String BUILD_SOUND_LABEL = "BuildingSoundLabel"; // 替换自 'ubsl'
+	// 定义单位选择高度的字符串表示，用于配置文件中的替换
+	private static final String UNIT_SELECT_HEIGHT = "selZ"; // 替换自 'uslz'
+
+	// 定义一个浮点数组，用于存储堆叠高度
 	private static final float[] heapZ = new float[3];
+
+	// 实例化一个复杂的MDX模型实例
 	public MdxComplexInstance instance;
+	// 游戏对象行
 	public GameObject row;
+	// 存储单位位置的数组
 	public final float[] location = new float[3];
+	// 单位选择时的缩放比例
 	public float selectionScale;
+	// 单位的声音集
 	public UnitSoundset soundset;
+	// 单位的肖像模型
 	public MdxModel portraitModel;
+	// 玩家索引
 	public int playerIndex;
+	// 模拟单位实例
 	private final CUnit simulationUnit;
+	// 单位的阴影移动器
 	public SplatMover shadow;
+	// 建筑阴影实例
 	private BuildingShadow buildingShadowInstance;
+	// 选择圈移动器
 	public SplatMover selectionCircle;
+	// 选择预览高亮移动器
 	public SplatMover selectionPreviewHighlight;
 
+	// 单位面向的角度
 	private float facing;
 
+	// 单位是否在游泳
 	private boolean swimming;
+	// 单位是否在工作
 	private boolean working;
 
+	// 单位是否死亡，默认为否
 	private boolean dead = false;
 
+	// 单位动画监听器实现
 	private UnitAnimationListenerImpl unitAnimationListenerImpl;
+	// 方向插值实例
 	private OrientationInterpolation orientationInterpolation;
+	// 当前转向速度
 	private float currentTurnVelocity = 0;
+	// 上次单位响应结束的时间戳
 	public long lastUnitResponseEndTimeMillis;
+	// 单位是否成为尸体
 	private boolean corpse;
+	// 单位是否是骨骼尸体
 	private boolean boneCorpse;
+	// 单位是否是建筑
 	private boolean building;
+	// 渲染单位类型数据
 	private RenderUnitTypeData typeData;
+	// 特殊艺术模型
 	public MdxModel specialArtModel;
+	// 超级喷溅移动器
 	public SplatMover uberSplat;
+	// 选择高度
 	private float selectionHeight;
+	// 首选的选中替代渲染单位
 	private RenderUnit preferredSelectionReplacement;
+
 
 	public RenderUnit(final War3MapViewer map, final MdxModel model, final GameObject row, final float x, final float y,
 			final float z, final int playerIndex, final UnitSoundset soundset, final MdxModel portraitModel,
@@ -96,33 +140,51 @@ public class RenderUnit implements RenderWidget {
 			final MdxModel portraitModel, final CUnit simulationUnit, final RenderUnitTypeData typeData,
 			final MdxModel specialArtModel, final BuildingShadow buildingShadow, final float selectionCircleScaleFactor,
 			final float animationWalkSpeed, final float animationRunSpeed, final float scalingValue) {
+		// 设置角色的肖像模型
 		this.portraitModel = portraitModel;
+		// 设置角色的类型数据
 		this.typeData = typeData;
+		// 设置角色的特殊艺术模型
 		this.specialArtModel = specialArtModel;
+		// 如果存在建筑阴影实例，则移除它
 		if (this.buildingShadowInstance != null) {
 			this.buildingShadowInstance.remove();
 		}
+		// 更新建筑阴影实例
 		this.buildingShadowInstance = buildingShadow;
+		// 如果存在实例，则分离它
 		if (this.instance != null) {
 			this.instance.detach();
 		}
+		// 添加一个新的MdxComplexInstance实例
 		final MdxComplexInstance instance = (MdxComplexInstance) model.addInstance();
 
+		// 设置角色的位置
 		this.location[0] = x;
 		this.location[1] = y;
 		this.location[2] = z;
+		// 移动实例到新位置
 		instance.move(this.location);
+		// 获取角色的朝向
 		this.facing = simulationUnit.getFacing();
+		// 将朝向转换为弧度
 		final float angle = (float) Math.toRadians(this.facing);
-//		instance.localRotation.setFromAxisRad(RenderMathUtils.VEC3_UNIT_Z, angle);
+		// 旋转实例以匹配角色的朝向
 		instance.rotate(tempQuat.setFromAxisRad(RenderMathUtils.VEC3_UNIT_Z, angle));
+		// 设置玩家索引
 		this.playerIndex = playerIndex & 0xFFFF;
+		// 设置实例的队伍颜色
 		instance.setTeamColor(this.playerIndex);
+		// 设置实例的场景
 		instance.setScene(map.worldScene);
+		// 创建并设置单位动画监听器
 		this.unitAnimationListenerImpl = new UnitAnimationListenerImpl(instance, animationWalkSpeed, animationRunSpeed);
 		simulationUnit.setUnitAnimationListener(this.unitAnimationListenerImpl);
+		// 获取所需的动画名称
 		final String requiredAnimationNames = row.getFieldAsString(ANIM_PROPS, 0);
-		TokenLoop: for (final String animationName : requiredAnimationNames.split(",")) {
+		// 遍历动画名称，并为每个动画名称添加对应的次要标签
+		TokenLoop:
+		for (final String animationName : requiredAnimationNames.split(",")) {
 			final String upperCaseToken = animationName.toUpperCase();
 			for (final SecondaryTag secondaryTag : SecondaryTag.values()) {
 				if (upperCaseToken.equals(secondaryTag.name())) {
@@ -132,10 +194,13 @@ public class RenderUnit implements RenderWidget {
 			}
 		}
 
+		// 如果行数据不为空，则进行以下操作
 		if (row != null) {
+			// 更新堆叠Z值
 			heapZ[2] = simulationUnit.getFlyHeight();
+			// 调整位置Z值以包含堆叠高度
 			this.location[2] += heapZ[2];
-
+			// 移动实例到新的堆叠位置
 			instance.move(heapZ);
 			String red;
 			String green;
@@ -143,36 +208,52 @@ public class RenderUnit implements RenderWidget {
 			red = RED;
 			green = GREEN;
 			blue = BLUE;
-			instance.setVertexColor(new float[] { (row.getFieldAsInteger(red, 0)) / 255f,
-					(row.getFieldAsInteger(green, 0)) / 255f, (row.getFieldAsInteger(blue, 0)) / 255f });
+			// 设置实例的顶点颜色
+			instance.setVertexColor(new float[]{(row.getFieldAsInteger(red, 0)) / 255f,
+					(row.getFieldAsInteger(green, 0)) / 255f, (row.getFieldAsInteger(blue, 0)) / 255f});
+			// 设置实例的统一缩放
 			instance.uniformScale(scalingValue);
 
+			// 设置选择时的缩放比例
 			this.selectionScale = row.getFieldAsFloat(War3MapViewer.UNIT_SELECT_SCALE, 0) * selectionCircleScaleFactor;
+			// 设置选择时的高度
 			this.selectionHeight = row.getFieldAsFloat(UNIT_SELECT_HEIGHT, 0);
+			// 获取方向插值的序号
 			int orientationInterpolationOrdinal = row.getFieldAsInteger(ORIENTATION_INTERPOLATION, 0);
+			// 确保方向插值序号在有效范围内
 			if ((orientationInterpolationOrdinal < 0)
 					|| (orientationInterpolationOrdinal >= OrientationInterpolation.VALUES.length)) {
 				orientationInterpolationOrdinal = 0;
 			}
+			// 设置方向插值
 			this.orientationInterpolation = OrientationInterpolation.VALUES[orientationInterpolationOrdinal];
 
+			// 设置混合时间
 			final float blendTime = row.getFieldAsFloat(BLEND_TIME, 0);
 			instance.setBlendTime(blendTime * 1000.0f);
 		}
 
+		// 更新实例
 		this.instance = instance;
+		// 更新行数据
 		this.row = row;
+		// 设置音效集
 		this.soundset = soundset;
+		// 设置是否为建筑
 		this.building = simulationUnit.isBuilding();
 	}
 
+	// 定义一个方法，用于填充命令卡
 	public void populateCommandCard(final CSimulation game, final GameUI gameUI,
-			final CommandButtonListener commandButtonListener, final AbilityDataUI abilityDataUI,
-			final int subMenuOrderId, final boolean multiSelect, final int localPlayerIndex) {
+									final CommandButtonListener commandButtonListener, final AbilityDataUI abilityDataUI,
+									final int subMenuOrderId, final boolean multiSelect, final int localPlayerIndex) {
+		// 创建一个命令卡填充访问者实例，并重置其状态
 		final CommandCardPopulatingAbilityVisitor commandCardPopulatingVisitor = CommandCardPopulatingAbilityVisitor.INSTANCE
 				.reset(game, gameUI, this.simulationUnit, commandButtonListener, abilityDataUI, subMenuOrderId,
 						multiSelect, localPlayerIndex);
+		// 遍历模拟单元的所有能力
 		for (final CAbility ability : this.simulationUnit.getAbilities()) {
+			// 如果模拟单元没有暂停，或者能力是增益效果，或者是单一图标被动能力，则访问该能力
 			if (!this.simulationUnit.isPaused() || (ability instanceof CBuff)
 					|| (ability instanceof AbilityGenericSingleIconPassiveAbility)) {
 				ability.visit(commandCardPopulatingVisitor);
@@ -530,25 +611,41 @@ public class RenderUnit implements RenderWidget {
 		return this.unitAnimationListenerImpl.secondaryAnimationTags;
 	}
 
+	/**
+	 * 当单位的位置发生变化时调用此方法
+	 *
+	 * @param map 地图视图对象
+	 */
 	public void repositioned(final War3MapViewer map) {
+		// 获取单位之前的 X 坐标
 		final float prevX = this.location[0];
+		// 获取单位之前的 Y 坐标
 		final float prevY = this.location[1];
+		// 获取单位当前的 X 坐标
 		final float simulationX = this.simulationUnit.getX();
+		// 获取单位当前的 Y 坐标
 		final float simulationY = this.simulationUnit.getY();
+		// 计算单位在 X 方向上的位移
 		final float dx = simulationX - prevX;
+		// 计算单位在 Y 方向上的位移
 		final float dy = simulationY - prevY;
+		// 如果阴影对象存在，则移动阴影
 		if (this.shadow != null) {
 			this.shadow.move(dx, dy, map.terrain.centerOffset);
 		}
+		// 如果选择圆圈对象存在，则移动选择圆圈
 		if (this.selectionCircle != null) {
 			this.selectionCircle.move(dx, dy, map.terrain.centerOffset);
 		}
+		// 如果选择预览高亮对象存在，则移动选择预览高亮
 		if (this.selectionPreviewHighlight != null) {
 			this.selectionPreviewHighlight.move(dx, dy, map.terrain.centerOffset);
 		}
+		// 更新单位的当前位置
 		this.location[0] = this.simulationUnit.getX();
 		this.location[1] = this.simulationUnit.getY();
 	}
+
 
 	@Override
 	public MdxComplexInstance getInstance() {

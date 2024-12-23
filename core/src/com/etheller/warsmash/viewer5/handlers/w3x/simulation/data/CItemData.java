@@ -13,7 +13,9 @@ import com.etheller.warsmash.viewer5.handlers.w3x.simulation.CItem;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.CItemType;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.CSimulation;
 import com.etheller.warsmash.viewer5.handlers.w3x.simulation.item.CItemTypeJass;
-
+/**
+ * CItemData类用于管理物品数据和生成物品实例。
+ */
 public class CItemData {
 	private static final String ABILITY_LIST = "abilList"; // replaced from 'iabi'
 	private static final String COOLDOWN_GROUP = "cooldownID"; // replaced from 'icid'
@@ -51,6 +53,10 @@ public class CItemData {
 	private final Map<War3ID, CItemType> itemIdToItemType = new HashMap<>();
 	private final ObjectData itemData;
 
+	/**
+	 * CItemData的构造函数，初始化物品数据并构建随机选择列表。
+	 * @param itemData 物品数据
+	 */
 	public CItemData(final ObjectData itemData) {
 		this.itemData = itemData;
 		// TODO the below is a bit hacky, but needed to build the list of random choices
@@ -60,6 +66,15 @@ public class CItemData {
 		}
 	}
 
+	/**
+	 * 创建一个新的物品实例。
+	 * @param simulation 模拟器实例
+	 * @param typeId 物品类型ID
+	 * @param x 物品的X坐标
+	 * @param y 物品的Y坐标
+	 * @param handleId 物品的句柄ID
+	 * @return 创建的物品实例
+	 */
 	public CItem create(final CSimulation simulation, final War3ID typeId, final float x, final float y,
 			final int handleId) {
 		final GameObject itemType = this.itemData.get(typeId.asStringValue());
@@ -68,6 +83,11 @@ public class CItemData {
 		return new CItem(handleId, x, y, itemTypeInstance.getMaxLife(), typeId, itemTypeInstance);
 	}
 
+	/**
+	 * 根据物品类型ID获取物品类型。
+	 * @param typeId 物品类型ID
+	 * @return 物品类型实例，如果不存在则返回null
+	 */
 	public CItemType getItemType(final War3ID typeId) {
 		final GameObject itemType = this.itemData.get(typeId.asStringValue());
 		if (itemType == null) {
@@ -76,6 +96,12 @@ public class CItemData {
 		return getItemTypeInstance(typeId, itemType);
 	}
 
+	/**
+	 * 根据物品类型ID和GameObject获取物品类型实例。
+	 * @param typeId 物品类型ID
+	 * @param itemType GameObject类型的物品
+	 * @return 物品类型实例
+	 */
 	private CItemType getItemTypeInstance(final War3ID typeId, final GameObject itemType) {
 		CItemType itemTypeInstance = this.itemIdToItemType.get(typeId);
 		if (itemTypeInstance == null) {
@@ -162,6 +188,12 @@ public class CItemData {
 		return itemTypeInstance;
 	}
 
+	/**
+	 * 根据等级和随机数生成器选择随机物品。
+	 * @param level 物品等级
+	 * @param seededRandom 随机数生成器
+	 * @return 随机选择的物品ID，如果没有可选物品则返回null
+	 */
 	public War3ID chooseRandomItem(final int level, final Random seededRandom) {
 		final RandomItemSet randomItemSet = this.levelToRandomChoices.get(level);
 		if (randomItemSet == null) {
@@ -170,6 +202,13 @@ public class CItemData {
 		return randomItemSet.unclassifiedItems.get(seededRandom.nextInt(randomItemSet.unclassifiedItems.size()));
 	}
 
+	/**
+	 * 根据物品分类、等级和随机数生成器选择随机物品。
+	 * @param itemClass 物品分类
+	 * @param level 物品等级
+	 * @param seededRandom 随机数生成器
+	 * @return 随机选择的物品ID，如果没有可选物品则返回null
+	 */
 	public War3ID chooseRandomItem(final CItemTypeJass itemClass, final int level, final Random seededRandom) {
 		final RandomItemSet randomItemSet = this.levelToRandomChoices.get(level);
 		if (randomItemSet == null) {
@@ -185,8 +224,12 @@ public class CItemData {
 		return itemsOfClass.get(seededRandom.nextInt(itemsOfClass.size()));
 	}
 
+	/**
+	 * 随机物品集合的内部类，用于管理不同分类的物品。
+	 */
 	private static final class RandomItemSet {
 		private final List<War3ID> unclassifiedItems = new ArrayList<>();
 		private final Map<CItemTypeJass, List<War3ID>> classificationToItems = new HashMap<>();
 	}
 }
+

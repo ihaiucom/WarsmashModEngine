@@ -2520,22 +2520,26 @@ public class MenuUI {
 		}
 		return this.rootFrame.getSkinField(background);
 	}
-
+	// 定义一个私有的静态内部类 LoadingMap，用于处理地图加载相关的逻辑
 	private static final class LoadingMap {
 
-		private final War3MapViewer viewer;
-		private final War3Map map;
-		private final War3MapW3i mapInfo;
+		// 定义三个私有最终变量，分别用来存储地图查看器、地图对象和地图信息对象
+		private final War3MapViewer viewer; // 地图查看器
+		private final War3Map map; // 地图对象
+		private final War3MapW3i mapInfo; // 地图信息对象
 
+		// 定义一个私有的 MapLoader 变量，用来存储当前活跃的地图加载器
 		private MapLoader activeMapLoader = null;
 
+		// 构造函数，用于初始化 LoadingMap 类的实例
 		public LoadingMap(final War3MapViewer viewer, final War3Map map, final War3MapW3i mapInfo) {
-			this.viewer = viewer;
-			this.map = map;
-			this.mapInfo = mapInfo;
+			this.viewer = viewer; // 初始化地图查看器
+			this.map = map; // 初始化地图对象
+			this.mapInfo = mapInfo; // 初始化地图信息对象
 		}
 
 	}
+
 
 	private void stopMusic() {
 		if (this.currentMusics != null) {

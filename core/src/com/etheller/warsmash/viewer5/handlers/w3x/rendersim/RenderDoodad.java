@@ -123,31 +123,43 @@ public class RenderDoodad {
 
 	private byte lastFogStateColor;
 
+	// 更新雾效状态的方法，根据战争迷雾的状态来更新渲染对象的雾效
 	public void updateFog(final War3MapViewer war3MapViewer) {
+		// 获取战争迷雾对象
 		final CPlayerFogOfWar fogOfWar = war3MapViewer.getFogOfWar();
+		// 获取寻路网格对象
 		final PathingGrid pathingGrid = war3MapViewer.simulation.getPathingGrid();
+		// 计算当前物体在战争迷雾中的X索引
 		final int fogOfWarIndexX = pathingGrid.getFogOfWarIndexX(this.x);
+		// 计算当前物体在战争迷雾中的Y索引
 		final int fogOfWarIndexY = pathingGrid.getFogOfWarIndexY(this.y);
+		// 获取当前位置的战争迷雾状态
 		final byte state = fogOfWar.getState(fogOfWarIndexX, fogOfWarIndexY);
+		// 初始化新的雾效状态为掩蔽
 		CFogState newFogState = CFogState.MASKED;
+		// 根据战争迷雾状态更新新的雾效状态
 		if (state < 0) {
-			newFogState = CFogState.MASKED;
+			newFogState = CFogState.MASKED; // 完全掩蔽
+		} else if (state == 0) {
+			newFogState = CFogState.VISIBLE; // 可见
+		} else {
+			newFogState = CFogState.FOGGED; // 雾中
 		}
-		else if (state == 0) {
-			newFogState = CFogState.VISIBLE;
-		}
-		else {
-			newFogState = CFogState.FOGGED;
-		}
+		// 如果新的雾效状态与当前状态不同，则更新当前状态
 		if (newFogState != this.fogState) {
 			this.fogState = newFogState;
 		}
+		// 如果战争迷雾状态发生变化，则更新顶点颜色以反映新的雾效
 		if (state != this.lastFogStateColor) {
+			// 淡化视线颜色
 			this.lastFogStateColor = War3MapViewer.fadeLineOfSightColor(this.lastFogStateColor, state);
+			// 更新顶点颜色数组，应用新的雾效颜色
 			for (int i = 0; i < this.vertexColorBase.length; i++) {
 				VERTEX_COLOR_HEAP[i] = (this.vertexColorBase[i] * (255 - (this.lastFogStateColor & 0xFF))) / 255f;
 			}
+			// 设置实例的顶点颜色
 			((MdxComplexInstance) this.instance).setVertexColor(VERTEX_COLOR_HEAP);
 		}
 	}
+
 }

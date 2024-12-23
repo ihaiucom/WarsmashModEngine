@@ -352,32 +352,59 @@ public class CUnit extends CWidget {
 			final War3ID typeId, final float facing, final float mana, final int maximumLife, final float lifeRegen,
 			final int maximumMana, final int speed, final CUnitType unitType) {
 		super(handleId, x, y, life);
+		// 设置玩家索引
 		this.playerIndex = playerIndex;
+		// 设置单位类型ID
 		this.typeId = typeId;
+		// 设置面向方向
 		this.facing = facing;
+		// 设置当前法力值
 		this.mana = mana;
+		// 设置基础最大生命值
 		this.baseMaximumLife = maximumLife;
+		// 设置当前最大生命值
 		this.maximumLife = maximumLife;
+		// 设置生命恢复速率
 		this.lifeRegen = lifeRegen;
+		// 设置法力恢复速率，从单位类型获取
 		this.manaRegen = unitType.getManaRegen();
+		// 设置基础最大法力值
 		this.baseMaximumMana = maximumMana;
+		// 设置当前最大法力值
 		this.maximumMana = maximumMana;
+		// 设置移动速度
 		this.speed = speed;
+		// 设置飞行高度，从单位类型获取默认飞行高度
 		this.flyHeight = unitType.getDefaultFlyingHeight();
+		// 设置单位类型
 		this.unitType = unitType;
+		// 设置防御类型，从单位类型获取
 		this.defenseType = unitType.getDefenseType();
+		// 添加单位类型的所有分类
 		this.classifications.addAll(unitType.getClassifications());
+		// 设置获取范围，从单位类型获取默认获取范围
 		this.acquisitionRange = unitType.getDefaultAcquisitionRange();
+		// 判断是否为建筑
 		this.structure = unitType.isBuilding();
+		// 设置停止行为
 		this.stopBehavior = new CBehaviorStop(this);
+		// 设置默认行为为停止行为
 		this.defaultBehavior = this.stopBehavior;
+		// 判断是否可复活
 		this.raisable = unitType.isRaise();
+		// 判断是否衰减
 		this.decays = unitType.isDecay();
+		// 初始化非堆叠增益效果
 		initializeNonStackingBuffs();
+		// 初始化监听器列表
 		initializeListenerLists();
+		// 添加伤害前监听器，用于检查攻击准确性
 		addPreDamageListener(CUnitAttackPreDamageListenerPriority.ACCURACY, new CUnitDefaultAccuracyCheckListener());
+		// 创建攻击视野雾气修改器
 		this.attackFogMod = new CUnitAttackVisionFogModifier(this, playerIndex);
+		// 计算所有派生字段
 		computeAllDerivedFields();
+
 	}
 
 
@@ -395,47 +422,67 @@ public class CUnit extends CWidget {
 
 	}
 
+	// 该方法用于重新生成单位的寻路实例
 	public void regeneratePathingInstance(final CSimulation game, final BufferedImage buildingPathingPixelMap) {
+		// 获取单位当前的X坐标和Y坐标
 		float unitX = getX();
 		float unitY = getY();
+
+		// 将单位的坐标对齐到64的倍数上，这是因为寻路网格通常是64x64的
 		unitX = (float) Math.floor(unitX / 64f) * 64f;
 		unitY = (float) Math.floor(unitY / 64f) * 64f;
+
+		// 如果建筑寻路像素图的宽度的一半是奇数，则将单位的X坐标向右移动32个单位
 		if (((buildingPathingPixelMap.getWidth() / 2) % 2) == 1) {
 			unitX += 32f;
 		}
+
+		// 如果建筑寻路像素图的高度的一半是奇数，则将单位的Y坐标向下移动32个单位
 		if (((buildingPathingPixelMap.getHeight() / 2) % 2) == 1) {
 			unitY += 32f;
 		}
+
+		// 使用游戏中的寻路网格，将建筑寻路像素图作为可移除的寻路覆盖纹理绘制到指定坐标
 		this.pathingInstance = game.getPathingGrid().blitRemovablePathingOverlayTexture(unitX, unitY,
-				270 /* no rotation, face forward */, buildingPathingPixelMap);
+				270 /* 无旋转，面向前方 */, buildingPathingPixelMap);
+
+		// 更新单位的X坐标和Y坐标
 		setX(unitX);
 		setY(unitY);
 	}
 
+	// 获取生命回复加成值
 	public float getLifeRegenBonus() {
-		return this.lifeRegenBonus;
+		return this.lifeRegenBonus; // 返回当前生命回复加成值
 	}
 
+	// 设置生命回复强度加成，并重新计算派生字段
 	public void setLifeRegenStrengthBonus(final float lifeRegenStrengthBonus) {
-		this.lifeRegenStrengthBonus = lifeRegenStrengthBonus;
-		computeDerivedFields(NonStackingStatBuffType.HPGEN);
+		this.lifeRegenStrengthBonus = lifeRegenStrengthBonus; // 设置新的生命回复强度加成值
+		computeDerivedFields(NonStackingStatBuffType.HPGEN); // 重新计算与生命回复相关的派生字段
 	}
 
+	// 定义一个方法，用于给单位添加非堆叠的状态增益效果
 	public void addNonStackingStatBuff(final NonStackingStatBuff buff) {
+		// TODO #如果buff的类型是ALLATK 所有攻击 (近战攻击和远程攻击)
 		if (buff.getBuffType() == NonStackingStatBuffType.ALLATK) {
+			// 获取近战攻击的非堆叠状态buff映射
 			Map<String, List<NonStackingStatBuff>> buffKeyMap = this.nonStackingBuffs
 					.get(NonStackingStatBuffType.MELEEATK);
+			// 如果映射不存在，则创建一个新的映射并放入nonStackingBuffs中
 			if (buffKeyMap == null) {
 				buffKeyMap = new HashMap<>();
 				this.nonStackingBuffs.put(NonStackingStatBuffType.MELEEATK, buffKeyMap);
 			}
+			// 获取当前buff的堆叠键对应的buff列表
 			List<NonStackingStatBuff> theList = buffKeyMap.get(buff.getStackingKey());
+			// 如果列表不存在，则创建一个新的列表并放入映射中
 			if (theList == null) {
 				theList = new ArrayList<>();
 				buffKeyMap.put(buff.getStackingKey(), theList);
 			}
-			theList.add(buff);
 
+			// 重复上述步骤，但这次是为了远程攻击的非堆叠状态buff映射
 			buffKeyMap = this.nonStackingBuffs.get(NonStackingStatBuffType.RNGDATK);
 			if (buffKeyMap == null) {
 				buffKeyMap = new HashMap<>();
@@ -446,8 +493,12 @@ public class CUnit extends CWidget {
 				theList = new ArrayList<>();
 				buffKeyMap.put(buff.getStackingKey(), theList);
 			}
+
+			// 将当前的buff添加到列表中
 			theList.add(buff);
 		}
+
+		// TODO #攻击百分比
 		else if (buff.getBuffType() == NonStackingStatBuffType.ALLATKPCT) {
 			Map<String, List<NonStackingStatBuff>> buffKeyMap = this.nonStackingBuffs
 					.get(NonStackingStatBuffType.MELEEATKPCT);
@@ -474,6 +525,7 @@ public class CUnit extends CWidget {
 			}
 			theList.add(buff);
 		}
+		// TODO #其他类型的buff
 		else {
 			Map<String, List<NonStackingStatBuff>> buffKeyMap = this.nonStackingBuffs.get(buff.getBuffType());
 			if (buffKeyMap == null) {
@@ -490,6 +542,7 @@ public class CUnit extends CWidget {
 		computeDerivedFields(buff.getBuffType());
 	}
 
+	// 从单位的非堆叠状态增益效果映射中移除指定的非堆叠状态增益效果
 	public void removeNonStackingStatBuff(final NonStackingStatBuff buff) {
 		if (buff.getBuffType() == NonStackingStatBuffType.ALLATK) {
 			Map<String, List<NonStackingStatBuff>> buffKeyMap = this.nonStackingBuffs
@@ -548,6 +601,7 @@ public class CUnit extends CWidget {
 		}
 		computeDerivedFields(buff.getBuffType());
 	}
+
 	/**
 	 * 向状态修改增益列表中添加一个新的监听器。
 	 * 如果列表中不包含该监听器，则将其添加到列表的开头。
@@ -1446,80 +1500,151 @@ public class CUnit extends CWidget {
 		}
 	}
 
+	/**
+	 * 为指定单位添加一个非堆叠的法术效果
+	 *
+	 * @param game        游戏模拟对象
+	 * @param stackingKey 堆叠键，用于标识法术效果的类型
+	 * @param id          法术效果的 ID
+	 * @param target      法术效果的目标类型
+	 * @return 返回新添加的非堆叠法术效果对象
+	 */
 	public NonStackingFx addNonStackingFx(final CSimulation game, final String stackingKey, final War3ID id,
-			final CEffectType target) {
+										  final CEffectType target) {
+		// 获取指定堆叠键的现有法术效果列表
 		List<NonStackingFx> existingArts = this.nonStackingFx.get(stackingKey);
+		// 创建一个新的非堆叠法术效果对象
 		final NonStackingFx newFx = new NonStackingFx(stackingKey, id);
+		// 如果现有法术效果列表为空
 		if (existingArts == null) {
+			// 创建一个新的列表
 			existingArts = new ArrayList<>();
+			// 将新列表添加到非堆叠法术效果映射中
 			this.nonStackingFx.put(stackingKey, existingArts);
 		}
+		// 如果现有法术效果列表为空
 		if (existingArts.isEmpty()) {
+			// 在游戏中为单位创建一个持久的法术效果
 			final SimulationRenderComponent fx = game.createPersistentSpellEffectOnUnit(this, id, target);
+			// 将新创建的法术效果设置为新法术效果对象的艺术效果
 			newFx.setArt(fx);
 		}
+		// 如果现有法术效果列表不为空
 		else {
+			// 将现有法术效果列表中的第一个法术效果设置为新法术效果对象的艺术效果
 			newFx.setArt(existingArts.iterator().next().getArt());
 		}
+		// 将新法术效果对象添加到现有法术效果列表中
 		existingArts.add(newFx);
+		// 返回新添加的非堆叠法术效果对象
 		return newFx;
 	}
 
+	/**
+	 * 移除指定单位的非堆叠法术效果
+	 *
+	 * @param game 游戏模拟对象
+	 * @param fx   要移除的非堆叠法术效果对象
+	 */
 	public void removeNonStackingFx(final CSimulation game, final NonStackingFx fx) {
+		// 获取指定堆叠键的现有法术效果列表
 		final List<NonStackingFx> existingArts = this.nonStackingFx.get(fx.getStackingKey());
+		// 如果现有法术效果列表不为空
 		if (existingArts != null) {
+			// 从现有法术效果列表中移除指定的法术效果对象
 			existingArts.remove(fx);
+			// 如果现有法术效果列表为空
 			if (existingArts.isEmpty()) {
+				// 移除法术效果的艺术表现
 				fx.getArt().remove();
 			}
 		}
 	}
 
+	/**
+	 * 为指定单位添加一个非堆叠的显示 buff
+	 *
+	 * @param game        游戏模拟对象
+	 * @param stackingKey 堆叠键，用于标识 buff 的类型
+	 * @param buff        要添加的 buff 对象
+	 */
 	public void addNonStackingDisplayBuff(final CSimulation game, final String stackingKey, final CBuff buff) {
+		// 获取指定堆叠键的现有 buff 列表
 		List<CBuff> existingBuffs = this.nonStackingDisplayBuffs.get(stackingKey);
+		// 如果现有 buff 列表为空
 		if (existingBuffs == null) {
+			// 创建一个新的列表
 			existingBuffs = new ArrayList<>();
+			// 将新列表添加到非堆叠显示 buff 映射中
 			this.nonStackingDisplayBuffs.put(stackingKey, existingBuffs);
 		}
+		// 如果现有 buff 列表为空
 		if (existingBuffs.isEmpty()) {
+			// 在游戏中为单位添加 buff
 			this.add(game, buff);
 		}
+		// 如果现有 buff 列表不为空
 		else {
+			// 获取单位当前的 buff，其类型与要添加的 buff 相同
 			final CBuff currentBuff = this.getFirstAbilityOfType(buff.getClass());
+			// 如果当前 buff 不存在
 			if (currentBuff == null) {
+				// 清空现有 buff 列表
 				existingBuffs.clear();
+				// 在游戏中为单位添加新 buff
 				this.add(game, buff);
 			}
+			// 如果当前 buff 存在
 			else {
+				// 如果新 buff 的等级大于或等于当前 buff 的等级
 				if (buff.getLevel() >= currentBuff.getLevel()) {
+					// 从游戏中移除当前 buff
 					this.remove(game, currentBuff);
+					// 在游戏中添加新 buff
 					this.add(game, buff);
 				}
-
 			}
 		}
+		// 将新 buff 添加到现有 buff 列表中
 		existingBuffs.add(buff);
 	}
 
+	/**
+	 * 移除指定单位的非堆叠显示 buff
+	 *
+	 * @param game        游戏模拟对象
+	 * @param stackingKey 堆叠键，用于标识 buff 的类型
+	 * @param buff        要移除的 buff 对象
+	 */
 	public void removeNonStackingDisplayBuff(final CSimulation game, final String stackingKey, final CBuff buff) {
+		// 获取指定堆叠键的现有 buff 列表
 		final List<CBuff> existingBuffs = this.nonStackingDisplayBuffs.get(stackingKey);
+		// 如果现有 buff 列表不为空
 		if (existingBuffs != null) {
+			// 从现有 buff 列表中移除指定的 buff 对象
 			existingBuffs.remove(buff);
+			// 获取单位当前的 buff，其类型与要移除的 buff 相同
 			CBuff currentBuff = this.getFirstAbilityOfType(buff.getClass());
+			// 如果当前 buff 是要移除的 buff
 			if (currentBuff == buff) {
+				// 从游戏中移除当前 buff
 				this.remove(game, currentBuff);
+				// 如果现有 buff 列表不为空
 				if (!existingBuffs.isEmpty()) {
 					currentBuff = null;
+					// 遍历现有 buff 列表，找到等级最高的 buff
 					for (final CBuff iterBuff : existingBuffs) {
 						if ((currentBuff == null) || (currentBuff.getLevel() < iterBuff.getLevel())) {
 							currentBuff = iterBuff;
 						}
 					}
+					// 在游戏中添加找到的等级最高的 buff
 					this.add(game, currentBuff);
 				}
 			}
 		}
 	}
+
 
 	private void initializeNonStackingBuffs() {
 		this.nonStackingBuffs.put(NonStackingStatBuffType.ATKSPD, new HashMap<>(1));
